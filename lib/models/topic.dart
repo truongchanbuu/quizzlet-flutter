@@ -1,4 +1,4 @@
-import 'package:quizzlet_fluttter/models/user.dart';
+import 'package:quizzlet_fluttter/features/auth/domain/entities/user.dart';
 
 class Topic {
   final String id;
@@ -6,7 +6,7 @@ class Topic {
   final bool isPublic;
   final String? folderId;
   final DateTime createdAt;
-  final User? createdBy;
+  final UserEntity? createdBy;
 
   Topic({
     required this.id,

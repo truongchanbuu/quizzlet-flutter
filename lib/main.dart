@@ -1,26 +1,41 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:quizzlet_fluttter/uis/common/app_bar.dart';
-import 'package:quizzlet_fluttter/uis/home/home_page.dart';
+import 'package:get_it/get_it.dart';
+import 'package:quizzlet_fluttter/config/theme/app_themes.dart';
+import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/welcome_page.dart';
+import 'package:quizzlet_fluttter/firebase_options.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await initializaDependencies();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final userRepo = GetIt.instance.get<UserRepository>();
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Quizzlet',
+      theme: theme(),
       home: SafeArea(
-        child: Scaffold(
-          appBar: QuizzletAppBar(
-            title: '0 / 0',
-          ),
-          body: HomePage(),
+        child: WelcomePage(
+          userRepository: userRepo,
         ),
       ),
     );
+  }
+
+  // Build UI methods
+  _buildAppBar() {
+    return AppBar();
   }
 }
