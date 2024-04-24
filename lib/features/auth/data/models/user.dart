@@ -6,7 +6,6 @@ part 'user.g.dart';
 @JsonSerializable()
 class UserModel extends UserEntity {
   const UserModel({
-    required super.id,
     required super.email,
     required super.password,
     super.username,
@@ -16,7 +15,6 @@ class UserModel extends UserEntity {
 
   UserEntity toEntity() {
     return UserEntity(
-      id: id,
       email: email,
       password: password,
       username: username,
@@ -27,7 +25,6 @@ class UserModel extends UserEntity {
 
   factory UserModel.fromEntity(UserEntity entity) {
     return UserModel(
-      id: entity.id,
       email: entity.email,
       password: entity.password,
       username: entity.username,
@@ -45,7 +42,6 @@ class UserModel extends UserEntity {
     String? avatarUrl,
   }) {
     return UserModel(
-      id: id ?? this.id,
       email: email ?? this.email,
       password: password ?? this.password,
       username: username ?? this.username,

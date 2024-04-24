@@ -33,7 +33,6 @@ class UserRepositoryImpl implements UserRepository {
       }
 
       final user = UserModel(
-        id: credential.user!.uid,
         email: email,
         password: password,
       );
@@ -170,7 +169,7 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<DataState<void>> setUserData(UserModel user) async {
     try {
-      await userCollection.doc(user.id).set(user.toJson());
+      await userCollection.doc(user.email).set(user.toJson());
       return const DataSuccess();
     } catch (e) {
       log(e.toString());
@@ -184,9 +183,9 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<DataState<UserModel>> getUserData(String uid) async {
+  Future<DataState<UserModel>> getUserData(String email) async {
     try {
-      var data = (await userCollection.doc(uid).get()).data();
+      var data = (await userCollection.doc(email).get()).data();
       UserModel user = UserModel.fromJson(data!);
 
       return DataSuccess(data: user);

@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
 import 'package:sign_in_button/sign_in_button.dart';
@@ -73,6 +74,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     TextFormField(
                       validator: _validateEmail,
                       onSaved: (newValue) => email = newValue,
+                      onChanged: (value) => email = value,
                       decoration: const InputDecoration(
                         labelText: 'ĐỊA CHỈ EMAIL',
                         hintText: 'abc@example.com',
@@ -86,6 +88,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     TextFormField(
                       validator: _validateName,
                       onSaved: (newValue) => userName = newValue,
+                      onChanged: (value) => userName = value,
                       decoration: const InputDecoration(
                         labelText: 'TÊN NGƯỜI DÙNG',
                         border: OutlineInputBorder(),
@@ -97,6 +100,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     TextFormField(
                       validator: _validatePassword,
                       onSaved: (newValue) => password = newValue,
+                      onChanged: (value) => password = value,
                       obscureText: _isHiddenPassword,
                       decoration: InputDecoration(
                         labelText: 'MẬT KHẨU',
@@ -116,6 +120,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     TextFormField(
                       validator: _validateConfirmedPassword,
                       onSaved: (newValue) => confirmedPassword = newValue,
+                      onChanged: (value) => confirmedPassword = value,
                       obscureText: _isHiddenConfirmPassword,
                       decoration: InputDecoration(
                         labelText: 'XÁC NHẬN MẬT KHẨU',
@@ -274,7 +279,7 @@ class _SignUpPageState extends State<SignUpPage> {
       return 'EMAIL KHÔNG ĐƯỢC ĐỂ TRỐNG';
     }
 
-    if (EmailValidator.validate(email!)) {
+    if (!EmailValidator.validate(email!)) {
       return 'EMAIL NÀY KHÔNG HỢP LỆ';
     }
 
