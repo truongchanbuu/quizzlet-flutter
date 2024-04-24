@@ -12,7 +12,20 @@
           "package_name": "com.example.quizzlet_fluttter"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "636054365584-6tslttgmhekar89419mjeu404lp9t92k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.quizzlet_fluttter",
+            "certificate_hash": "2beacb5d38638db7163d6b03028ffb2985a04d23"
+          }
+        },
+        {
+          "client_id": "636054365584-m1b19monh4bnrn297nsnpt94kepo1srq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBrmVltZCeT1mo5TuGUrcg2-asZ7eceAXI"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "636054365584-m1b19monh4bnrn297nsnpt94kepo1srq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "636054365584-cmen51oh9pg9rmicish2tiqsfrg8715j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.quizzletFluttter"
+              }
+            }
+          ]
         }
       }
     }

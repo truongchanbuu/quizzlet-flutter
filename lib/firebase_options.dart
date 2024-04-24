@@ -67,6 +67,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '636054365584',
     projectId: 'quizzlet-flutter-458c5',
     storageBucket: 'quizzlet-flutter-458c5.appspot.com',
+    androidClientId: '636054365584-6tslttgmhekar89419mjeu404lp9t92k.apps.googleusercontent.com',
+    iosClientId: '636054365584-cmen51oh9pg9rmicish2tiqsfrg8715j.apps.googleusercontent.com',
     iosBundleId: 'com.example.quizzletFluttter',
   );
 
@@ -76,6 +78,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '636054365584',
     projectId: 'quizzlet-flutter-458c5',
     storageBucket: 'quizzlet-flutter-458c5.appspot.com',
+    androidClientId: '636054365584-6tslttgmhekar89419mjeu404lp9t92k.apps.googleusercontent.com',
+    iosClientId: '636054365584-mrbephsb4eoip5k405us0tk1lkbr1b82.apps.googleusercontent.com',
     iosBundleId: 'com.example.quizzletFluttter.RunnerTests',
   );
 }

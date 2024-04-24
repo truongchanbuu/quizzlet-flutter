@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:quizzlet_fluttter/features/auth/data/data_source/remote/user_api_service.dart';
 import 'package:quizzlet_fluttter/features/auth/data/repository/user_repository_impl.dart';

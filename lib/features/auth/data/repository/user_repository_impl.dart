@@ -182,4 +182,22 @@ class UserRepositoryImpl implements UserRepository {
       );
     }
   }
+
+  @override
+  Future<DataState<UserModel>> getUserData(String uid) async {
+    try {
+      var data = (await userCollection.doc(uid).get()).data();
+      UserModel user = UserModel.fromJson(data!);
+
+      return DataSuccess(data: user);
+    } catch (e) {
+      log(e.toString());
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e,
+        ),
+      );
+    }
+  }
 }

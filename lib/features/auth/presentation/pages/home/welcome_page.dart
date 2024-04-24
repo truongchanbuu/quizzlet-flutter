@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_state.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/signup_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/homepage.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -89,81 +90,49 @@ class _WelcomePageState extends State<WelcomePage> {
 
           return Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                _buildSlider(introductionItems),
-                const SizedBox(height: 15),
-                // Cần cách nhau ra thật xa
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: const TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Bằng việc đăng ký, tôi chấp thuận ',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildSlider(introductionItems),
+                  const SizedBox(height: 20),
+                  _buildIntroText(introductionItems[_activeIndex]['content']!),
+                  const SizedBox(height: 30),
+                  _buildIndicator(introductionItems.length),
+                  const SizedBox(height: 30),
+                  _buildPolicyAlertText(),
+                  const SizedBox(height: 15),
+                  ElevatedButton(
+                    onPressed: _navigateToSignUpPage,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      backgroundColor: Colors.indigo,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      TextSpan(
-                        text: 'Điều khoản dịch vụ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
+                    ),
+                    child: const Text(
+                      'Đăng ký miễn phí',
+                      style: TextStyle(
+                        color: Colors.white,
                       ),
-                      TextSpan(
-                        text: ' và ',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'Chính sách quyền riêng tư',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' của Quizzlet',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    backgroundColor: Colors.indigo,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  child: const Text(
-                    'Đăng ký miễn phí',
-                    style: TextStyle(
-                      color: Colors.white,
+                  const SizedBox(height: 15),
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      backgroundColor: Colors.grey.shade100,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    child: const Text(
+                      'Hoặc đăng nhập',
                     ),
                   ),
-                ),
-                const SizedBox(height: 15),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                  child: const Text(
-                    'Hoặc đăng nhập',
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -173,47 +142,106 @@ class _WelcomePageState extends State<WelcomePage> {
 
   _buildSlider(List<Map<String, dynamic>> items) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height / 2,
-      child: Column(
-        children: [
-          CarouselSlider(
-            carouselController: carouseController,
-            items: items
-                .map(
-                  (item) => Image.asset(
-                    item['image']!,
-                    semanticLabel: item['content'],
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        _buildErrorImageWidget(error.toString()),
-                  ),
-                )
-                .toList(),
-            options: CarouselOptions(
-              onPageChanged: (index, reason) =>
-                  setState(() => _activeIndex = index),
-              initialPage: 0,
-              enableInfiniteScroll: false,
-              autoPlay: false,
-              viewportFraction: 1,
-              scrollDirection: Axis.horizontal,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            items[_activeIndex]['content'],
+      height: MediaQuery.of(context).size.height / 3,
+      child: CarouselSlider(
+        carouselController: carouseController,
+        items: items
+            .map(
+              (item) => Image.asset(
+                item['image']!,
+                semanticLabel: item['content'],
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildErrorImageWidget(error.toString()),
+              ),
+            )
+            .toList(),
+        options: CarouselOptions(
+          onPageChanged: (index, reason) =>
+              setState(() => _activeIndex = index),
+          initialPage: 0,
+          enableInfiniteScroll: true,
+          autoPlay: true,
+          viewportFraction: 1,
+          scrollDirection: Axis.horizontal,
+        ),
+      ),
+    );
+  }
+
+  _buildIndicator(count) {
+    return AnimatedSmoothIndicator(
+      activeIndex: _activeIndex,
+      count: count,
+      onDotClicked: (page) {
+        setState(() => _activeIndex = page);
+        carouseController.animateToPage(page);
+      },
+    );
+  }
+
+  _buildIntroText(String text) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        var height = MediaQuery.of(context).size.height;
+
+        if (constraints.minHeight <= 640) {
+          height = height / 5;
+        }
+
+        return SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: height,
+          child: Text(
+            text,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 30),
-          AnimatedSmoothIndicator(
-            activeIndex: _activeIndex,
-            count: items.length,
-            onDotClicked: (index) => carouseController.animateToPage(index),
+        );
+      },
+    );
+  }
+
+  _buildPolicyAlertText() {
+    return RichText(
+      textAlign: TextAlign.center,
+      text: const TextSpan(
+        children: [
+          TextSpan(
+            text: 'Bằng việc đăng ký, tôi chấp thuận ',
+            style: TextStyle(
+              color: Colors.black,
+            ),
           ),
+          TextSpan(
+            text: 'Điều khoản dịch vụ',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          TextSpan(
+            text: ' và ',
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+          TextSpan(
+            text: 'Chính sách quyền riêng tư',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          TextSpan(
+            text: ' của Quizzlet',
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          )
         ],
       ),
     );
@@ -228,6 +256,18 @@ class _WelcomePageState extends State<WelcomePage> {
         const SizedBox(height: 10),
         Text(errorMessage),
       ],
+    );
+  }
+
+  // Navigation methods
+  _navigateToSignUpPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SignUpPage(
+          userRepository: widget.userRepository,
+        ),
+        settings: const RouteSettings(name: '/account/sign-up'),
+      ),
     );
   }
 }

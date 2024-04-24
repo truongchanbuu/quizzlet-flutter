@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/entities/user.dart';
 

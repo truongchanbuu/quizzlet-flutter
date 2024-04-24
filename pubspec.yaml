@@ -43,21 +43,23 @@ dependencies:
   dio: ^5.4.3+1
   json_annotation: ^4.8.1
   retrofit: ^4.1.0
+  cloud_firestore: ^4.17.0
+  firebase_auth: ^4.19.2
+  firebase_core: ^2.30.0
+  google_sign_in: ^6.2.1
 
   # Util
   equatable: ^2.0.5
   intl: ^0.18.1
   bloc: ^8.1.4
   get_it: ^7.7.0
-  
-  cloud_firestore: ^4.17.0
-  firebase_auth: ^4.19.2
-  firebase_core: ^2.30.0
-  google_sign_in: ^6.2.1
-  firebase_ui_auth: ^1.13.1
+  email_validator: ^2.1.17
+
+  # UI
   carousel_slider: ^4.2.1
   cached_network_image: ^3.3.1
   smooth_page_indicator: ^1.1.0
+  sign_in_button: ^3.2.0
 
 dev_dependencies:
   flutter_test:
