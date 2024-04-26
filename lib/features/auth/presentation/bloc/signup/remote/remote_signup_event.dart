@@ -13,8 +13,8 @@ final class SubmitSignUp extends SignUpEvent {
   const SubmitSignUp(this.user);
 }
 
-final class InputtingSignUp extends SignUpEvent {
+final class ValidatingInput extends SignUpEvent {
   final String email;
 
-  const InputtingSignUp(this.email);
+  const ValidatingInput(this.email);
 }

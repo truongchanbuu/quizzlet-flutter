@@ -185,12 +185,15 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<DataState<UserModel>> getUserData(String email) async {
     try {
-      var data = (await userCollection.doc(email).get()).data();
-      UserModel user = UserModel.fromJson(data!);
-
-      return DataSuccess(data: user);
+      var docSnapshot = await userCollection.doc(email).get();
+      if (docSnapshot.exists) {
+        UserModel user = UserModel.fromJson(docSnapshot.data()!);
+        return DataSuccess(data: user);
+      }
+      
+      return const DataSuccess(data: null);
     } catch (e) {
-      log(e.toString());
+      log('There is something wrong: ${e.toString()}');
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),

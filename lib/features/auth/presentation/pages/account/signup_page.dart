@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/common/common.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -18,13 +19,20 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   bool _isHiddenPassword = true;
   bool _isHiddenConfirmPassword = true;
+
+  // Info
   String? email;
   String? userName;
   String? password;
   String? confirmedPassword;
   DateTime? userBirthday;
+
+  // Controllers
   late final TextEditingController dateController;
   late final GlobalKey<FormState> _formKey;
+
+  // Error messages
+  String? emailErrorMessage;
 
   @override
   void initState() {
@@ -57,6 +65,32 @@ class _SignUpPageState extends State<SignUpPage> {
       create: (context) => SignUpBloc(widget.userRepository),
       child: BlocBuilder<SignUpBloc, SignUpState>(
         builder: (context, state) {
+          if (state.status == SignUpStatus.unvalidated) {
+            emailErrorMessage = "EMAIL NÀY ĐÃ ĐƯỢC SỬ DỤNG";
+          }
+
+          // if (state.status == SignUpStatus.failed) {
+          //   AwesomeDialog(
+          //     context: context,
+          //     dialogType: DialogType.error,
+          //     animType: AnimType.leftSlide,
+          //     title: 'Sign up failed',
+          //     desc: 'There is something wrong',
+          //     btnCancelOnPress: () {},
+          //     btnOkOnPress: () {},
+          //   ).show();
+          // } else if (state.status == SignUpStatus.success) {
+          //   AwesomeDialog(
+          //     context: context,
+          //     dialogType: DialogType.success,
+          //     animType: AnimType.leftSlide,
+          //     title: 'Sign up success',
+          //     desc: 'YEAH',
+          //     btnCancelOnPress: () {},
+          //     btnOkOnPress: () {},
+          //   ).show();
+          // }
+
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -72,14 +106,15 @@ class _SignUpPageState extends State<SignUpPage> {
                     const Text('HOẶC ĐĂNG KÝ BẰNG EMAIL'),
                     const SizedBox(height: 10),
                     TextFormField(
-                      validator: _validateEmail,
+                      validator: (email) => _validateEmail(context, email),
                       onSaved: (newValue) => email = newValue,
                       onChanged: (value) => email = value,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'ĐỊA CHỈ EMAIL',
                         hintText: 'abc@example.com',
-                        hintStyle: TextStyle(color: Colors.grey),
-                        border: OutlineInputBorder(),
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        border: const OutlineInputBorder(),
+                        errorText: emailErrorMessage,
                       ),
                       textInputAction: TextInputAction.next,
                       keyboardType: TextInputType.emailAddress,
@@ -140,14 +175,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     TextFormField(
                       controller: dateController,
                       validator: _validateBirthday,
-                      onTap: () async {
-                        userBirthday = await _showDatePicker();
-
-                        if (userBirthday != null) {
-                          dateController.text =
-                              DateFormat('dd-MM-yyyy').format(userBirthday!);
-                        }
-                      },
+                      onTap: _handleUserBirthday,
                       decoration: const InputDecoration(
                         labelText: 'NGÀY THÁNG NĂM SINH',
                         hintText: 'DD-MM-YYYY',
@@ -160,7 +188,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 15),
                     TextButton(
-                      onPressed: _submitSignUpForm,
+                      onPressed: () => _submitSignUpForm(context),
                       style: TextButton.styleFrom(
                         minimumSize: const Size.fromHeight(50),
                         shape: const RoundedRectangleBorder(),
@@ -174,7 +202,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    _buildPolicyAlertText(),
+                    buildPolicyAlertText(),
                   ],
                 ),
               ),
@@ -213,55 +241,17 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  _buildPolicyAlertText() {
-    return RichText(
-      textAlign: TextAlign.center,
-      text: const TextSpan(
-        children: [
-          TextSpan(
-            text: 'Bằng việc đăng ký, tôi chấp thuận ',
-            style: TextStyle(
-              color: Colors.black,
-            ),
-          ),
-          TextSpan(
-            text: 'Điều khoản dịch vụ',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          TextSpan(
-            text: ' và ',
-            style: TextStyle(
-              color: Colors.black,
-            ),
-          ),
-          TextSpan(
-            text: 'Chính sách quyền riêng tư',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          TextSpan(
-            text: ' của Quizzlet',
-            style: TextStyle(
-              color: Colors.black,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Future<DateTime?> _showDatePicker() async {
-    return await showDatePicker(
+  Future<void> _handleUserBirthday() async {
+    userBirthday = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1920, 1, 1),
       lastDate: DateTime.now(),
     );
+
+    if (userBirthday != null) {
+      dateController.text = DateFormat('dd-MM-yyyy').format(userBirthday!);
+    }
   }
 
   // State methods
@@ -274,7 +264,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   // Handle data
-  String? _validateEmail(String? email) {
+  String? _validateEmail(BuildContext context, String? email) {
     if (email?.isEmpty ?? true) {
       return 'EMAIL KHÔNG ĐƯỢC ĐỂ TRỐNG';
     }
@@ -282,6 +272,8 @@ class _SignUpPageState extends State<SignUpPage> {
     if (!EmailValidator.validate(email!)) {
       return 'EMAIL NÀY KHÔNG HỢP LỆ';
     }
+
+    context.read<SignUpBloc>().add(ValidatingInput(email));
 
     return null;
   }
@@ -325,9 +317,17 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
   }
 
-  _submitSignUpForm() {
+  _submitSignUpForm(BuildContext context) {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
+
+      UserModel user = UserModel(
+        email: email!,
+        password: password!,
+        dateOfBirth: userBirthday,
+        username: userName,
+      );
+      context.read<SignUpBloc>().add(SubmitSignUp(user));
     }
   }
 }

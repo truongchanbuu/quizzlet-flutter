@@ -1,11 +1,21 @@
 part of 'remote_signup_bloc.dart';
 
-enum SignUpStatus { loading, success, failed }
+enum SignUpStatus {
+  loading,
+  progressing,
+  success,
+  failed,
+  validated,
+  unvalidated,
+}
 
 class SignUpState extends Equatable {
   final SignUpStatus status;
-
   const SignUpState(this.status);
+
+  factory SignUpState.init() {
+    return const SignUpState(SignUpStatus.loading);
+  }
 
   factory SignUpState.success() {
     return const SignUpState(SignUpStatus.success);
@@ -15,8 +25,16 @@ class SignUpState extends Equatable {
     return const SignUpState(SignUpStatus.failed);
   }
 
-  factory SignUpState.progress() {
-    return const SignUpState(SignUpStatus.loading);
+  factory SignUpState.validating() {
+    return const SignUpState(SignUpStatus.progressing);
+  }
+
+  factory SignUpState.validated() {
+    return const SignUpState(SignUpStatus.validated);
+  }
+
+  factory SignUpState.unvalidated() {
+    return const SignUpState(SignUpStatus.unvalidated);
   }
 
   @override

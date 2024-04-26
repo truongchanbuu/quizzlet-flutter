@@ -10,6 +10,6 @@ abstract class UserRepository {
   Future<DataState<UserModel>> signUp(UserModel signUpData);
   Future<DataState<void>> logOut();
   Future<DataState<void>> resetPassword(String email);
-  Future<DataState<UserModel>> getUserData(String id);
+  Future<DataState<UserModel>> getUserData(String email);
   Future<DataState<void>> setUserData(UserModel user);
 }
