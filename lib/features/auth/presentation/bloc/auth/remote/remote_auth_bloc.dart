@@ -9,12 +9,10 @@ import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/re
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   final UserRepository _userRepository;
-  late final StreamSubscription<User?> _userSubcription;
+  late final StreamSubscription<User?> _userSubscription;
 
-  AuthenticationBloc(
-    this._userRepository,
-  ) : super(AuthenticationState.init()) {
-    _userSubcription = _userRepository.user.listen((authUser) {
+  AuthenticationBloc(this._userRepository) : super(AuthenticationState.init()) {
+    _userSubscription = _userRepository.user.listen((authUser) {
       add(AuthenticationUserChanged(authUser));
     });
     on<AuthenticationUserChanged>((event, emit) {
@@ -28,7 +26,7 @@ class AuthenticationBloc
 
   @override
   Future<void> close() {
-    _userSubcription.cancel();
+    _userSubscription.cancel();
     return super.close();
   }
 }

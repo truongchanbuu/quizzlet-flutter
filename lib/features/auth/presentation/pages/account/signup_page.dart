@@ -1,12 +1,16 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:quizzlet_fluttter/core/util/shared_preference_util.dart';
 import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/common/common.dart';
-import 'package:sign_in_button/sign_in_button.dart';
+import 'package:dbcrypt/dbcrypt.dart';
 
 class SignUpPage extends StatefulWidget {
   final UserRepository userRepository;
@@ -29,9 +33,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
   // Controllers
   late final TextEditingController dateController;
+
+  // Key
   late final GlobalKey<FormState> _formKey;
 
-  // Error messages
+  // Error message
   String? emailErrorMessage;
 
   @override
@@ -63,34 +69,8 @@ class _SignUpPageState extends State<SignUpPage> {
   _buildBody() {
     return BlocProvider(
       create: (context) => SignUpBloc(widget.userRepository),
-      child: BlocBuilder<SignUpBloc, SignUpState>(
+      child: BlocConsumer<SignUpBloc, SignUpState>(
         builder: (context, state) {
-          if (state.status == SignUpStatus.unvalidated) {
-            emailErrorMessage = "EMAIL NÀY ĐÃ ĐƯỢC SỬ DỤNG";
-          }
-
-          // if (state.status == SignUpStatus.failed) {
-          //   AwesomeDialog(
-          //     context: context,
-          //     dialogType: DialogType.error,
-          //     animType: AnimType.leftSlide,
-          //     title: 'Sign up failed',
-          //     desc: 'There is something wrong',
-          //     btnCancelOnPress: () {},
-          //     btnOkOnPress: () {},
-          //   ).show();
-          // } else if (state.status == SignUpStatus.success) {
-          //   AwesomeDialog(
-          //     context: context,
-          //     dialogType: DialogType.success,
-          //     animType: AnimType.leftSlide,
-          //     title: 'Sign up success',
-          //     desc: 'YEAH',
-          //     btnCancelOnPress: () {},
-          //     btnOkOnPress: () {},
-          //   ).show();
-          // }
-
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -101,7 +81,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     const Text('ĐĂNG NHẬP NHANH BẰNG'),
                     const SizedBox(height: 10),
-                    _buildSignInMethodsWidget(),
+                    buildSignInMethodsWidget(widget.userRepository),
                     const SizedBox(height: 20),
                     const Text('HOẶC ĐĂNG KÝ BẰNG EMAIL'),
                     const SizedBox(height: 10),
@@ -202,42 +182,47 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    buildPolicyAlertText(),
+                    Center(
+                      child: buildPolicyAlertText(),
+                    ),
                   ],
                 ),
               ),
             ),
           );
         },
+        listener: (BuildContext context, SignUpState state) {
+          if (state.status == SignUpStatus.emailExisted) {
+            emailErrorMessage = 'EMAIL NÀY ĐÃ ĐƯỢC SỬ DỤNG';
+          } else if (state.status == SignUpStatus.emailNotExisted) {
+            emailErrorMessage = null;
+          } else if (state.status == SignUpStatus.failed) {
+            SchedulerBinding.instance.addPostFrameCallback((_) => AwesomeDialog(
+                  context: context,
+                  dialogType: DialogType.error,
+                  animType: AnimType.leftSlide,
+                  headerAnimationLoop: false,
+                  title: 'ĐĂNG KÝ KHÔNG THÀNH CÔNG',
+                  dismissOnTouchOutside: false,
+                  desc: 'Đã có lỗi xảy ra trong quá trình đăng ký...',
+                  btnCancelOnPress: () {},
+                  btnCancelText: 'OK',
+                ).show());
+          } else if (state.status == SignUpStatus.success) {
+            SchedulerBinding.instance.addPostFrameCallback((_) => AwesomeDialog(
+                  context: context,
+                  dialogType: DialogType.success,
+                  animType: AnimType.leftSlide,
+                  headerAnimationLoop: false,
+                  dismissOnTouchOutside: false,
+                  title: 'ĐĂNG KÝ THÀNH CÔNG',
+                  desc: 'Chúc mừng bạn đã đăng ký thành công',
+                  btnOkOnPress: () => signInSuccess(context),
+                  btnOkText: 'ĐI ĐẾN MÀN HÌNH CHÍNH',
+                ).show());
+          }
+        },
       ),
-    );
-  }
-
-  _buildSignInMethodsWidget() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: SignInButton(
-            Buttons.google,
-            onPressed: () {},
-            elevation: 0,
-            text: 'Google',
-            padding: const EdgeInsets.all(20),
-          ),
-        ),
-        const SizedBox(width: 20),
-        Expanded(
-          flex: 1,
-          child: SignInButton(
-            Buttons.facebook,
-            onPressed: () {},
-            elevation: 0,
-            text: 'Facebook',
-            padding: const EdgeInsets.all(20),
-          ),
-        ),
-      ],
     );
   }
 
@@ -263,7 +248,7 @@ class _SignUpPageState extends State<SignUpPage> {
     setState(() => _isHiddenConfirmPassword = !_isHiddenConfirmPassword);
   }
 
-  // Handle data
+  // Validation methods
   String? _validateEmail(BuildContext context, String? email) {
     if (email?.isEmpty ?? true) {
       return 'EMAIL KHÔNG ĐƯỢC ĐỂ TRỐNG';
@@ -274,6 +259,10 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     context.read<SignUpBloc>().add(ValidatingInput(email));
+
+    if (context.read<SignUpBloc>().state.status == SignUpStatus.emailExisted) {
+      return 'EMAIL NÀY ĐÃ ĐƯỢC SỬ DỤNG';
+    }
 
     return null;
   }
@@ -317,13 +306,14 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
   }
 
+  // Handle data
   _submitSignUpForm(BuildContext context) {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
       UserModel user = UserModel(
         email: email!,
-        password: password!,
+        password: DBCrypt().hashpw(password!, DBCrypt().gensalt()),
         dateOfBirth: userBirthday,
         username: userName,
       );

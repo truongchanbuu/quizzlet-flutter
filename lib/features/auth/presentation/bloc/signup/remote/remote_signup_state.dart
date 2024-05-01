@@ -5,8 +5,8 @@ enum SignUpStatus {
   progressing,
   success,
   failed,
-  validated,
-  unvalidated,
+  emailNotExisted,
+  emailExisted,
 }
 
 class SignUpState extends Equatable {
@@ -29,14 +29,14 @@ class SignUpState extends Equatable {
     return const SignUpState(SignUpStatus.progressing);
   }
 
-  factory SignUpState.validated() {
-    return const SignUpState(SignUpStatus.validated);
+  factory SignUpState.emailNotExisted() {
+    return const SignUpState(SignUpStatus.emailNotExisted);
   }
 
-  factory SignUpState.unvalidated() {
-    return const SignUpState(SignUpStatus.unvalidated);
+  factory SignUpState.emailExisted() {
+    return const SignUpState(SignUpStatus.emailExisted);
   }
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [status];
 }

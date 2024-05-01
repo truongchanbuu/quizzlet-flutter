@@ -18,7 +18,10 @@ final class SignInWithGoogle extends SignInEvent {
   const SignInWithGoogle();
 }
 
+final class SignInWithFacebook extends SignInEvent {
+  const SignInWithFacebook();
+}
+
 final class SignOutRequired extends SignInEvent {
   const SignOutRequired();
 }
-

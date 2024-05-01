@@ -5,7 +5,6 @@ import 'package:get_it/get_it.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_state.dart';
-import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/signup_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/common/common.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/homepage.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -120,7 +119,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   ),
                   const SizedBox(height: 15),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _navigateToSignInPage,
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
                       backgroundColor: Colors.grey.shade100,
@@ -220,13 +219,10 @@ class _WelcomePageState extends State<WelcomePage> {
 
   // Navigation methods
   _navigateToSignUpPage() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => SignUpPage(
-          userRepository: widget.userRepository,
-        ),
-        settings: const RouteSettings(name: '/account/sign-up'),
-      ),
-    );
+    Navigator.of(context).pushNamed('/account/sign-up');
+  }
+
+  _navigateToSignInPage() {
+    Navigator.of(context).pushNamed('/account/sign-in');
   }
 }

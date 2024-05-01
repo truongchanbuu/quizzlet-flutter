@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quizzlet_fluttter/features/auth/data/data_source/remote/user_api_service.dart';
 import 'package:quizzlet_fluttter/features/auth/data/repository/user_repository_impl.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
@@ -9,6 +12,7 @@ import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/re
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/reset-password/remote/bloc/remote_reset_password_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signin/remote/remote_signin_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final sl = GetIt.instance;
 
@@ -22,8 +26,28 @@ Future<void> initializaDependencies() async {
   // Firebase
   sl.registerSingleton<FirebaseAuth>(FirebaseAuth.instance);
   sl.registerSingleton<FirebaseFirestore>(FirebaseFirestore.instance);
+  sl.registerSingleton<GoogleSignIn>(GoogleSignIn(
+    clientId:
+        '636054365584-m1b19monh4bnrn297nsnpt94kepo1srq.apps.googleusercontent.com',
+    scopes: ['email', 'profile'],
+  ));
 
-  sl.registerSingleton<UserRepository>(UserRepositoryImpl(sl()));
+  AndroidOptions getAndroidOptions() =>
+      const AndroidOptions(encryptedSharedPreferences: true);
+  sl.registerSingleton<FlutterSecureStorage>(
+      FlutterSecureStorage(aOptions: getAndroidOptions()));
+
+  // Facebook Auth Instance
+  if (kIsWeb) {
+    await FacebookAuth.i.webAndDesktopInitialize(
+      appId: "1790488901429891",
+      cookie: true,
+      xfbml: true,
+      version: "v15.0",
+    );
+  }
+
+  sl.registerSingleton<UserRepository>(UserRepositoryImpl(sl(), sl()));
 
   // Blocs
   sl.registerFactory<AuthenticationBloc>(() => AuthenticationBloc(sl()));

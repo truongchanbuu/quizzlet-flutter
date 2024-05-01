@@ -5,8 +5,9 @@ import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 abstract class UserRepository {
   Stream<User?> get user;
 
-  Future<DataState<UserModel>> signIn(String email, String password);
-  Future<DataState<void>> signInWithGoogle();
+  Future<DataState<UserCredential>> signIn(String email, String password);
+  Future<DataState<UserCredential>> signInWithGoogle();
+  Future<DataState<UserCredential>> signInWithFacebook();
   Future<DataState<UserModel>> signUp(UserModel signUpData);
   Future<DataState<void>> logOut();
   Future<DataState<void>> resetPassword(String email);

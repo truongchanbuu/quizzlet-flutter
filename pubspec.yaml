@@ -44,16 +44,18 @@ dependencies:
   json_annotation: ^4.8.1
   retrofit: ^4.1.0
   cloud_firestore: ^4.17.0
-  firebase_auth: ^4.19.2
-  firebase_core: ^2.30.0
-  google_sign_in: ^6.2.1
 
   # Util
+  firebase_core: ^2.30.0
   equatable: ^2.0.5
   intl: ^0.18.1
   bloc: ^8.1.4
   get_it: ^7.7.0
   email_validator: ^2.1.17
+  dbcrypt: ^2.0.0
+  flutter_facebook_auth: ^6.0.4
+  firebase_auth: ^4.19.2
+  google_sign_in: ^6.2.1
 
   # UI
   carousel_slider: ^4.2.1
@@ -61,6 +63,7 @@ dependencies:
   smooth_page_indicator: ^1.1.0
   sign_in_button: ^3.2.0
   awesome_dialog: ^3.2.0
+  flutter_secure_storage: ^9.0.0
 
 dev_dependencies:
   flutter_test:

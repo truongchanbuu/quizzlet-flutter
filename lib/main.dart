@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/config/theme/app_themes.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/signin_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/welcome_page.dart';
 import 'package:quizzlet_fluttter/firebase_options.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
@@ -29,6 +30,9 @@ class MyApp extends StatelessWidget {
       theme: theme(),
       routes: {
         '/account/sign-up': (context) => SignUpPage(
+              userRepository: userRepository,
+            ),
+        '/account/sign-in': (context) => SignInPage(
               userRepository: userRepository,
             ),
       },

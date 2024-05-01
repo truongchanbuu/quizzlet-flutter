@@ -34,10 +34,10 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       try {
         var dataState = await _userRepository.getUserData(event.email);
 
-        if (dataState is DataFailed) {
-          emit(SignUpState.unvalidated());
-        } else if (dataState is DataSuccess && dataState.data == null) {
-          emit(SignUpState.success());
+        if (dataState is DataSuccess && dataState.data == null) {
+          emit(SignUpState.emailNotExisted());
+        } else {
+          emit(SignUpState.emailExisted());
         }
       } catch (e) {
         log(e.toString());
