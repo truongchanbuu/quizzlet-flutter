@@ -20,11 +20,12 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
           String? token = await dataState.data!.user!.getIdToken();
           emit(SignInState.success(token!));
         } else {
-          emit(SignInState.failed());
+          emit(SignInState.failed(
+              dataState.error?.message ?? 'Please check your email and password again'));
         }
       } catch (e) {
         log(e.toString());
-        emit(SignInState.failed());
+        emit(SignInState.failed('There is something wrong: ${e.toString()}'));
       }
     });
 
@@ -35,11 +36,12 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
           String? token = await dataState.data!.user!.getIdToken();
           emit(SignInState.success(token!));
         } else {
-          emit(SignInState.failed());
+          emit(SignInState.failed(
+              dataState.error?.message ?? 'There is something wrong'));
         }
       } catch (e) {
         log('Google login failed: ${e.toString()}');
-        emit(SignInState.failed());
+        emit(SignInState.failed('There is something wrong: ${e.toString()}'));
       }
     });
 
@@ -50,11 +52,12 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
           String? token = await dataState.data!.user!.getIdToken();
           emit(SignInState.success(token!));
         } else {
-          emit(SignInState.failed());
+          emit(SignInState.failed(
+              dataState.error?.message ?? 'There is something wrong'));
         }
       } catch (e) {
         log(e.toString());
-        emit(SignInState.failed());
+        emit(SignInState.failed('There is something wrong: ${e.toString()}'));
       }
     });
 
@@ -65,11 +68,12 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
         if (dataState is DataSuccess) {
           emit(SignInState.logOut());
         } else {
-          emit(SignInState.failed());
+          emit(SignInState.failed(
+              dataState.error?.message ?? 'There is something wrong'));
         }
       } catch (e) {
         log(e.toString());
-        emit(SignInState.failed());
+        emit(SignInState.failed('There is something wrong: ${e.toString()}'));
       }
     });
   }

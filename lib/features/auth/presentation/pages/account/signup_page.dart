@@ -1,16 +1,14 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:quizzlet_fluttter/core/util/shared_preference_util.dart';
 import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
-import 'package:quizzlet_fluttter/features/auth/presentation/pages/common/common.dart';
 import 'package:dbcrypt/dbcrypt.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/widgets/common.dart';
 
 class SignUpPage extends StatefulWidget {
   final UserRepository userRepository;

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dbcrypt/dbcrypt.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -32,7 +33,7 @@ class UserRepositoryImpl implements UserRepository {
         return DataFailed(
           error: DioException(
             requestOptions: RequestOptions(),
-            message: 'There is something wrong',
+            message: 'There is no user',
           ),
         );
       }
@@ -44,6 +45,7 @@ class UserRepositoryImpl implements UserRepository {
         error: DioException(
           requestOptions: RequestOptions(),
           error: e,
+          message: 'Please check your email and password again',
         ),
       );
     }
@@ -72,6 +74,14 @@ class UserRepositoryImpl implements UserRepository {
       );
 
       var userCredential = await firebaseAuth.signInWithCredential(credential);
+      setUserData(
+        UserModel(
+          email: userCredential.user?.email ?? googleUser.email,
+          password: DBCrypt().hashpw(
+              userCredential.user?.email ?? googleUser.email,
+              DBCrypt().gensalt()),
+        ),
+      );
       return DataSuccess(data: userCredential);
     } catch (e) {
       log(e.toString());
@@ -113,7 +123,6 @@ class UserRepositoryImpl implements UserRepository {
             ),
           );
         case LoginStatus.failed:
-          print(loginResult.message);
           return DataFailed(
             error: DioException(
               requestOptions: RequestOptions(),
@@ -203,7 +212,7 @@ class UserRepositoryImpl implements UserRepository {
     try {
       await firebaseAuth.sendPasswordResetEmail(email: email);
       return const DataSuccess();
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       log(e.toString());
       return DataFailed(
         error: DioException(

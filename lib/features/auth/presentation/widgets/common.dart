@@ -49,11 +49,9 @@ buildPolicyAlertText() {
   );
 }
 
-buildSignInMethodsWidget(
-  UserRepository userRepository, {
-  Future<void> Function(BuildContext context) navigateToSuccessPage =
-      signInSuccess,
-}) {
+buildSignInMethodsWidget(UserRepository userRepository,
+    {Future<void> Function(BuildContext context) navigateToSuccessPage =
+        signInSuccess}) {
   return BlocProvider(
     create: (context) => SignInBloc(userRepository),
     child: BlocBuilder<SignInBloc, SignInState>(

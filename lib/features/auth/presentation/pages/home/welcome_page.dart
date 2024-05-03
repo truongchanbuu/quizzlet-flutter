@@ -1,12 +1,14 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:quizzlet_fluttter/core/constants/constants.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_state.dart';
-import 'package:quizzlet_fluttter/features/auth/presentation/pages/common/common.dart';
-import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/homepage.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/home_page.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/widgets/common.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -18,20 +20,48 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
+  // State
   int _activeIndex = 0;
+
+  // Controller
   late CarouselController carouseController;
+
+  // Storage
+  late final FlutterSecureStorage storage;
+
+  // Info
+  String? accessToken;
 
   @override
   void initState() {
     super.initState();
     carouseController = CarouselController();
+    storage = const FlutterSecureStorage();
+    getAccessToken();
+  }
+
+  void getAccessToken() async {
+    accessToken = await storage.read(key: 'accessToken');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: _buildBody(),
+    return BlocProvider(
+      create: (context) => GetIt.instance.get<AuthenticationBloc>(),
+      child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        builder: (context, state) {
+          if ((state.user != null ||
+              accessToken != null ||
+              state.status == AuthenticationStatus.authenticated)) {
+            return const HomePage();
+          }
+
+          return Scaffold(
+            appBar: _buildAppBar(),
+            body: _buildBody(),
+          );
+        },
+      ),
     );
   }
 
@@ -39,7 +69,7 @@ class _WelcomePageState extends State<WelcomePage> {
   _buildAppBar() {
     return AppBar(
       title: const Text(
-        'Quizzlet',
+        appName,
         style: TextStyle(
           color: Colors.indigo,
           fontSize: 25,
@@ -80,62 +110,51 @@ class _WelcomePageState extends State<WelcomePage> {
       },
     ];
 
-    return BlocProvider(
-      create: (context) => GetIt.instance.get<AuthenticationBloc>(),
-      child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-        builder: (context, state) {
-          if (state.status == AuthenticationStatus.authenticated) {
-            return const HomePage();
-          }
-
-          return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildSlider(introductionItems),
-                  const SizedBox(height: 20),
-                  _buildIntroText(introductionItems[_activeIndex]['content']!),
-                  const SizedBox(height: 30),
-                  _buildIndicator(introductionItems.length),
-                  const SizedBox(height: 30),
-                  buildPolicyAlertText(),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
-                    onPressed: _navigateToSignUpPage,
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                      backgroundColor: Colors.indigo,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    child: const Text(
-                      'Đăng ký miễn phí',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
-                    onPressed: _navigateToSignInPage,
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                      backgroundColor: Colors.grey.shade100,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    child: const Text(
-                      'Hoặc đăng nhập',
-                    ),
-                  ),
-                ],
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildSlider(introductionItems),
+            const SizedBox(height: 15),
+            _buildIntroText(introductionItems[_activeIndex]['content']!),
+            const SizedBox(height: 25),
+            _buildIndicator(introductionItems.length),
+            const SizedBox(height: 25),
+            buildPolicyAlertText(),
+            const SizedBox(height: 15),
+            ElevatedButton(
+              onPressed: _navigateToSignUpPage,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                backgroundColor: Colors.indigo,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              child: const Text(
+                'Đăng ký miễn phí',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
               ),
             ),
-          );
-        },
+            const SizedBox(height: 15),
+            ElevatedButton(
+              onPressed: _navigateToSignInPage,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                backgroundColor: Colors.grey.shade100,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              child: const Text(
+                'Hoặc đăng nhập',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -4,9 +4,10 @@ enum SignInStatus { loading, success, failed, signedOut }
 
 class SignInState {
   final SignInStatus status;
+  final String? error;
   final String? token;
 
-  SignInState(this.status, {this.token});
+  SignInState(this.status, {this.token, this.error});
 
   factory SignInState.init() {
     return SignInState(SignInStatus.loading);
@@ -20,8 +21,8 @@ class SignInState {
     return SignInState(SignInStatus.success, token: token);
   }
 
-  factory SignInState.failed() {
-    return SignInState(SignInStatus.failed);
+  factory SignInState.failed(String error) {
+    return SignInState(SignInStatus.failed, error: error);
   }
 
   factory SignInState.logOut() {

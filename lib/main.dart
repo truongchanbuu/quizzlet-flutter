@@ -1,8 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/config/theme/app_themes.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/reset-password/remote/bloc/remote_reset_password_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signin/remote/remote_signin_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/signin_page.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/home_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/welcome_page.dart';
 import 'package:quizzlet_fluttter/firebase_options.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
@@ -28,12 +33,27 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Quizzlet',
       theme: theme(),
+      initialRoute: '/',
       routes: {
+        '/home': (context) => const HomePage(),
         '/account/sign-up': (context) => SignUpPage(
               userRepository: userRepository,
             ),
-        '/account/sign-in': (context) => SignInPage(
-              userRepository: userRepository,
+        '/account/sign-in': (context) => MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) => AuthenticationBloc(userRepository),
+                ),
+                BlocProvider(
+                  create: (context) => SignInBloc(userRepository),
+                ),
+                BlocProvider(
+                  create: (context) => ResetPasswordBloc(userRepository),
+                )
+              ],
+              child: SignInPage(
+                userRepository: userRepository,
+              ),
             ),
       },
       home: SafeArea(

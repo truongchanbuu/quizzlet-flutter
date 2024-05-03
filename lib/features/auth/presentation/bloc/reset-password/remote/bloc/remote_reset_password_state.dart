@@ -4,15 +4,16 @@ enum ResetPasswordStatus { success, failed, processing }
 
 class ResetPasswordState extends Equatable {
   final ResetPasswordStatus status;
+  final String? error;
 
-  const ResetPasswordState(this.status);
-  
+  const ResetPasswordState(this.status, {this.error});
+
   factory ResetPasswordState.success() {
     return const ResetPasswordState(ResetPasswordStatus.success);
   }
-  
-  factory ResetPasswordState.failed() {
-    return const ResetPasswordState(ResetPasswordStatus.failed);
+
+  factory ResetPasswordState.failed(String error) {
+    return ResetPasswordState(ResetPasswordStatus.failed, error: error);
   }
 
   factory ResetPasswordState.processing() {
@@ -22,4 +23,3 @@ class ResetPasswordState extends Equatable {
   @override
   List<Object> get props => [];
 }
-
