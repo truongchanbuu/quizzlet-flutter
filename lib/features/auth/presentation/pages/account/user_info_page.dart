@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
@@ -64,7 +65,15 @@ class InfoPage extends StatelessWidget {
                           ),
                           errorWidget: (context, url, error) => CircleAvatar(
                             radius: 50,
-                            child: Text((user.displayName ?? 'User')[0]),
+                            backgroundColor: Colors.blue,
+                            child: Text(
+                              (user.displayName ?? 'User')[0].toUpperCase(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 40,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                           fit: BoxFit.cover,
                           width: MediaQuery.of(context).size.width / 10,

@@ -17,15 +17,8 @@ class DetailInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => GetIt.instance.get<SignOutBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => GetIt.instance.get<UpdateInfoBloc>(),
-        )
-      ],
+    return BlocProvider(
+      create: (context) => GetIt.instance.get<SignOutBloc>(),
       child: BlocConsumer<SignOutBloc, SignOutState>(
         listener: (context, state) {
           if (state is SignOutSuccess) {
@@ -175,7 +168,6 @@ class DetailInfoPage extends StatelessWidget {
       builder: (context) => BlocConsumer<UpdateInfoBloc, UpdateInfoState>(
         listener: (context, state) {},
         builder: (context, state) {
-          print(context);
           return SizedBox(
             height: MediaQuery.of(context).size.height * 0.4,
             child: Center(
