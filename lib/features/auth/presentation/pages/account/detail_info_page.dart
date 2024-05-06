@@ -88,36 +88,54 @@ class DetailInfoPage extends StatelessWidget {
 
   _buildInfoSection(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(
-            Radius.circular(5),
-          )),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+      ),
       child: Column(
         children: [
           Material(
-            child: ListTile(
+            color: Colors.transparent,
+            child: InkWell(
               onTap: () =>
                   _showReAuthenticateModal(context, 'Đổi tên người dùng'),
-              title: const Text('Tên người dùng'),
-              subtitle: Text(user.displayName ?? 'User'),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+              highlightColor: Colors.grey.withOpacity(0.5),
+              child: ListTile(
+                title: const Text('Tên người dùng'),
+                subtitle: Text(user.displayName ?? 'User'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+              ),
             ),
           ),
+          const Divider(),
           Material(
-            child: ListTile(
+            color: Colors.transparent,
+            child: InkWell(
               onTap: () => _showReAuthenticateModal(context, 'Đặt lại email'),
-              title: const Text('Email'),
-              subtitle: Text(user.email!),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              highlightColor: Colors.grey.withOpacity(0.5),
+              child: ListTile(
+                title: const Text('Email'),
+                subtitle: Text(user.email!),
+                trailing: const Icon(Icons.arrow_forward_ios),
+              ),
             ),
           ),
+          const Divider(),
           Material(
-            child: ListTile(
+            color: Colors.transparent,
+            child: InkWell(
               onTap: () =>
                   _showReAuthenticateModal(context, 'Đặt lại mật khẩu'),
-              title: const Text('Đặt lại mật khẩu'),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(15),
+                  bottomRight: Radius.circular(15)),
+              highlightColor: Colors.grey.withOpacity(0.5),
+              child: const ListTile(
+                title: Text('Đặt lại mật khẩu'),
+                trailing: Icon(Icons.arrow_forward_ios),
+              ),
             ),
           ),
         ],
