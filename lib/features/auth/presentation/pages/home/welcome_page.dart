@@ -12,14 +12,15 @@ import 'package:quizzlet_fluttter/features/auth/presentation/widgets/common.dart
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class WelcomePage extends StatefulWidget {
-  final UserRepository userRepository;
-  const WelcomePage({super.key, required this.userRepository});
+  const WelcomePage({super.key});
 
   @override
   State<WelcomePage> createState() => _WelcomePageState();
 }
 
 class _WelcomePageState extends State<WelcomePage> {
+  late UserRepository userRepository;
+
   // State
   int _activeIndex = 0;
 
@@ -35,6 +36,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
+    userRepository = GetIt.instance.get<UserRepository>();
     carouseController = CarouselController();
     storage = const FlutterSecureStorage();
     getAccessToken();
@@ -50,9 +52,10 @@ class _WelcomePageState extends State<WelcomePage> {
       create: (context) => GetIt.instance.get<AuthenticationBloc>(),
       child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
-          if ((state.user != null ||
-              accessToken != null ||
-              state.status == AuthenticationStatus.authenticated)) {
+          if (
+              // state.user != null ||
+              // accessToken != null ||
+              state.status == AuthenticationStatus.authenticated) {
             return const HomePage();
           }
 

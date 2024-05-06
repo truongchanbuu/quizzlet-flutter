@@ -13,4 +13,6 @@ abstract class UserRepository {
   Future<DataState<void>> resetPassword(String email);
   Future<DataState<UserModel>> getUserData(String email);
   Future<DataState<void>> setUserData(UserModel user);
+  Future<DataState<void>> reAuthenticate(AuthCredential credential);
+  Future<DataState<void>> updateUsername(String username);
 }

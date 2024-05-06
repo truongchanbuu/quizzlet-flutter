@@ -1,6 +1,13 @@
 part of 'remote_signin_bloc.dart';
 
-enum SignInStatus { loading, success, failed, signedOut }
+enum SignInStatus {
+  loading,
+  success,
+  failed,
+  wrongPassword,
+  emailNotFound,
+  disabled,
+}
 
 class SignInState {
   final SignInStatus status;
@@ -25,7 +32,17 @@ class SignInState {
     return SignInState(SignInStatus.failed, error: error);
   }
 
-  factory SignInState.logOut() {
-    return SignInState(SignInStatus.signedOut);
+  factory SignInState.wrongPassword() {
+    return SignInState(SignInStatus.wrongPassword,
+        error: 'Mật khẩu không chính xác');
+  }
+
+  factory SignInState.emailNotFound() {
+    return SignInState(SignInStatus.emailNotFound,
+        error: 'Email không tồn tại');
+  }
+
+  factory SignInState.disabled() {
+    return SignInState(SignInStatus.disabled, error: 'Email đã bị vô hiệu hóa');
   }
 }

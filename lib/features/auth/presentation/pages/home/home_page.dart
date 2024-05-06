@@ -1,8 +1,5 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:quizzlet_fluttter/core/constants/constants.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/user_info_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/search_box.dart';
@@ -16,8 +13,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late User user;
-
   // Controllers
   late final PageController pageController;
 
@@ -45,7 +40,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   // Pages
-  late final pages = [
+  late final List<Widget> pages = [
     const SingleChildScrollView(
       child: Column(
         children: [
@@ -55,16 +50,13 @@ class _HomePageState extends State<HomePage> {
     ),
     const Text('Loi giai'),
     const Text('Thu vien'),
-    InfoPage(
-      user: user,
-    ),
+    const InfoPage(),
   ];
 
   @override
   void initState() {
     super.initState();
     pageController = PageController();
-    user = GetIt.instance.get<FirebaseAuth>().currentUser!;
   }
 
   @override
@@ -120,14 +112,15 @@ class _HomePageState extends State<HomePage> {
           ),
         )
       ],
+      automaticallyImplyLeading: false,
     );
   }
 
   _buildBody() {
     return PageView(
       controller: pageController,
-      children: pages,
       onPageChanged: (page) => setState(() => _currentPageIndex = page),
+      children: pages,
     );
   }
 
@@ -137,10 +130,8 @@ class _HomePageState extends State<HomePage> {
       activeIndex: _currentPageIndex,
       onTap: (int pageIndex) {
         setState(() => _currentPageIndex = pageIndex);
-        pageController.animateToPage(
+        pageController.jumpToPage(
           pageIndex,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
         );
       },
       notchSmoothness: NotchSmoothness.smoothEdge,

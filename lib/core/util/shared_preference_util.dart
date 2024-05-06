@@ -7,3 +7,8 @@ Future<void> saveToSharedPref(String key, String? value) async {
   final storage = GetIt.instance.get<FlutterSecureStorage>();
   await storage.write(key: key, value: value);
 }
+
+Future<void> deleteAccessToken() async {
+  final storage = GetIt.instance.get<FlutterSecureStorage>();
+  await storage.delete(key: 'accessToken');
+}

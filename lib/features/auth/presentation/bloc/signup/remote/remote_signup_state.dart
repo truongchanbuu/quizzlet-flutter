@@ -1,8 +1,8 @@
 part of 'remote_signup_bloc.dart';
 
 enum SignUpStatus {
+  initial,
   loading,
-  progressing,
   success,
   failed,
   emailNotExisted,
@@ -14,7 +14,7 @@ class SignUpState extends Equatable {
   const SignUpState(this.status);
 
   factory SignUpState.init() {
-    return const SignUpState(SignUpStatus.loading);
+    return const SignUpState(SignUpStatus.initial);
   }
 
   factory SignUpState.success() {
@@ -25,8 +25,8 @@ class SignUpState extends Equatable {
     return const SignUpState(SignUpStatus.failed);
   }
 
-  factory SignUpState.validating() {
-    return const SignUpState(SignUpStatus.progressing);
+  factory SignUpState.loading() {
+    return const SignUpState(SignUpStatus.loading);
   }
 
   factory SignUpState.emailNotExisted() {

@@ -13,14 +13,15 @@ import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signin/remote/
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/common.dart';
 
 class SignInPage extends StatefulWidget {
-  const SignInPage({super.key, required this.userRepository});
-  final UserRepository userRepository;
+  const SignInPage({super.key});
 
   @override
   State<SignInPage> createState() => _SignInPageState();
 }
 
 class _SignInPageState extends State<SignInPage> {
+  late final UserRepository userRepository;
+
   late final GlobalKey<FormState> _formKey;
   late final FlutterSecureStorage storage;
   late final GlobalKey<FormState> _resetFormKey;
@@ -33,9 +34,14 @@ class _SignInPageState extends State<SignInPage> {
   String? email;
   String? password;
 
+  // Error messages
+  String? passwordErrorMessage;
+  String? emailErrorMessage;
+
   @override
   void initState() {
     super.initState();
+    userRepository = GetIt.instance.get<UserRepository>();
     _formKey = GlobalKey();
     _resetFormKey = GlobalKey();
     storage = GetIt.instance.get<FlutterSecureStorage>();
@@ -65,7 +71,22 @@ class _SignInPageState extends State<SignInPage> {
         BlocListener<SignInBloc, SignInState>(
           listener: (context, state) {
             if (state.status == SignInStatus.success) {
+              setState(() {
+                emailErrorMessage = null;
+                passwordErrorMessage = null;
+              });
               signInSuccess(context);
+            } else if (state.status == SignInStatus.wrongPassword) {
+              setState(() {
+                emailErrorMessage = null;
+                passwordErrorMessage = state.error!.toUpperCase();
+              });
+            } else if (state.status == SignInStatus.emailNotFound ||
+                state.status == SignInStatus.disabled) {
+              setState(() {
+                passwordErrorMessage = null;
+                emailErrorMessage = state.error!.toUpperCase();
+              });
             } else {
               SchedulerBinding.instance
                   .addPostFrameCallback((_) => AwesomeDialog(
@@ -130,7 +151,7 @@ class _SignInPageState extends State<SignInPage> {
             children: [
               const Text('ĐĂNG NHẬP NHANH BẰNG'),
               const SizedBox(height: 10),
-              buildSignInMethodsWidget(widget.userRepository),
+              buildSignInMethodsWidget(userRepository),
               const SizedBox(height: 20),
               const Text('HOẶC ĐĂNG NHẬP BẰNG EMAIL'),
               const SizedBox(height: 10),
@@ -139,11 +160,12 @@ class _SignInPageState extends State<SignInPage> {
                 onSaved: (newValue) => email = newValue,
                 onChanged: (value) => email = value,
                 autofillHints: const [AutofillHints.email],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'ĐỊA CHỈ EMAIL',
                   hintText: 'abc@example.com',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: OutlineInputBorder(),
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  border: const OutlineInputBorder(),
+                  errorText: emailErrorMessage,
                 ),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.emailAddress,
@@ -164,6 +186,7 @@ class _SignInPageState extends State<SignInPage> {
                       : IconButton(
                           onPressed: _changeIsHiddenPasswordState,
                           icon: const Icon(Icons.visibility_off)),
+                  errorText: passwordErrorMessage,
                 ),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.visiblePassword,

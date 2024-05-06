@@ -3,22 +3,25 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
-import 'package:dbcrypt/dbcrypt.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/common.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 
 class SignUpPage extends StatefulWidget {
-  final UserRepository userRepository;
-  const SignUpPage({super.key, required this.userRepository});
+  const SignUpPage({super.key});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  late final UserRepository userRepository;
+
   bool _isHiddenPassword = true;
   bool _isHiddenConfirmPassword = true;
 
@@ -41,6 +44,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void initState() {
     super.initState();
+    userRepository = GetIt.instance.get<UserRepository>();
     _formKey = GlobalKey<FormState>();
     dateController = TextEditingController();
   }
@@ -66,9 +70,13 @@ class _SignUpPageState extends State<SignUpPage> {
 
   _buildBody() {
     return BlocProvider(
-      create: (context) => SignUpBloc(widget.userRepository),
+      create: (context) => GetIt.instance.get<SignUpBloc>(),
       child: BlocConsumer<SignUpBloc, SignUpState>(
         builder: (context, state) {
+          if (state.status == SignUpStatus.loading) {
+            return const LoadingIndicator();
+          }
+
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -79,7 +87,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     const Text('ĐĂNG NHẬP NHANH BẰNG'),
                     const SizedBox(height: 10),
-                    buildSignInMethodsWidget(widget.userRepository),
+                    buildSignInMethodsWidget(userRepository),
                     const SizedBox(height: 20),
                     const Text('HOẶC ĐĂNG KÝ BẰNG EMAIL'),
                     const SizedBox(height: 10),
@@ -256,12 +264,6 @@ class _SignUpPageState extends State<SignUpPage> {
       return 'EMAIL NÀY KHÔNG HỢP LỆ';
     }
 
-    context.read<SignUpBloc>().add(ValidatingInput(email));
-
-    if (context.read<SignUpBloc>().state.status == SignUpStatus.emailExisted) {
-      return 'EMAIL NÀY ĐÃ ĐƯỢC SỬ DỤNG';
-    }
-
     return null;
   }
 
@@ -311,7 +313,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
       UserModel user = UserModel(
         email: email!,
-        password: DBCrypt().hashpw(password!, DBCrypt().gensalt()),
+        password: password!,
         dateOfBirth: userBirthday,
         username: userName,
       );

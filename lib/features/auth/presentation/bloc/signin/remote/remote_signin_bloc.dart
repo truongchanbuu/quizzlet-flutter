@@ -19,9 +19,18 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
         if (dataState is DataSuccess) {
           String? token = await dataState.data!.user!.getIdToken();
           emit(SignInState.success(token!));
+        } else if (dataState is DataFailed &&
+            dataState.error!.error == 'wrong-password') {
+          emit(SignInState.wrongPassword());
+        } else if (dataState is DataFailed &&
+            dataState.error!.error == 'user-not-found') {
+          emit(SignInState.emailNotFound());
+        } else if (dataState is DataFailed &&
+            dataState.error!.error == 'user-disabled') {
+          emit(SignInState.disabled());
         } else {
-          emit(SignInState.failed(
-              dataState.error?.message ?? 'Please check your email and password again'));
+          emit(SignInState.failed(dataState.error?.message ??
+              'Please check your email and password again'));
         }
       } catch (e) {
         log(e.toString());
@@ -51,22 +60,6 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
         if (dataState is DataSuccess) {
           String? token = await dataState.data!.user!.getIdToken();
           emit(SignInState.success(token!));
-        } else {
-          emit(SignInState.failed(
-              dataState.error?.message ?? 'There is something wrong'));
-        }
-      } catch (e) {
-        log(e.toString());
-        emit(SignInState.failed('There is something wrong: ${e.toString()}'));
-      }
-    });
-
-    on<SignOutRequired>((event, emit) async {
-      try {
-        final dataState = await _userRepository.logOut();
-
-        if (dataState is DataSuccess) {
-          emit(SignInState.logOut());
         } else {
           emit(SignInState.failed(
               dataState.error?.message ?? 'There is something wrong'));

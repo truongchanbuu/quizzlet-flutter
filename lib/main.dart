@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/config/theme/app_themes.dart';
-import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/reset-password/remote/bloc/remote_reset_password_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signin/remote/remote_signin_bloc.dart';
@@ -20,12 +19,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await initializaDependencies();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final userRepository = sl.get<UserRepository>();
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,30 +34,24 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/home': (context) => const HomePage(),
-        '/account/sign-up': (context) => SignUpPage(
-              userRepository: userRepository,
-            ),
+        '/account/sign-up': (context) => const SignUpPage(),
         '/account/sign-in': (context) => MultiBlocProvider(
               providers: [
                 BlocProvider(
-                  create: (context) => AuthenticationBloc(userRepository),
+                  create: (context) => sl.get<AuthenticationBloc>(),
                 ),
                 BlocProvider(
-                  create: (context) => SignInBloc(userRepository),
+                  create: (context) => sl.get<SignInBloc>(),
                 ),
                 BlocProvider(
-                  create: (context) => ResetPasswordBloc(userRepository),
+                  create: (context) => sl.get<ResetPasswordBloc>(),
                 )
               ],
-              child: SignInPage(
-                userRepository: userRepository,
-              ),
+              child: const SignInPage(),
             ),
       },
-      home: SafeArea(
-        child: WelcomePage(
-          userRepository: userRepository,
-        ),
+      home: const SafeArea(
+        child: WelcomePage(),
       ),
     );
   }

@@ -11,8 +11,10 @@ import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repositor
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/reset-password/remote/bloc/remote_reset_password_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signin/remote/remote_signin_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/bloc/remote_signout_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/bloc/remote_update_info_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -53,5 +55,7 @@ Future<void> initializaDependencies() async {
   sl.registerFactory<AuthenticationBloc>(() => AuthenticationBloc(sl()));
   sl.registerFactory<SignInBloc>(() => SignInBloc(sl()));
   sl.registerFactory<SignUpBloc>(() => SignUpBloc(sl()));
+  sl.registerFactory<SignOutBloc>(() => SignOutBloc(sl()));
+  sl.registerFactory<UpdateInfoBloc>(() => UpdateInfoBloc(sl()));
   sl.registerFactory<ResetPasswordBloc>(() => ResetPasswordBloc(sl()));
 }

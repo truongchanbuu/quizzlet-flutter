@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dbcrypt/dbcrypt.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -29,25 +28,15 @@ class UserRepositoryImpl implements UserRepository {
         password: password,
       );
 
-      if (credential.user == null) {
-        return DataFailed(
-          error: DioException(
-            requestOptions: RequestOptions(),
-            message: 'There is no user',
-          ),
-        );
-      }
-
       return DataSuccess(data: credential);
-    } catch (e) {
-      log(e.toString());
+    } on FirebaseAuthException catch (e) {
+      log(e.message.toString());
       return DataFailed(
-        error: DioException(
-          requestOptions: RequestOptions(),
-          error: e,
-          message: 'Please check your email and password again',
-        ),
-      );
+          error: DioException(
+        requestOptions: RequestOptions(),
+        error: e.code,
+        message: e.message,
+      ));
     }
   }
 
@@ -74,14 +63,7 @@ class UserRepositoryImpl implements UserRepository {
       );
 
       var userCredential = await firebaseAuth.signInWithCredential(credential);
-      setUserData(
-        UserModel(
-          email: userCredential.user?.email ?? googleUser.email,
-          password: DBCrypt().hashpw(
-              userCredential.user?.email ?? googleUser.email,
-              DBCrypt().gensalt()),
-        ),
-      );
+
       return DataSuccess(data: userCredential);
     } catch (e) {
       log(e.toString());
@@ -152,14 +134,8 @@ class UserRepositoryImpl implements UserRepository {
         password: signUpData.password,
       );
 
-      if (credential.user == null) {
-        return DataFailed(
-          error: DioException(
-            requestOptions: RequestOptions(),
-            message: 'There is something wrong',
-          ),
-        );
-      }
+      await firebaseAuth.currentUser!.updateDisplayName(signUpData.username);
+      await firebaseAuth.currentUser!.updatePhotoURL(signUpData.avatarUrl);
 
       final user = signUpData.copyWith(
         id: credential.user!.uid,
@@ -167,26 +143,13 @@ class UserRepositoryImpl implements UserRepository {
 
       return DataSuccess(data: user);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        log('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        log('The account already exists for that email.');
-      }
-
+      log(e.message.toString());
       return DataFailed(
-        error: DioException(
-          requestOptions: RequestOptions(),
-          error: e,
-        ),
-      );
-    } catch (e) {
-      log(e.toString());
-      return DataFailed(
-        error: DioException(
-          requestOptions: RequestOptions(),
-          error: e,
-        ),
-      );
+          error: DioException(
+        requestOptions: RequestOptions(),
+        error: e.code,
+        message: e.message,
+      ));
     }
   }
 
@@ -258,6 +221,33 @@ class UserRepositoryImpl implements UserRepository {
         error: DioException(
           requestOptions: RequestOptions(),
           error: e,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<void>> reAuthenticate(AuthCredential credential) async {
+    try {
+      await firebaseAuth.currentUser?.reauthenticateWithCredential(credential);
+      return const DataSuccess();
+    } catch (e) {
+      log(e.toString());
+      return const DataFailed();
+    }
+  }
+
+  @override
+  Future<DataState<void>> updateUsername(String username) async {
+    try {
+      await firebaseAuth.currentUser!.updateDisplayName(username);
+      return const DataSuccess();
+    } catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e,
+          message: e.toString(),
         ),
       );
     }
