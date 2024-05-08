@@ -1,7 +1,8 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/bloc/remote_update_info_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/home_page.dart';
 
 class ChangeUserNamePage extends StatefulWidget {
   const ChangeUserNamePage({super.key});
@@ -38,7 +39,31 @@ class _ChangeUserNamePageState extends State<ChangeUserNamePage> {
       actions: [
         BlocListener<UpdateInfoBloc, UpdateInfoState>(
           listener: (context, state) {
-            print(state);
+            if (state is UpdateInfoFailed) {
+              AwesomeDialog(
+                context: context,
+                dialogType: DialogType.error,
+                headerAnimationLoop: false,
+                title: 'Có lỗi xảy ra vui lòng thử lại',
+                btnCancelOnPress: () {},
+              ).show();
+            } else if (state is UpdateInfoSuccess) {
+              AwesomeDialog(
+                context: context,
+                dialogType: DialogType.success,
+                title: 'Đã thay đôi thành công',
+                btnOkOnPress: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                headerAnimationLoop: false,
+              ).show();
+            }
           },
           child: TextButton(
             onPressed: () {

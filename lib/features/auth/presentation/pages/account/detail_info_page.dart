@@ -10,6 +10,7 @@ import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/re
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/bloc/remote_signout_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/bloc/remote_signout_event.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/bloc/remote_signout_state.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/bloc/remote_update_info_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/change_username_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/re-auth_form.dart';
@@ -204,8 +205,13 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ChangeUserNamePage(),
-                    ),
+                        builder: (context) => BlocProvider(
+                              create: (context) =>
+                                  GetIt.instance.get<UpdateInfoBloc>(),
+                              child: const ChangeUserNamePage(),
+                            ),
+                        settings:
+                            const RouteSettings(name: '/change_username')),
                   );
                   break;
                 case 'email':
@@ -225,6 +231,7 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
                 title: 'Xác thực không thành công',
                 desc: 'Người dùng không có quyền thực hiện hành động này',
                 btnCancelText: 'OK',
+                btnCancelOnPress: () {},
               ).show();
             }
           },
