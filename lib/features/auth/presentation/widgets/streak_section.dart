@@ -58,8 +58,7 @@ class StreakDaySection extends StatelessWidget {
                       'Tháng ${DateTime.now().month.toString()}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 30,
-                        // color: Colors.white,
+                        fontSize: 25,
                         letterSpacing: double.minPositive,
                       ),
                     ),
@@ -83,7 +82,7 @@ class StreakDaySection extends StatelessWidget {
                       '${streakDays.toString()} STREAK',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 40,
+                        fontSize: 35,
                       ),
                     ),
                     const SizedBox(width: 10),

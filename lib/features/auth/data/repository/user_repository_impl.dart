@@ -65,12 +65,13 @@ class UserRepositoryImpl implements UserRepository {
       var userCredential = await firebaseAuth.signInWithCredential(credential);
 
       return DataSuccess(data: userCredential);
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       log(e.toString());
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),
-          error: e,
+          error: e.code,
+          message: e.message,
         ),
       );
     }
@@ -227,13 +228,65 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<DataState<void>> reAuthenticate(AuthCredential credential) async {
+  Future<DataState<UserCredential>> reAuthenticateGoogleUser() async {
     try {
-      await firebaseAuth.currentUser?.reauthenticateWithCredential(credential);
-      return const DataSuccess();
-    } catch (e) {
-      log(e.toString());
-      return const DataFailed();
+      var reAuthCredential = await firebaseAuth.currentUser!
+          .reauthenticateWithPopup(GoogleAuthProvider());
+
+      return DataSuccess(data: reAuthCredential);
+    } on FirebaseAuthException catch (e) {
+      log("Error re-authenticating with Google: ${e.message}");
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<UserCredential>> reAuthenticatePasswordUser(
+      String email, String password) async {
+    try {
+      var credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
+
+      var reAuthCredential = await firebaseAuth.currentUser!
+          .reauthenticateWithCredential(credential);
+
+      return DataSuccess(data: reAuthCredential);
+    } on FirebaseAuthException catch (e) {
+      log("Error re-authenticating with Google: ${e.message}");
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<UserCredential>> reAuthenticateFacebookUser() async {
+    try {
+      var reAuthCredential = await firebaseAuth.currentUser!
+          .reauthenticateWithPopup(FacebookAuthProvider());
+
+      return DataSuccess(data: reAuthCredential);
+    } on FirebaseAuthException catch (e) {
+      log("Error re-authenticating with Google: ${e.message}");
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
     }
   }
 

@@ -16,9 +16,11 @@ class LoadingIndicator extends StatelessWidget {
           flexibleSize = MediaQuery.of(context).size.width / 10;
         }
 
+        final indicatorSize = size ?? flexibleSize;
+
         return Center(
-          child: LoadingAnimationWidget.inkDrop(
-              color: color, size: size ?? flexibleSize),
+          child:
+              LoadingAnimationWidget.inkDrop(color: color, size: indicatorSize),
         );
       },
     );

@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
@@ -60,11 +59,11 @@ class InfoPage extends StatelessWidget {
                         child: CachedNetworkImage(
                           imageUrl: user.photoURL ?? '',
                           placeholder: (context, url) => const CircleAvatar(
-                            radius: 50,
+                            radius: 40,
                             child: LoadingIndicator(),
                           ),
                           errorWidget: (context, url, error) => CircleAvatar(
-                            radius: 50,
+                            radius: 40,
                             backgroundColor: Colors.blue,
                             child: Text(
                               (user.displayName ?? 'User')[0].toUpperCase(),
@@ -76,7 +75,6 @@ class InfoPage extends StatelessWidget {
                             ),
                           ),
                           fit: BoxFit.cover,
-                          width: MediaQuery.of(context).size.width / 10,
                         ),
                       ),
                     ),

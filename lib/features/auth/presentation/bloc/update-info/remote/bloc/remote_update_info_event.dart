@@ -18,9 +18,3 @@ final class UpdateEmail extends UpdateInfoEvent {
 
   const UpdateEmail(this.email);
 }
-
-final class ReAuthenticateUser extends UpdateInfoEvent {
-  final AuthCredential credential;
-
-  const ReAuthenticateUser(this.credential);
-}

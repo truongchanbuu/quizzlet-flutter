@@ -17,3 +17,17 @@ final class AuthenticationUserChanged extends AuthenticationEvent {
 
   const AuthenticationUserChanged(this.user);
 }
+
+final class ReAuthenticateGoogleUser extends AuthenticationEvent {
+  const ReAuthenticateGoogleUser();
+}
+
+final class ReAuthenticateFacebookUser extends AuthenticationEvent {
+  const ReAuthenticateFacebookUser();
+}
+
+final class ReAuthenticatePasswordUser extends AuthenticationEvent {
+  final String email;
+  final String password;
+  const ReAuthenticatePasswordUser(this.email, this.password);
+}
