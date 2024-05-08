@@ -295,7 +295,23 @@ class UserRepositoryImpl implements UserRepository {
     try {
       await firebaseAuth.currentUser!.updateDisplayName(username);
       return const DataSuccess();
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e,
+          message: e.toString(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<void>> updateEmail(String email) async {
+    try {
+      await firebaseAuth.currentUser!.verifyBeforeUpdateEmail(email);
+      return const DataSuccess();
+    } on FirebaseAuthException catch (e) {
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),

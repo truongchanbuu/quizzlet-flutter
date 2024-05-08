@@ -18,4 +18,5 @@ abstract class UserRepository {
   Future<DataState<UserCredential>> reAuthenticatePasswordUser(
       String email, String password);
   Future<DataState<void>> updateUsername(String username);
+  Future<DataState<void>> updateEmail(String email);
 }

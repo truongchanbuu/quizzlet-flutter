@@ -26,82 +26,79 @@ class StreakDaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Thành tựu',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Thành tựu',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
             ),
           ),
-          const SizedBox(height: 10),
-          Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(
-                Radius.circular(10),
+          width: MediaQuery.of(context).size.width,
+          height: 300,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Tháng ${DateTime.now().month.toString()}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      letterSpacing: double.minPositive,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Image.asset(
+                    'assets/images/calendar.png',
+                    fit: BoxFit.contain,
+                  ),
+                ],
               ),
-            ),
-            width: MediaQuery.of(context).size.width,
-            height: 300,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Tháng ${DateTime.now().month.toString()}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25,
-                        letterSpacing: double.minPositive,
-                      ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/images/fire_streak.png',
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    '${streakDays.toString()} STREAK',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 35,
                     ),
-                    const SizedBox(width: 10),
-                    Image.asset(
-                      '/images/calendar.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      '/images/fire_streak.png',
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      '${streakDays.toString()} STREAK',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 35,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Image.asset(
-                      '/images/fire_streak.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 25),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: getWeekDays().map(_buildDays).toList(),
-                ),
-              ],
-            ),
+                  ),
+                  const SizedBox(width: 10),
+                  Image.asset(
+                    'assets/images/fire_streak.png',
+                    fit: BoxFit.contain,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 25),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: getWeekDays().map(_buildDays).toList(),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

@@ -41,11 +41,14 @@ class _HomePageState extends State<HomePage> {
 
   // Pages
   late final List<Widget> pages = [
-    const SingleChildScrollView(
-      child: Column(
-        children: [
-          StreakDaySection(streakDays: 2),
-        ],
+    const Padding(
+      padding: EdgeInsets.all(20.0),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            StreakDaySection(streakDays: 2),
+          ],
+        ),
       ),
     ),
     const Text('Loi giai'),

@@ -115,6 +115,7 @@ class InfoPage extends StatelessWidget {
                       trailing: const Icon(Icons.arrow_forward_ios),
                     ),
                   ),
+                  const SizedBox(height: 20),
                   const StreakDaySection(streakDays: 2),
                 ],
               ),

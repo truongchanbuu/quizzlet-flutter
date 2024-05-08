@@ -43,6 +43,7 @@ class _ChangeUserNamePageState extends State<ChangeUserNamePage> {
               AwesomeDialog(
                 context: context,
                 dialogType: DialogType.error,
+                padding: const EdgeInsets.all(10),
                 headerAnimationLoop: false,
                 title: 'Có lỗi xảy ra vui lòng thử lại',
                 btnCancelOnPress: () {},
@@ -51,13 +52,12 @@ class _ChangeUserNamePageState extends State<ChangeUserNamePage> {
               AwesomeDialog(
                 context: context,
                 dialogType: DialogType.success,
+                padding: const EdgeInsets.all(10),
                 title: 'Đã thay đôi thành công',
                 btnOkOnPress: () {
-                  Navigator.pushAndRemoveUntil(
+                  Navigator.pushNamedAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const HomePage(),
-                    ),
+                    '/',
                     (route) => false,
                   );
                 },

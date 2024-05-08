@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -10,6 +13,7 @@ import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/re
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/home_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/common.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -31,7 +35,7 @@ class _WelcomePageState extends State<WelcomePage> {
   late final FlutterSecureStorage storage;
 
   // Info
-  String? accessToken;
+  String? token;
 
   @override
   void initState() {
@@ -39,11 +43,26 @@ class _WelcomePageState extends State<WelcomePage> {
     userRepository = GetIt.instance.get<UserRepository>();
     carouseController = CarouselController();
     storage = const FlutterSecureStorage();
-    getAccessToken();
+    getToken();
   }
 
-  void getAccessToken() async {
-    accessToken = await storage.read(key: 'accessToken');
+  void getToken() async {
+    token = await storage.read(key: 'token');
+  }
+
+  bool isAuthedByToken() {
+    if (token != null) {
+      try {
+        var decodedToken = JwtDecoder.decode(token!);
+
+        return decodedToken['email'] != null &&
+            decodedToken['email'] ==
+                GetIt.instance.get<FirebaseAuth>().currentUser!.email;
+      } catch (e) {
+        log('Decode error: ${e.toString()}');
+      }
+    }
+    return false;
   }
 
   @override
@@ -52,9 +71,7 @@ class _WelcomePageState extends State<WelcomePage> {
       create: (context) => GetIt.instance.get<AuthenticationBloc>(),
       child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
-          if (
-              // state.user != null ||
-              // accessToken != null ||
+          if (isAuthedByToken() ||
               state.status == AuthenticationStatus.authenticated) {
             return const HomePage();
           }

@@ -30,7 +30,7 @@ class _SignInPageState extends State<SignInPage> {
   bool _isHiddenPassword = true;
 
   // Info
-  String? accessToken;
+  String? token;
   String? email;
   String? password;
 
@@ -45,11 +45,11 @@ class _SignInPageState extends State<SignInPage> {
     _formKey = GlobalKey();
     _resetFormKey = GlobalKey();
     storage = GetIt.instance.get<FlutterSecureStorage>();
-    getAccessToken();
+    getToken();
   }
 
-  void getAccessToken() async {
-    accessToken = await storage.read(key: 'accessToken');
+  void getToken() async {
+    token = await storage.read(key: 'token');
   }
 
   @override
@@ -63,7 +63,7 @@ class _SignInPageState extends State<SignInPage> {
       listeners: [
         BlocListener<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
-            if (state.user != null || accessToken != null) {
+            if (state.user != null || token != null) {
               Navigator.popUntil(context, ModalRoute.withName('/'));
             }
           },
@@ -92,6 +92,7 @@ class _SignInPageState extends State<SignInPage> {
                   .addPostFrameCallback((_) => AwesomeDialog(
                         context: context,
                         dialogType: DialogType.error,
+                        padding: const EdgeInsets.all(10),
                         animType: AnimType.leftSlide,
                         headerAnimationLoop: false,
                         title: 'ĐĂNG NHẬP KHÔNG THÀNH CÔNG',
@@ -111,6 +112,7 @@ class _SignInPageState extends State<SignInPage> {
                 context: context,
                 dialogType: DialogType.success,
                 headerAnimationLoop: false,
+                padding: const EdgeInsets.all(10),
                 title: 'Đường link đã được gửi vào email của bạn',
                 btnOkOnPress: () {
                   Navigator.pop(context);
@@ -120,6 +122,7 @@ class _SignInPageState extends State<SignInPage> {
               AwesomeDialog(
                 context: context,
                 dialogType: DialogType.error,
+                padding: const EdgeInsets.all(10),
                 headerAnimationLoop: false,
                 btnCancelOnPress: () {},
                 title: state.error,

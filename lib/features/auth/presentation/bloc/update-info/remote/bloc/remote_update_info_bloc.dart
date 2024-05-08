@@ -27,5 +27,21 @@ class UpdateInfoBloc extends Bloc<UpdateInfoEvent, UpdateInfoState> {
         emit(UpdateInfoFailed(message: e.toString()));
       }
     });
+
+    on<UpdateEmail>((event, emit) async {
+      try {
+        var dataState = await _userRepository.updateEmail(event.email);
+
+        if (dataState is DataFailed) {
+          emit(UpdateInfoFailed(
+              message: dataState.error?.message ?? 'There is something wrong'));
+        } else if (dataState is DataSuccess) {
+          emit(UpdateInfoSuccess(data: dataState.data));
+        }
+      } catch (e) {
+        log(e.toString());
+        emit(UpdateInfoFailed(message: e.toString()));
+      }
+    });
   }
 }

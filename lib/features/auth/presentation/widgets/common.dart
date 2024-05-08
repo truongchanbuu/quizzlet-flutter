@@ -101,8 +101,8 @@ _signInWithFacebook(BuildContext context) {
 Future<void> signInSuccess(BuildContext context) async {
   var token =
       await GetIt.instance.get<FirebaseAuth>().currentUser!.getIdToken();
-  await saveToSharedPref('accessToken', token);
+  await saveToSharedPref('token', token);
   if (context.mounted) {
-    Navigator.popUntil(context, ModalRoute.withName('/'));
+    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
   }
 }

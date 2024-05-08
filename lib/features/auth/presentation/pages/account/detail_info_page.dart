@@ -11,7 +11,9 @@ import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/bloc/remote_signout_event.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/bloc/remote_signout_state.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/bloc/remote_update_info_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/change_email_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/change_username_page.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/welcome_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/re-auth_form.dart';
 import 'package:sign_in_button/sign_in_button.dart';
@@ -42,11 +44,18 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
       child: BlocConsumer<SignOutBloc, SignOutState>(
         listener: (context, state) {
           if (state is SignOutSuccess) {
-            deleteAccessToken();
-            Navigator.popUntil(context, ModalRoute.withName('/'));
+            deleteToken();
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WelcomePage(),
+              ),
+              (route) => false,
+            );
           } else if (state is SignOutFailed) {
             AwesomeDialog(
               context: context,
+              padding: const EdgeInsets.all(10),
               title: 'Đăng xuất thất bại',
               headerAnimationLoop: false,
               dialogType: DialogType.error,
@@ -218,7 +227,11 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Placeholder(),
+                      builder: (context) => BlocProvider(
+                        create: (context) =>
+                            GetIt.instance.get<UpdateInfoBloc>(),
+                        child: const ChangeEmailPage(),
+                      ),
                     ),
                   );
                   break;
@@ -227,6 +240,7 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
               AwesomeDialog(
                 context: context,
                 dialogType: DialogType.error,
+                padding: const EdgeInsets.all(10),
                 headerAnimationLoop: false,
                 title: 'Xác thực không thành công',
                 desc: 'Người dùng không có quyền thực hiện hành động này',
