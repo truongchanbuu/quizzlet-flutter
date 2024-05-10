@@ -20,8 +20,6 @@ class InfoPage extends StatefulWidget {
 }
 
 class _InfoPageState extends State<InfoPage> {
-  String? imageURL;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,6 +58,8 @@ class _InfoPageState extends State<InfoPage> {
             return const LoadingIndicator();
           }
 
+          String? imageURL = user.photoURL;
+
           return BlocConsumer<UpdateInfoBloc, UpdateInfoState>(
             listener: (context, state) {
               if (state is UpdateInfoFailed) {
@@ -67,7 +67,7 @@ class _InfoPageState extends State<InfoPage> {
                   context: context,
                   headerAnimationLoop: false,
                   dialogType: DialogType.error,
-                  title: 'Có lỗi xảy ra vui lòng thử lại sau',
+                  title: 'Có lỗi xảy ra vui lòng thử lại sau: ${state.message}',
                   padding: const EdgeInsets.all(10),
                   btnCancelOnPress: () {},
                   btnCancelText: 'OK',
@@ -100,7 +100,7 @@ class _InfoPageState extends State<InfoPage> {
                                 shape: BoxShape.circle,
                               ),
                               child: CachedNetworkImage(
-                                imageUrl: imageURL ?? (user.photoURL ?? ''),
+                                imageUrl: imageURL ?? '',
                                 placeholder: (context, url) =>
                                     const CircleAvatar(
                                   radius: 40,

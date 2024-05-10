@@ -74,7 +74,7 @@ class UpdateInfoBloc extends Bloc<UpdateInfoEvent, UpdateInfoState> {
           emit(UpdateInfoLoading());
         }
       } catch (e) {
-        log(e.toString());
+        log('Upload Failed: ${e.toString()}');
         emit(UpdateInfoFailed(message: e.toString()));
       }
     });
@@ -85,12 +85,11 @@ class UpdateInfoBloc extends Bloc<UpdateInfoEvent, UpdateInfoState> {
 
         if (dataState is DataSuccess && dataState.data != null) {
           emit(UpdateInfoSuccess(data: dataState.data));
-        } else {
-          emit(UpdateInfoFailed(
-              message: dataState.error?.message ?? 'There is something wrong'));
+        } else if (dataState is DataFailed) {
+          emit(UpdateInfoFailed(message: dataState.error!.message!));
         }
       } catch (e) {
-        log(e.toString());
+        log('Update Avatar Failed: ${e.toString()}');
         emit(UpdateInfoFailed(message: e.toString()));
       }
     });

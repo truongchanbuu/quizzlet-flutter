@@ -337,8 +337,8 @@ class UserRepositoryImpl implements UserRepository {
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),
-          error: e,
-          message: e.toString(),
+          error: e.code,
+          message: e.message,
         ),
       );
     }
@@ -354,8 +354,8 @@ class UserRepositoryImpl implements UserRepository {
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),
-          error: e,
-          message: e.toString(),
+          error: e.code,
+          message: e.message,
         ),
       );
     }
@@ -375,7 +375,7 @@ class UserRepositoryImpl implements UserRepository {
 
       return DataSuccess(data: photoURL);
     } catch (e) {
-      log(e.toString());
+      log('Upload Failed: ${e.toString()}');
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),
