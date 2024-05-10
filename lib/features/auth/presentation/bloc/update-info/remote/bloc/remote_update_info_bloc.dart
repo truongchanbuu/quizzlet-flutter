@@ -43,5 +43,56 @@ class UpdateInfoBloc extends Bloc<UpdateInfoEvent, UpdateInfoState> {
         emit(UpdateInfoFailed(message: e.toString()));
       }
     });
+
+    on<UpdatePassword>((event, emit) async {
+      try {
+        var dataState = await _userRepository.updatePassword(event.password);
+
+        if (dataState is DataFailed) {
+          emit(UpdateInfoFailed(
+              message: dataState.error?.message ?? 'There is something wrong'));
+        } else if (dataState is DataSuccess) {
+          emit(UpdateInfoSuccess(data: dataState.data));
+        }
+      } catch (e) {
+        log(e.toString());
+        emit(UpdateInfoFailed(message: e.toString()));
+      }
+    });
+
+    on<UploadAvatar>((event, emit) async {
+      try {
+        var dataState =
+            await _userRepository.uploadAvatar(event.emailAsID, event.imgPath);
+
+        if (dataState is DataSuccess && dataState.data != null) {
+          emit(UpdateInfoSuccess(data: dataState.data));
+        } else if (dataState is DataFailed) {
+          emit(UpdateInfoFailed(
+              message: dataState.error?.message ?? 'There is something wrong'));
+        } else {
+          emit(UpdateInfoLoading());
+        }
+      } catch (e) {
+        log(e.toString());
+        emit(UpdateInfoFailed(message: e.toString()));
+      }
+    });
+
+    on<UpdateProfileAvatar>((event, emit) async {
+      try {
+        var dataState = await _userRepository.updateAvatar(event.photoURL);
+
+        if (dataState is DataSuccess && dataState.data != null) {
+          emit(UpdateInfoSuccess(data: dataState.data));
+        } else {
+          emit(UpdateInfoFailed(
+              message: dataState.error?.message ?? 'There is something wrong'));
+        }
+      } catch (e) {
+        log(e.toString());
+        emit(UpdateInfoFailed(message: e.toString()));
+      }
+    });
   }
 }

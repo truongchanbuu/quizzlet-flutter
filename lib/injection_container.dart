@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -28,6 +29,7 @@ Future<void> initializaDependencies() async {
   // Firebase
   sl.registerSingleton<FirebaseAuth>(FirebaseAuth.instance);
   sl.registerSingleton<FirebaseFirestore>(FirebaseFirestore.instance);
+  sl.registerSingleton<FirebaseStorage>(FirebaseStorage.instance);
   sl.registerSingleton<GoogleSignIn>(GoogleSignIn(
     clientId:
         '636054365584-m1b19monh4bnrn297nsnpt94kepo1srq.apps.googleusercontent.com',

@@ -12,6 +12,7 @@ import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/bloc/remote_signout_state.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/bloc/remote_update_info_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/change_email_page.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/change_password_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/change_username_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/welcome_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
@@ -231,6 +232,18 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
                         create: (context) =>
                             GetIt.instance.get<UpdateInfoBloc>(),
                         child: const ChangeEmailPage(),
+                      ),
+                    ),
+                  );
+                  break;
+                case 'password':
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                        create: (context) =>
+                            GetIt.instance.get<UpdateInfoBloc>(),
+                        child: const ChangePasswordPage(),
                       ),
                     ),
                   );

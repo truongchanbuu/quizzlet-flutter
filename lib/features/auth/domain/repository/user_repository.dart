@@ -17,6 +17,9 @@ abstract class UserRepository {
   Future<DataState<UserCredential>> reAuthenticateFacebookUser();
   Future<DataState<UserCredential>> reAuthenticatePasswordUser(
       String email, String password);
+  Future<DataState<String>> uploadAvatar(String emailAsId, String imgPath);
   Future<DataState<void>> updateUsername(String username);
   Future<DataState<void>> updateEmail(String email);
+  Future<DataState<void>> updatePassword(String password);
+  Future<DataState<void>> updateAvatar(String photoURL);
 }

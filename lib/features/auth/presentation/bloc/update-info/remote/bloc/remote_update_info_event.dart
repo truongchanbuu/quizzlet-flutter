@@ -18,3 +18,22 @@ final class UpdateEmail extends UpdateInfoEvent {
 
   const UpdateEmail(this.email);
 }
+
+final class UpdatePassword extends UpdateInfoEvent {
+  final String password;
+
+  const UpdatePassword(this.password);
+}
+
+final class UpdateProfileAvatar extends UpdateInfoEvent {
+  final String photoURL;
+
+  const UpdateProfileAvatar(this.photoURL);
+}
+
+final class UploadAvatar extends UpdateInfoEvent {
+  final String emailAsID;
+  final String imgPath;
+
+  const UploadAvatar(this.emailAsID, this.imgPath);
+}

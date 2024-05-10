@@ -1,11 +1,14 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:quizzlet_fluttter/core/resources/data_state.dart';
 import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
@@ -15,6 +18,7 @@ class UserRepositoryImpl implements UserRepository {
   final GoogleSignIn googleSignIn;
   final userCollection =
       GetIt.instance.get<FirebaseFirestore>().collection('users');
+  final storage = GetIt.instance.get<FirebaseStorage>();
 
   UserRepositoryImpl(this.firebaseAuth, this.googleSignIn);
 
@@ -310,6 +314,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<DataState<void>> updateEmail(String email) async {
     try {
       await firebaseAuth.currentUser!.verifyBeforeUpdateEmail(email);
+
       return const DataSuccess();
     } on FirebaseAuthException catch (e) {
       return DataFailed(
@@ -317,6 +322,65 @@ class UserRepositoryImpl implements UserRepository {
           requestOptions: RequestOptions(),
           error: e,
           message: e.toString(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<void>> updatePassword(String password) async {
+    try {
+      await firebaseAuth.currentUser!.updatePassword(password);
+
+      return const DataSuccess();
+    } on FirebaseAuthException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e,
+          message: e.toString(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<void>> updateAvatar(String photoURL) async {
+    try {
+      await firebaseAuth.currentUser!.updatePhotoURL(photoURL);
+
+      return const DataSuccess();
+    } on FirebaseAuthException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e,
+          message: e.toString(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<String>> uploadAvatar(
+      String emailAsID, String imagePath) async {
+    Reference refRoot = storage.ref();
+    Reference refAvatars = refRoot.child('/avatars');
+
+    try {
+      Reference refUploadFile = refAvatars.child(emailAsID);
+      await refUploadFile.putFile(File(imagePath));
+
+      String photoURL = await refUploadFile.getDownloadURL();
+
+      return DataSuccess(data: photoURL);
+    } catch (e) {
+      log(e.toString());
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          message: e.toString(),
+          error: e,
         ),
       );
     }

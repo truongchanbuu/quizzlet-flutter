@@ -9,7 +9,6 @@ import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/common.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -93,7 +92,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(height: 10),
                     TextFormField(
                       validator: (email) => _validateEmail(context, email),
-                      onSaved: (newValue) => email = newValue,
+                      onSaved: (newValue) => email = newValue?.trim(),
                       onChanged: (value) => email = value,
                       decoration: InputDecoration(
                         labelText: 'ĐỊA CHỈ EMAIL',
@@ -108,7 +107,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(height: 10),
                     TextFormField(
                       validator: _validateName,
-                      onSaved: (newValue) => userName = newValue,
+                      onSaved: (newValue) => userName = newValue?.trim(),
                       onChanged: (value) => userName = value,
                       decoration: const InputDecoration(
                         labelText: 'TÊN NGƯỜI DÙNG',
@@ -120,7 +119,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(height: 10),
                     TextFormField(
                       validator: _validatePassword,
-                      onSaved: (newValue) => password = newValue,
+                      onSaved: (newValue) => password = newValue?.trim(),
                       onChanged: (value) => password = value,
                       obscureText: _isHiddenPassword,
                       decoration: InputDecoration(
@@ -140,7 +139,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(height: 10),
                     TextFormField(
                       validator: _validateConfirmedPassword,
-                      onSaved: (newValue) => confirmedPassword = newValue,
+                      onSaved: (newValue) =>
+                          confirmedPassword = newValue?.trim(),
                       onChanged: (value) => confirmedPassword = value,
                       obscureText: _isHiddenConfirmPassword,
                       decoration: InputDecoration(
@@ -258,7 +258,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   // Validation methods
   String? _validateEmail(BuildContext context, String? email) {
-    if (email?.isEmpty ?? true) {
+    if (email?.trim().isEmpty ?? true) {
       return 'EMAIL KHÔNG ĐƯỢC ĐỂ TRỐNG';
     }
 
@@ -273,7 +273,7 @@ class _SignUpPageState extends State<SignUpPage> {
     RegExp passwordRegex =
         RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[!@#$%^&*(),.?":{}|<>]).{8,}$');
 
-    if (!passwordRegex.hasMatch(password ?? '')) {
+    if (!passwordRegex.hasMatch(password?.trim() ?? '')) {
       return "MẬT KHẨU PHẢI CÓ ÍT NHẤT 1 CHỮ IN HOA, 1 CHỮ 1 THƯỜNG, 1 KÝ TỰ ĐẶC BIỆT VÀ DÀI ÍT NHẤT 8 KÝ TỰ";
     }
 
@@ -281,7 +281,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   String? _validateName(String? name) {
-    if (name?.isEmpty ?? true) {
+    if (name?.trim().isEmpty ?? true) {
       return 'HÃY NHẬP TÊN CỦA BẠN';
     }
 
@@ -289,7 +289,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   String? _validateConfirmedPassword(String? confirmed) {
-    if (confirmed?.isEmpty ?? true) {
+    if (confirmed?.trim().isEmpty ?? true) {
       return "HÃY XÁC NHẬN LẠI MÂT KHẨU";
     }
 
