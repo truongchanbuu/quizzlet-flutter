@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:quizzlet_fluttter/core/util/image_util.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_state.dart';
-import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/bloc/remote_update_info_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/remote_update_info_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/detail_info_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/streak_section.dart';

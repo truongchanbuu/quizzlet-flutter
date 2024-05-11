@@ -8,7 +8,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:quizzlet_fluttter/core/resources/data_state.dart';
 import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';

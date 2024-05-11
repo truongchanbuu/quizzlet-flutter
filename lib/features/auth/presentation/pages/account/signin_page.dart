@@ -8,7 +8,7 @@ import 'package:get_it/get_it.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_state.dart';
-import 'package:quizzlet_fluttter/features/auth/presentation/bloc/reset-password/remote/bloc/remote_reset_password_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/reset-password/remote/remote_reset_password_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signin/remote/remote_signin_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/common.dart';
 

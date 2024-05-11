@@ -156,12 +156,86 @@ class _HomePageState extends State<HomePage> {
 
   _buildFloatingActionButton() {
     return FloatingActionButton(
-      onPressed: () {},
+      onPressed: _showBottomSheeetForCreation,
       backgroundColor: Colors.white,
       shape: const CircleBorder(side: BorderSide.none),
       child: const Icon(
         Icons.add,
         color: Colors.indigo,
+      ),
+    );
+  }
+
+  _showBottomSheeetForCreation() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.4,
+        color: Colors.grey.shade200,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {},
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      child: const ListTile(
+                        title: Text('Topic'),
+                        leading: Icon(Icons.filter_none),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {},
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      child: const ListTile(
+                        title: Text('Thư mục'),
+                        leading: Icon(Icons.folder),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {},
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      child: const ListTile(
+                        title: Text('Lớp'),
+                        leading: Icon(Icons.switch_account),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

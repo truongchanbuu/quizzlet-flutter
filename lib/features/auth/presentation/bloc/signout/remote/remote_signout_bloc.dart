@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:quizzlet_fluttter/core/resources/data_state.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
-import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/bloc/remote_signout_event.dart';
-import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/bloc/remote_signout_state.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/remote_signout_event.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote/remote_signout_state.dart';
 
 class SignOutBloc extends Bloc<SignOutEvent, SignOutState> {
   final UserRepository _userRepository;
