@@ -10,6 +10,7 @@ class FolderModel extends FolderEntity {
     required super.folderId,
     required super.folderName,
     required super.topics,
+    required super.creator,
   });
 
   FolderEntity toEntity() {
@@ -17,6 +18,7 @@ class FolderModel extends FolderEntity {
       folderId: folderId,
       folderName: folderName,
       topics: topics,
+      creator: creator,
     );
   }
 
@@ -25,18 +27,21 @@ class FolderModel extends FolderEntity {
       folderId: entity.folderId,
       folderName: entity.folderName,
       topics: entity.topics,
+      creator: entity.creator,
     );
   }
-  
+
   FolderModel copyWith({
     String? folderId,
     String? folderName,
     List<TopicModel>? topics,
+    String? creator,
   }) {
     return FolderModel(
       folderId: folderId ?? this.folderId,
       folderName: folderName ?? this.folderName,
       topics: topics ?? this.topics,
+      creator: creator ?? this.creator,
     );
   }
 

@@ -25,12 +25,12 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
         } else if (dataState is DataFailed) {
           emit(SignUpState.failed());
         } else if (dataState is DataSuccess && dataState.data != null) {
-          // UserModel? user = dataState.data!.copyWith(
-          //   password:
-          //       DBCrypt().hashpw(dataState.data!.password, DBCrypt().gensalt()),
-          // );
-          //
-          // await _userRepository.setUserData(user);
+          UserModel? user = dataState.data!.copyWith(
+            password:
+                DBCrypt().hashpw(dataState.data!.password, DBCrypt().gensalt()),
+          );
+
+          await _userRepository.setUserData(user);
           emit(SignUpState.success());
         }
       } catch (e) {

@@ -3,8 +3,9 @@ import 'package:quizzlet_fluttter/features/topic/domain/entities/learn_state.dar
 
 class WordEntity extends Equatable {
   final String wordId;
-  final String english;
-  final String vietnamese;
+  final String terminology;
+  final String meaning;
+  final String? wordDesc;
   final String? phonetic;
   final String? illustratorUrl;
   final LearnState learnState;
@@ -12,8 +13,9 @@ class WordEntity extends Equatable {
 
   const WordEntity({
     required this.wordId,
-    required this.english,
-    required this.vietnamese,
+    required this.terminology,
+    required this.meaning,
+    required this.wordDesc,
     this.phonetic,
     this.illustratorUrl,
     this.learnState = LearnState.notLearn,
@@ -23,9 +25,10 @@ class WordEntity extends Equatable {
   @override
   List<Object?> get props => [
         wordId,
-        english,
-        vietnamese,
+        terminology,
+        meaning,
         phonetic,
+        wordDesc,
         illustratorUrl,
         learnState,
         starred

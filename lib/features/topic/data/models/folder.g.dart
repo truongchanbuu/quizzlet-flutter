@@ -12,6 +12,7 @@ FolderModel _$FolderModelFromJson(Map<String, dynamic> json) => FolderModel(
       topics: (json['topics'] as List<dynamic>)
           .map((e) => TopicModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      creator: json['creator'] as String?,
     );
 
 Map<String, dynamic> _$FolderModelToJson(FolderModel instance) =>
@@ -19,4 +20,5 @@ Map<String, dynamic> _$FolderModelToJson(FolderModel instance) =>
       'folderId': instance.folderId,
       'folderName': instance.folderName,
       'topics': instance.topics,
+      'creator': instance.creator,
     };

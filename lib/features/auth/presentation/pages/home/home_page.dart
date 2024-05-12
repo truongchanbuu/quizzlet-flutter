@@ -4,6 +4,9 @@ import 'package:quizzlet_fluttter/core/constants/constants.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/user_info_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/search_box.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/streak_section.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/create_topic_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/lib_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/create_folder_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       'name': 'Lời giải',
     },
     {
-      'icon': Icons.folder,
+      'icon': Icons.menu_book,
       'name': 'Thư viện',
     },
     {
@@ -52,7 +55,7 @@ class _HomePageState extends State<HomePage> {
       ),
     ),
     const Text('Loi giai'),
-    const Text('Thu vien'),
+    const LibraryPage(),
     const InfoPage(),
   ];
 
@@ -72,7 +75,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _currentPageIndex == 0 ? _buildAppBar(context) : null,
-      backgroundColor: Colors.grey.shade200,
       body: _buildBody(),
       floatingActionButton: _buildFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -156,7 +158,7 @@ class _HomePageState extends State<HomePage> {
 
   _buildFloatingActionButton() {
     return FloatingActionButton(
-      onPressed: _showBottomSheeetForCreation,
+      onPressed: _showBottomSheetForCreation,
       backgroundColor: Colors.white,
       shape: const CircleBorder(side: BorderSide.none),
       child: const Icon(
@@ -166,7 +168,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _showBottomSheeetForCreation() {
+  _showBottomSheetForCreation() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -187,7 +189,12 @@ class _HomePageState extends State<HomePage> {
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/topic/create',
+                        );
+                      },
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       child: const ListTile(
                         title: Text('Topic'),
@@ -205,11 +212,16 @@ class _HomePageState extends State<HomePage> {
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const CreateFolderDialog(),
+                        );
+                      },
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       child: const ListTile(
                         title: Text('Thư mục'),
-                        leading: Icon(Icons.folder),
+                        leading: Icon(Icons.folder_outlined),
                       ),
                     ),
                   ),

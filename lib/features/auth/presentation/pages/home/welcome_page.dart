@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get_it/get_it.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 import 'package:quizzlet_fluttter/core/constants/constants.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
@@ -40,7 +40,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
-    userRepository = GetIt.instance.get<UserRepository>();
+    userRepository = sl.get<UserRepository>();
     carouseController = CarouselController();
     storage = const FlutterSecureStorage();
     getToken();
@@ -56,8 +56,7 @@ class _WelcomePageState extends State<WelcomePage> {
         var decodedToken = JwtDecoder.decode(token!);
 
         return decodedToken['email'] != null &&
-            decodedToken['email'] ==
-                GetIt.instance.get<FirebaseAuth>().currentUser!.email;
+            decodedToken['email'] == sl.get<FirebaseAuth>().currentUser!.email;
       } catch (e) {
         log('Decode error: ${e.toString()}');
       }
@@ -68,7 +67,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => GetIt.instance.get<AuthenticationBloc>(),
+      create: (context) => sl.get<AuthenticationBloc>(),
       child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
           if (isAuthedByToken() ||

@@ -8,8 +8,9 @@ part 'word.g.dart';
 class WordModel extends WordEntity {
   const WordModel({
     required super.wordId,
-    required super.english,
-    required super.vietnamese,
+    required super.terminology,
+    required super.meaning,
+    super.wordDesc,
     super.phonetic,
     super.illustratorUrl,
     super.learnState,
@@ -19,8 +20,9 @@ class WordModel extends WordEntity {
   WordEntity toEntity() {
     return WordEntity(
       wordId: wordId,
-      english: english,
-      vietnamese: vietnamese,
+      terminology: terminology,
+      meaning: meaning,
+      wordDesc: wordDesc,
       phonetic: phonetic,
       illustratorUrl: illustratorUrl,
       learnState: learnState,
@@ -31,8 +33,9 @@ class WordModel extends WordEntity {
   factory WordModel.fromEntity(WordEntity entity) {
     return WordModel(
       wordId: entity.wordId,
-      english: entity.english,
-      vietnamese: entity.vietnamese,
+      terminology: entity.terminology,
+      meaning: entity.meaning,
+      wordDesc: entity.wordDesc,
       phonetic: entity.phonetic,
       illustratorUrl: entity.illustratorUrl,
       learnState: entity.learnState,
@@ -42,8 +45,9 @@ class WordModel extends WordEntity {
 
   WordModel copyWith({
     String? wordId,
-    String? english,
-    String? vietnamese,
+    String? terminology,
+    String? meaning,
+    String? wordDesc,
     String? phonetic,
     String? illustratorUrl,
     LearnState? learnState,
@@ -51,8 +55,9 @@ class WordModel extends WordEntity {
   }) {
     return WordModel(
       wordId: wordId ?? this.wordId,
-      english: english ?? this.english,
-      vietnamese: vietnamese ?? this.vietnamese,
+      terminology: terminology ?? this.terminology,
+      meaning: meaning ?? this.meaning,
+      wordDesc: wordDesc ?? this.wordDesc,
       phonetic: phonetic ?? this.phonetic,
       illustratorUrl: illustratorUrl ?? this.illustratorUrl,
       learnState: learnState ?? this.learnState,

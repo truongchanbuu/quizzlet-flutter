@@ -6,18 +6,17 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quizzlet_fluttter/core/resources/data_state.dart';
 import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class UserRepositoryImpl implements UserRepository {
   final FirebaseAuth firebaseAuth;
   final GoogleSignIn googleSignIn;
-  final userCollection =
-      GetIt.instance.get<FirebaseFirestore>().collection('users');
-  final storage = GetIt.instance.get<FirebaseStorage>();
+  final userCollection = sl.get<FirebaseFirestore>().collection('users');
+  final storage = sl.get<FirebaseStorage>();
 
   UserRepositoryImpl(this.firebaseAuth, this.googleSignIn);
 
@@ -67,6 +66,14 @@ class UserRepositoryImpl implements UserRepository {
 
       var userCredential = await firebaseAuth.signInWithCredential(credential);
 
+      setUserData(UserModel(
+        email: userCredential.user!.email!,
+        password:
+            userCredential.user!.email!, // Generate random password (encrypted)
+        avatarUrl: userCredential.user!.photoURL,
+        username: userCredential.user!.displayName,
+      ));
+
       return DataSuccess(data: userCredential);
     } on FirebaseAuthException catch (e) {
       log(e.toString());
@@ -99,6 +106,14 @@ class UserRepositoryImpl implements UserRepository {
               FacebookAuthProvider.credential(loginResult.accessToken!.token);
           var userCredential =
               await firebaseAuth.signInWithCredential(facebookAuthCredential);
+
+          setUserData((UserModel(
+            email: userCredential.user!.email!,
+            password: userCredential
+                .user!.email!, // Generate random password (encrypted)
+            avatarUrl: userCredential.user!.photoURL,
+            username: userCredential.user!.displayName,
+          )));
           return DataSuccess(data: userCredential);
         case LoginStatus.cancelled:
           return DataFailed(

@@ -3,7 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 import 'package:quizzlet_fluttter/core/util/image_util.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_state.dart';
@@ -38,10 +38,10 @@ class _InfoPageState extends State<InfoPage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => GetIt.instance.get<AuthenticationBloc>(),
+          create: (context) => sl.get<AuthenticationBloc>(),
         ),
         BlocProvider(
-          create: (context) => GetIt.instance.get<UpdateInfoBloc>(),
+          create: (context) => sl.get<UpdateInfoBloc>(),
         )
       ],
       child: BlocConsumer<AuthenticationBloc, AuthenticationState>(

@@ -3,7 +3,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 import 'package:intl/intl.dart';
 import 'package:quizzlet_fluttter/features/auth/data/models/user.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
@@ -43,7 +43,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void initState() {
     super.initState();
-    userRepository = GetIt.instance.get<UserRepository>();
+    userRepository = sl.get<UserRepository>();
     _formKey = GlobalKey<FormState>();
     dateController = TextEditingController();
   }
@@ -69,7 +69,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   _buildBody() {
     return BlocProvider(
-      create: (context) => GetIt.instance.get<SignUpBloc>(),
+      create: (context) => sl.get<SignUpBloc>(),
       child: BlocConsumer<SignUpBloc, SignUpState>(
         builder: (context, state) {
           if (state.status == SignUpStatus.loading) {

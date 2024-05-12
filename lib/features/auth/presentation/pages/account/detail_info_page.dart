@@ -2,7 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 import 'package:quizzlet_fluttter/core/util/shared_preference_util.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_event.dart';
@@ -41,7 +41,7 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => GetIt.instance.get<SignOutBloc>(),
+      create: (context) => sl.get<SignOutBloc>(),
       child: BlocConsumer<SignOutBloc, SignOutState>(
         listener: (context, state) {
           if (state is SignOutSuccess) {
@@ -206,7 +206,7 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
       isScrollControlled: true,
       useSafeArea: true,
       builder: (context) => BlocProvider(
-        create: (context) => GetIt.instance.get<AuthenticationBloc>(),
+        create: (context) => sl.get<AuthenticationBloc>(),
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
             if (state.status == AuthenticationStatus.reAuthSuccess) {
@@ -216,8 +216,7 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => BlocProvider(
-                              create: (context) =>
-                                  GetIt.instance.get<UpdateInfoBloc>(),
+                              create: (context) => sl.get<UpdateInfoBloc>(),
                               child: const ChangeUserNamePage(),
                             ),
                         settings:
@@ -229,8 +228,7 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => BlocProvider(
-                        create: (context) =>
-                            GetIt.instance.get<UpdateInfoBloc>(),
+                        create: (context) => sl.get<UpdateInfoBloc>(),
                         child: const ChangeEmailPage(),
                       ),
                     ),
@@ -241,8 +239,7 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => BlocProvider(
-                        create: (context) =>
-                            GetIt.instance.get<UpdateInfoBloc>(),
+                        create: (context) => sl.get<UpdateInfoBloc>(),
                         child: const ChangePasswordPage(),
                       ),
                     ),

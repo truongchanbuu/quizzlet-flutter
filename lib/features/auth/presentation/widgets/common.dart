@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 import 'package:quizzlet_fluttter/core/util/shared_preference_util.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signin/remote/remote_signin_bloc.dart';
@@ -99,8 +99,7 @@ _signInWithFacebook(BuildContext context) {
 
 // Success
 Future<void> signInSuccess(BuildContext context) async {
-  var token =
-      await GetIt.instance.get<FirebaseAuth>().currentUser!.getIdToken();
+  var token = await sl.get<FirebaseAuth>().currentUser!.getIdToken();
   await saveToSharedPref('token', token);
   if (context.mounted) {
     Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);

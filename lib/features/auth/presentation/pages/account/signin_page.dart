@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get_it/get_it.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 import 'package:quizzlet_fluttter/features/auth/domain/repository/user_repository.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/auth/remote/remote_auth_state.dart';
@@ -41,10 +41,10 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void initState() {
     super.initState();
-    userRepository = GetIt.instance.get<UserRepository>();
+    userRepository = sl.get<UserRepository>();
     _formKey = GlobalKey();
     _resetFormKey = GlobalKey();
-    storage = GetIt.instance.get<FlutterSecureStorage>();
+    storage = sl.get<FlutterSecureStorage>();
     getToken();
   }
 
