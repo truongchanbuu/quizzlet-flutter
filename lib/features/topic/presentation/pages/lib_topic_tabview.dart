@@ -16,44 +16,44 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
   @override
   void initState() {
     super.initState();
-    // topics = [
-    //   TopicModel(
-    //     topicId: '001',
-    //     topicName: 'Culture',
-    //     words: const [],
-    //     isPublic: false,
-    //     createdBy: 'truongbuu1593@gmail.com',
-    //     lastAccess: DateTime.now(),
-    //     createdAt: DateTime(2024, 5, 12),
-    //   ),
-    //   TopicModel(
-    //     topicId: '002',
-    //     topicName: 'Culture',
-    //     words: const [],
-    //     isPublic: false,
-    //     createdBy: 'test@gmail.com',
-    //     lastAccess: null,
-    //     createdAt: DateTime(2024, 5, 12),
-    //   ),
-    //   TopicModel(
-    //     topicId: '003',
-    //     topicName: 'Culture',
-    //     words: const [],
-    //     isPublic: false,
-    //     createdBy: 'test@gmail.com',
-    //     lastAccess: DateTime.now(),
-    //     createdAt: DateTime(2024, 5, 12),
-    //   ),
-    //   TopicModel(
-    //     topicId: '004',
-    //     topicName: 'Culture',
-    //     words: const [],
-    //     isPublic: false,
-    //     createdBy: 'test@gmail.com',
-    //     lastAccess: DateTime.now(),
-    //     createdAt: DateTime(2024, 5, 12),
-    //   ),
-    // ];
+    topics = [
+      TopicModel(
+        topicId: '001',
+        topicName: 'Culture',
+        words: const [],
+        isPublic: false,
+        createdBy: 'truongbuu1593@gmail.com',
+        lastAccess: DateTime.now(),
+        createdAt: DateTime(2024, 5, 12),
+      ),
+      TopicModel(
+        topicId: '002',
+        topicName: 'Culture',
+        words: const [],
+        isPublic: false,
+        createdBy: 'test@gmail.com',
+        lastAccess: null,
+        createdAt: DateTime(2024, 5, 12),
+      ),
+      TopicModel(
+        topicId: '003',
+        topicName: 'Culture',
+        words: const [],
+        isPublic: false,
+        createdBy: 'test@gmail.com',
+        lastAccess: DateTime.now(),
+        createdAt: DateTime(2024, 5, 12),
+      ),
+      TopicModel(
+        topicId: '004',
+        topicName: 'Culture',
+        words: const [],
+        isPublic: false,
+        createdBy: 'test@gmail.com',
+        lastAccess: DateTime.now(),
+        createdAt: DateTime(2024, 5, 12),
+      ),
+    ];
     _topicsByDate(topics);
   }
 
@@ -100,8 +100,15 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(groupName),
-              ListView.builder(
+              Text(
+                groupName,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
@@ -109,6 +116,8 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
                   return _createTopicItem(topic);
                 },
                 itemCount: topics.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 10),
               ),
             ],
           );
