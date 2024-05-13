@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/core/util/date_time_util.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic_item.dart';
 
 class LibTopicTabView extends StatefulWidget {
   const LibTopicTabView({super.key});
@@ -47,10 +49,32 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
       TopicModel(
         topicId: '004',
         topicName: 'Culture',
-        words: const [],
+        words: const [
+          WordModel(
+              wordId: 'W001',
+              terminology: 'Blue Archive',
+              meaning: 'Hocsinheptoi'),
+          WordModel(
+              wordId: 'W002',
+              terminology: 'Blue Archive',
+              meaning: 'Motdoiliemkhiet'),
+          WordModel(
+              wordId: 'W003',
+              terminology: 'Blue Archive',
+              meaning: 'hocsinhngaycangmatday'),
+        ],
         isPublic: false,
         createdBy: 'test@gmail.com',
         lastAccess: DateTime.now(),
+        createdAt: DateTime(2024, 5, 12),
+      ),
+      TopicModel(
+        topicId: '005',
+        topicName: 'Culture 1',
+        words: const [],
+        isPublic: false,
+        createdBy: 'test@gmail.com',
+        lastAccess: DateTime(2023, 10, 10),
         createdAt: DateTime(2024, 5, 12),
       ),
     ];
@@ -127,51 +151,7 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
   }
 
   Widget _createTopicItem(TopicModel topic) {
-    return InkWell(
-      onTap: () {},
-      borderRadius: const BorderRadius.all(Radius.circular(10)),
-      child: Material(
-        elevation: 1,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(width: 0.5),
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-          ),
-          child: ListTile(
-            title: Padding(
-                padding: const EdgeInsets.only(bottom: 10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      topic.topicName,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      '${topic.words.length} thuật ngữ',
-                      style: const TextStyle(fontSize: 10),
-                    ),
-                  ],
-                )),
-            contentPadding: const EdgeInsets.all(20),
-            subtitle: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 15,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  topic.createdBy,
-                  style: const TextStyle(color: Colors.black),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    return TopicItem(topic: topic);
   }
 
   // Handle data
