@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flash_card_widget.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 
 class FlashCardPage extends StatefulWidget {
   final List<WordModel> words;
@@ -14,7 +15,12 @@ class _FlashCardPageState extends State<FlashCardPage> {
   int _currentWordIndex = 0;
   int _currentStudying = 0;
   int _currentLearned = 0;
+  int _currentFrontFaceSelected = 0;
+  int _currentLearningContentSelected = 0;
+
   bool _isPlaying = false;
+  bool _isShuffled = false;
+  bool _isAllPronouncing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -129,18 +135,52 @@ class _FlashCardPageState extends State<FlashCardPage> {
   _showFlashCardSettings() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Column(
-        children: [
-          const Text(
-            'Tùy chọn',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: Text(
+                  'Tùy chọn',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildToolIcons(),
+              const SizedBox(height: 10),
+              const Text(
+                'Thiết lập thẻ nhớ',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text('Mặt trước'),
+              const SizedBox(height: 10),
+              _buildFlashCardFrontSelection(),
+              const SizedBox(height: 10),
+              const Text('Nội dung học'),
+              const SizedBox(height: 10),
+              _buildLearningContentSelection(),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () {},
+                style: TextButton.styleFrom(
+                  minimumSize: const Size.fromHeight(55),
+                ),
+                child: const Text(
+                  'Đặt lại thẻ nhớ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-          _buildToolIcons(),
-        ],
+        ),
       ),
     );
   }
@@ -149,15 +189,31 @@ class _FlashCardPageState extends State<FlashCardPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildIconWithTextBelow('Trộn thẻ', const Icon(Icons.shuffle)),
+        StatefulBuilder(
+          builder: (context, setModalState) => _buildIconWithTextBelow(
+            'Trộn thẻ',
+            const Icon(Icons.shuffle),
+            _isShuffled ? Colors.indigo : null,
+            () =>
+                setState(() => setModalState(() => _isShuffled = !_isShuffled)),
+          ),
+        ),
         const SizedBox(width: 100),
-        _buildIconWithTextBelow(
-            'Phát bản thu', const Icon(Icons.volume_up_outlined)),
+        StatefulBuilder(
+          builder: (context, setModalState) => _buildIconWithTextBelow(
+            'Phát bản thu',
+            const Icon(Icons.volume_up_outlined),
+            _isAllPronouncing ? Colors.indigo : null,
+            () => setState(() =>
+                setModalState(() => _isAllPronouncing = !_isAllPronouncing)),
+          ),
+        )
       ],
     );
   }
 
-  _buildIconWithTextBelow(String text, Icon icon) {
+  _buildIconWithTextBelow(
+      String text, Icon icon, Color? color, void Function()? onPressed) {
     return Column(
       children: [
         Container(
@@ -166,16 +222,68 @@ class _FlashCardPageState extends State<FlashCardPage> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(width: 1),
+            color: Colors.transparent,
           ),
           child: IconButton(
-            onPressed: () {},
+            onPressed: onPressed,
             icon: icon,
             iconSize: 30,
+            color: color,
           ),
         ),
         const SizedBox(height: 10),
         Text(text),
       ],
+    );
+  }
+
+  _buildFlashCardFrontSelection() {
+    return SizedBox(
+      width: double.infinity,
+      child: ToggleSwitch(
+        onToggle: (index) =>
+            setState(() => _currentFrontFaceSelected = index ?? 0),
+        initialLabelIndex: _currentFrontFaceSelected,
+        totalSwitches: 2,
+        labels: const ['Thuật ngữ', 'Định nghĩa'],
+        activeBgColor: const [Colors.indigo],
+        inactiveBgColor: Colors.white,
+        activeFgColor: Colors.white,
+        inactiveFgColor: Colors.indigo,
+        customWidths: const [double.infinity, double.infinity],
+        customTextStyles: const [
+          TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ],
+        centerText: true,
+        borderColor: const [Colors.indigo],
+      ),
+    );
+  }
+
+  _buildLearningContentSelection() {
+    return SizedBox(
+      width: double.infinity,
+      child: ToggleSwitch(
+        onToggle: (index) =>
+            setState(() => _currentLearningContentSelected = index ?? 0),
+        initialLabelIndex: _currentLearningContentSelected,
+        totalSwitches: 2,
+        labels: const ['Tất cả các thẻ', 'Chỉ các thẻ được gắn sao'],
+        activeBgColor: const [Colors.indigo],
+        inactiveBgColor: Colors.white,
+        activeFgColor: Colors.white,
+        inactiveFgColor: Colors.indigo,
+        customWidths: const [double.infinity, double.infinity],
+        customTextStyles: const [
+          TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ],
+        centerText: true,
+        borderColor: const [Colors.indigo],
+      ),
     );
   }
 }

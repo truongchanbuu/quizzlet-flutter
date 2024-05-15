@@ -47,6 +47,8 @@ class _FlashCardState extends State<FlashCard> {
   _buildCard(String title) {
     return GestureDetector(
       onTap: () => _flipCardController.flipcard(),
+      onHorizontalDragStart: (details) {},
+      onVerticalDragStart: (details) {},
       child: SizedBox(
         width: MediaQuery.of(context).size.width - 100,
         height: MediaQuery.of(context).size.height - 250,
