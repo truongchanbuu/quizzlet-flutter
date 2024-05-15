@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flash_card_preview_section.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/learn_feature_item_widget.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/word_card_list.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class TopicDetailPage extends StatefulWidget {
   final TopicModel topic;
@@ -43,24 +45,47 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   }
 
   _showBottomSheetOptions(BuildContext context) {
+    String email = sl.get<FirebaseAuth>().currentUser!.email!;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: ListView(
-          children: [
-            ListTile(
-              onTap: () {},
-              leading: const Icon(Icons.folder_outlined),
-              title: const Text('Thêm vào thư mục'),
-            ),
-            ListTile(
-              onTap: _shareTopic,
-              leading: const Icon(Icons.share_outlined),
-              title: const Text('Chia sẻ'),
-            )
-          ],
+      builder: (context) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.4,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ListView(
+            children: [
+              ListTile(
+                onTap: () {},
+                leading: const Icon(Icons.folder_outlined),
+                title: const Text('Thêm vào thư mục'),
+              ),
+              ListTile(
+                onTap: _shareTopic,
+                leading: const Icon(Icons.share_outlined),
+                title: const Text('Chia sẻ'),
+              ),
+              if (email == widget.topic.createdBy)
+                ListTile(
+                  onTap: () {},
+                  leading: const Icon(Icons.edit),
+                  title: const Text('Chỉnh sửa'),
+                ),
+              if (email == widget.topic.createdBy)
+                ListTile(
+                  onTap: () {},
+                  leading: const Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                  title: const Text(
+                    'Xóa chủ đề',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

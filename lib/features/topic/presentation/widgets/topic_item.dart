@@ -31,21 +31,26 @@ class TopicItem extends StatelessWidget {
           ),
           child: ListTile(
             title: Padding(
-                padding: const EdgeInsets.only(bottom: 10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      topic.topicName,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    topic.topicName,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    '${topic.words.length} thuật ngữ',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Text(
-                      '${topic.words.length} thuật ngữ',
-                      style: const TextStyle(fontSize: 10),
-                    ),
-                  ],
-                )),
+                  ),
+                ],
+              ),
+            ),
             contentPadding: const EdgeInsets.all(20),
             subtitle: Row(
               children: [

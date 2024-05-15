@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/flash_card_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PreviewFlashCardSection extends StatefulWidget {
@@ -39,64 +40,9 @@ class _PreviewFlashCardSectionState extends State<PreviewFlashCardSection> {
             axis: FlipAxis.horizontal,
             onTapFlipping: true,
             rotateSide: RotateSide.bottom,
-            frontWidget: Material(
-              elevation: 2,
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              child: InkWell(
-                onTap: () {
-                  _flipCardControllers[index].flipcard();
-                },
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                child: Stack(
-                  children: [
-                    ListTile(
-                      title: Center(
-                        child: Text(
-                          widget.words[index].terminology,
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.bottomRight,
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.fullscreen),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            backWidget: Material(
-              elevation: 2,
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              child: InkWell(
-                onTap: () {
-                  _flipCardControllers[index].flipcard();
-                },
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                child: Stack(
-                  children: [
-                    ListTile(
-                      title: Center(
-                        child: Text(
-                          widget.words[index].meaning,
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.bottomRight,
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.fullscreen),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            animationDuration: const Duration(milliseconds: 500),
+            frontWidget: _buildCard(index, widget.words[index].terminology),
+            backWidget: _buildCard(index, widget.words[index].meaning),
           ),
           options: CarouselOptions(
             onPageChanged: (index, reason) =>
@@ -121,6 +67,48 @@ class _PreviewFlashCardSectionState extends State<PreviewFlashCardSection> {
           curve: Curves.ease,
         ),
       ],
+    );
+  }
+
+  _buildCard(int index, String title) {
+    return Card(
+      elevation: 2,
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: () => _flipCardControllers[index].flipcard(),
+            child: Center(
+              child: Text(
+                title,
+                style: const TextStyle(color: Colors.black),
+                semanticsLabel: title,
+              ),
+            ),
+          ),
+          Container(
+            alignment: Alignment.bottomRight,
+            child: IconButton(
+              onPressed: navigateToFlashCardLearnPage,
+              icon: const Icon(Icons.fullscreen),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  navigateToFlashCardLearnPage() {
+    final currentRoute = ModalRoute.of(context);
+    final currentRouteName = currentRoute?.settings.name ?? '';
+    const newRouteName = '/flashcards/';
+    final fullRouteName = '$currentRouteName$newRouteName';
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FlashCardPage(words: widget.words),
+        settings: RouteSettings(name: fullRouteName),
+      ),
     );
   }
 }

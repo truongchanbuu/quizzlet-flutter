@@ -190,6 +190,7 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
+                        Navigator.pop(context);
                         Navigator.pushNamed(
                           context,
                           '/topic/create',
@@ -197,7 +198,7 @@ class _HomePageState extends State<HomePage> {
                       },
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       child: const ListTile(
-                        title: Text('Topic'),
+                        title: Text('Chủ đề'),
                         leading: Icon(Icons.filter_none),
                       ),
                     ),
@@ -213,6 +214,7 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
+                        Navigator.pop(context);
                         showDialog(
                           context: context,
                           builder: (context) => const CreateFolderDialog(),

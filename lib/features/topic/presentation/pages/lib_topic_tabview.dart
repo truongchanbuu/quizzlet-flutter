@@ -116,42 +116,57 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
   }
 
   _buildTopics() {
-    return ListView.separated(
-        itemBuilder: (context, index) {
-          String groupName = groupTopics.keys.toList()[index];
-          List<TopicModel> topics = groupTopics[groupName]!;
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildSearchBar(),
+          const SizedBox(height: 20),
+          ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                String groupName = groupTopics.keys.toList()[index];
+                List<TopicModel> topics = groupTopics[groupName]!;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                groupName,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-              const SizedBox(height: 10),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  var topic = topics[index];
-                  return _createTopicItem(topic);
-                },
-                itemCount: topics.length,
-                separatorBuilder: (context, index) =>
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      groupName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
                     const SizedBox(height: 10),
-              ),
-            ],
-          );
-        },
-        separatorBuilder: (context, index) => const SizedBox(height: 10),
-        itemCount: groupTopics.length);
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        var topic = topics[index];
+                        return TopicItem(topic: topic);
+                      },
+                      itemCount: topics.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
+                    ),
+                  ],
+                );
+              },
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
+              itemCount: groupTopics.length),
+        ],
+      ),
+    );
   }
 
-  Widget _createTopicItem(TopicModel topic) {
-    return TopicItem(topic: topic);
+  _buildSearchBar() {
+    return TextField(
+      onChanged: (value) {},
+      decoration: const InputDecoration(
+        labelText: 'BỘ LỌC',
+      ),
+    );
   }
 
   // Handle data

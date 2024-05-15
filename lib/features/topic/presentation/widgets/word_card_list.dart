@@ -35,14 +35,8 @@ class _WordCardListState extends State<WordCardList> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
-              onTap: () async {
-                setState(() {
-                  _termPronouncingIndex = index;
-                });
-                await pronounce(widget.words[index].terminology);
-                setState(() {
-                  _termPronouncingIndex = null;
-                });
+              onTap: () {
+                pronounce(widget.words[index].terminology);
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -76,11 +70,8 @@ class _WordCardListState extends State<WordCardList> {
             ),
             const SizedBox(height: 10),
             GestureDetector(
-              onTap: () async {
-                setState(() {
-                  _meanPronouncingIndex = index;
-                });
-                await pronounce(widget.words[index].meaning);
+              onTap: () {
+                pronounce(widget.words[index].meaning);
               },
               child: Text(
                 widget.words[index].meaning,
