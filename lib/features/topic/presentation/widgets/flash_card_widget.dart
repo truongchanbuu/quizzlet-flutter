@@ -26,42 +26,42 @@ class _FlashCardState extends State<FlashCard> {
   }
 
   final textStyle = const TextStyle(
-    fontSize: 40,
+    fontSize: 20,
   );
 
   final double elevation = 3;
 
   @override
   Widget build(BuildContext context) {
-    return FlipCard(
-      frontWidget: _buildCard(widget.word.terminology),
-      backWidget: _buildCard(widget.word.meaning),
-      controller: _flipCardController,
-      rotateSide: RotateSide.right,
-      axis: FlipAxis.vertical,
-      animationDuration: const Duration(milliseconds: 500),
-      onTapFlipping: true,
+    return Card(
+      elevation: elevation,
+      child: FlipCard(
+        frontWidget: _buildCard(widget.word.terminology),
+        backWidget: _buildCard(widget.word.meaning),
+        controller: _flipCardController,
+        rotateSide: RotateSide.left,
+        axis: FlipAxis.vertical,
+        animationDuration: const Duration(milliseconds: 500),
+        onTapFlipping: true,
+      ),
     );
   }
 
   _buildCard(String title) {
     return GestureDetector(
       onTap: () => _flipCardController.flipcard(),
-      onHorizontalDragStart: (details) {},
-      onVerticalDragStart: (details) {},
+      onLongPress: () => _showCardDialog(title),
       child: SizedBox(
         width: MediaQuery.of(context).size.width - 100,
         height: MediaQuery.of(context).size.height - 250,
         child: Stack(
           children: [
-            Card(
-              elevation: elevation,
-              child: Center(
-                child: Text(
-                  title,
-                  style: textStyle,
-                  semanticsLabel: title,
-                ),
+            Center(
+              child: Text(
+                title,
+                style: textStyle,
+                semanticsLabel: title,
+                textAlign: TextAlign.center,
               ),
             ),
             Positioned(
@@ -83,6 +83,29 @@ class _FlashCardState extends State<FlashCard> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  _showCardDialog(String title) {
+    showDialog(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(title),
+        semanticLabel: title,
+        children: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            style: TextButton.styleFrom(
+              minimumSize: const Size.fromHeight(50),
+              shape: const BeveledRectangleBorder(),
+              padding: const EdgeInsets.all(20.0),
+            ),
+            child: const Text('Đóng'),
+          ),
+        ],
       ),
     );
   }

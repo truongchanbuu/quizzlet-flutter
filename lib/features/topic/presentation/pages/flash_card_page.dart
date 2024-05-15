@@ -13,21 +13,98 @@ class FlashCardPage extends StatefulWidget {
 
 class _FlashCardPageState extends State<FlashCardPage> {
   int _currentWordIndex = 0;
-  int _currentStudying = 0;
-  int _currentLearned = 0;
+  var _currentStudying = [];
+  var _currentLearned = [];
   int _currentFrontFaceSelected = 0;
   int _currentLearningContentSelected = 0;
 
   bool _isPlaying = false;
   bool _isShuffled = false;
   bool _isAllPronouncing = false;
+  bool _isMessageVisible = false;
+  bool _isStudyingDrag = false;
+  bool _isLearnedDrag = false;
+
+  num percentage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    percentage = (_currentWordIndex / widget.words.length).round();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: _buildAppBar(),
-      body: _buildBody(),
+      body: ListView(
+        children: [
+          _buildProgressIndicator(),
+          const SizedBox(height: 10),
+          _buildLearningStats(),
+          const SizedBox(height: 30),
+          _buildFlashCard(),
+          const SizedBox(height: 25),
+          buildToolButtons(),
+        ],
+      ),
+    );
+  }
+
+  _buildProgressIndicator() {
+    return LinearProgressIndicator(
+      value: percentage.toDouble(),
+      semanticsLabel: 'Your learning progress',
+      semanticsValue: 'You learned ${percentage * 100}%',
+    );
+  }
+
+  _buildLearningStats() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          width: 100,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: Colors.orangeAccent.withOpacity(0.2),
+            border: Border.all(width: 1, color: Colors.orangeAccent),
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+          ),
+          child: Text(
+            '${_currentStudying.length}',
+            style: const TextStyle(
+              color: Colors.deepOrange,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Container(
+          width: 100,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: Colors.greenAccent.withOpacity(0.2),
+            border: Border.all(width: 1, color: Colors.greenAccent),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              bottomLeft: Radius.circular(20),
+            ),
+          ),
+          child: Text(
+            '${_currentLearned.length}',
+            style: const TextStyle(
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -47,82 +124,47 @@ class _FlashCardPageState extends State<FlashCardPage> {
     );
   }
 
-  _buildBody() {
-    var percentage = _currentWordIndex / widget.words.length;
-
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          LinearProgressIndicator(
-            value: percentage,
-            semanticsLabel: 'Your learning progress',
-            semanticsValue: 'You learned ${percentage * 100}%',
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 100,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: Colors.orangeAccent.withOpacity(0.5),
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(5),
-                    bottomRight: Radius.circular(5),
-                  ),
-                ),
-                child: Text(
-                  '$_currentStudying',
-                  style: const TextStyle(
-                    color: Colors.orange,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Container(
-                width: 100,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: Colors.greenAccent.withOpacity(0.5),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(5),
-                    bottomLeft: Radius.circular(5),
-                  ),
-                ),
-                child: Text(
-                  '$_currentLearned',
-                  style: const TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          FlashCard(word: widget.words[_currentWordIndex]),
-          const SizedBox(height: 20),
-          buildToolButtons(),
-        ],
-      ),
-    );
-  }
-
   buildToolButtons() {
+    const textStyle = TextStyle(color: Colors.black, fontSize: 11);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           IconButton(
-            onPressed: () {},
+            onPressed: _currentWordIndex == 0 ? null : () {},
             icon: const Icon(Icons.undo),
           ),
+          Visibility(
+            visible: _isMessageVisible,
+            child: Expanded(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 500),
+                opacity: _isMessageVisible ? 1.0 : 0.0,
+                child: ListTile(
+                  leading: const Icon(Icons.play_arrow),
+                  title: _isPlaying
+                      ? const Text(
+                          'Tự động cuộn thẻ đang được BẬT',
+                          style: textStyle,
+                          textAlign: TextAlign.center,
+                        )
+                      : const Text(
+                          'Tự động cuộn thẻ đang được TẮT',
+                          style: textStyle,
+                          textAlign: TextAlign.center,
+                        ),
+                ),
+              ),
+            ),
+          ),
           IconButton(
-            onPressed: () => setState(() => _isPlaying = !_isPlaying),
+            onPressed: () {
+              setState(() => _isPlaying = !_isPlaying);
+              _showText();
+            },
             icon: _isPlaying
                 ? const Icon(Icons.pause)
                 : const Icon(Icons.play_arrow),
@@ -286,4 +328,55 @@ class _FlashCardPageState extends State<FlashCardPage> {
       ),
     );
   }
+
+  _buildFlashCard() {
+    return Draggable(
+      data: widget.words[_currentWordIndex],
+      onDragUpdate: _dragProcess,
+      feedback: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 40),
+        child: FlashCard(word: widget.words[_currentWordIndex]),
+      ),
+      childWhenDragging: Container(
+        width: MediaQuery.of(context).size.width - 100,
+        height: MediaQuery.of(context).size.height - 250,
+        margin: const EdgeInsets.symmetric(horizontal: 40),
+        child: const Card(
+          elevation: 3,
+          child: Center(
+            child: Text(
+              '',
+              semanticsLabel: '',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 40),
+        child: FlashCard(word: widget.words[_currentWordIndex]),
+      ),
+    );
+  }
+
+  // Handle data
+  _showText() {
+    setState(() {
+      _isMessageVisible = true;
+    });
+    Future.delayed(
+      const Duration(seconds: 2),
+      () {
+        setState(() {
+          _isMessageVisible = false;
+        });
+      },
+    );
+  }
+
+  _dragProcess(DragUpdateDetails details) {}
+
+  _dragCanceled() {}
+
+  _dragSuccess() {}
 }
