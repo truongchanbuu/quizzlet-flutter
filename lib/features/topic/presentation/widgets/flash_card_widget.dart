@@ -4,7 +4,12 @@ import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
 
 class FlashCard extends StatefulWidget {
   final WordModel word;
-  const FlashCard({super.key, required this.word});
+  final Color borderColor;
+  const FlashCard({
+    super.key,
+    required this.word,
+    this.borderColor = Colors.transparent,
+  });
 
   @override
   State<FlashCard> createState() => _FlashCardState();
@@ -29,11 +34,15 @@ class _FlashCardState extends State<FlashCard> {
     fontSize: 20,
   );
 
-  final double elevation = 3;
+  final double elevation = 5;
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: widget.borderColor),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
       elevation: elevation,
       child: FlipCard(
         frontWidget: _buildCard(widget.word.terminology),

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/exam_settings_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/flashcard/flash_card_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flash_card_preview_section.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/learn_feature_item_widget.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/word_card_list.dart';
@@ -159,7 +161,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     return Column(
       children: [
         LearnFeatureItem(
-          onTap: () {},
+          onTap: _navigateToFlashCardLearnPage,
           title: 'Thẻ ghi nhớ',
           leading: const Icon(
             Icons.library_add_sharp,
@@ -168,7 +170,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         ),
         const SizedBox(height: 10),
         LearnFeatureItem(
-          onTap: () {},
+          onTap: _navigateToExamSettings,
           title: 'Kiểm tra',
           leading: const Icon(
             Icons.library_books_sharp,
@@ -181,4 +183,34 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
   // Handle data
   _shareTopic() {}
+
+  _navigateToExamSettings() {
+    final currentRoute = ModalRoute.of(context);
+    final currentRouteName = currentRoute?.settings.name ?? '';
+    const newRouteName = '/exam/settings';
+    final fullRouteName = '$currentRouteName$newRouteName';
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ExamSettingPage(topic: widget.topic),
+        settings: RouteSettings(name: fullRouteName),
+      ),
+    );
+  }
+
+  _navigateToFlashCardLearnPage() {
+    final currentRoute = ModalRoute.of(context);
+    final currentRouteName = currentRoute?.settings.name ?? '';
+    const newRouteName = '/flashcards/';
+    final fullRouteName = '$currentRouteName$newRouteName';
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FlashCardPage(words: widget.topic.words),
+        settings: RouteSettings(name: fullRouteName),
+      ),
+    );
+  }
 }

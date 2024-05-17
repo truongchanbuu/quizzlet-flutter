@@ -4,7 +4,7 @@ import 'package:quizzlet_fluttter/core/constants/constants.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/user_info_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/search_box.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/streak_section.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/pages/create_topic_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/create_topic_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/lib_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/create_folder_dialog.dart';
 

@@ -22,15 +22,16 @@ class _FlashCardPageState extends State<FlashCardPage> {
   bool _isShuffled = false;
   bool _isAllPronouncing = false;
   bool _isMessageVisible = false;
+
   bool _isStudyingDrag = false;
   bool _isLearnedDrag = false;
+  bool _isFinished = false;
 
   num percentage = 0;
 
   @override
   void initState() {
     super.initState();
-    percentage = (_currentWordIndex / widget.words.length).round();
   }
 
   @override
@@ -38,21 +39,41 @@ class _FlashCardPageState extends State<FlashCardPage> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: _buildAppBar(),
-      body: ListView(
+      body: Stack(
         children: [
-          _buildProgressIndicator(),
-          const SizedBox(height: 10),
-          _buildLearningStats(),
-          const SizedBox(height: 30),
-          _buildFlashCard(),
-          const SizedBox(height: 25),
-          buildToolButtons(),
+          Column(
+            children: [
+              const SizedBox(height: 10),
+              _buildLearningStats(),
+              const SizedBox(height: 20),
+              _buildFlashCard(context),
+            ],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: _buildToolButtons(),
+          ),
+          Positioned(
+            left: 0,
+            child: _buildFlashCardDragTarget(
+              MediaQuery.of(context).size.height,
+              20,
+            ),
+          ),
+          Positioned(
+            right: 0,
+            child: _buildFlashCardDragTarget(
+              MediaQuery.of(context).size.height,
+              20,
+            ),
+          ),
         ],
       ),
     );
   }
 
   _buildProgressIndicator() {
+    percentage = _currentWordIndex / widget.words.length;
     return LinearProgressIndicator(
       value: percentage.toDouble(),
       semanticsLabel: 'Your learning progress',
@@ -69,7 +90,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
           alignment: Alignment.center,
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: Colors.orangeAccent.withOpacity(0.2),
+            color: _isStudyingDrag
+                ? Colors.orangeAccent
+                : Colors.orangeAccent.withOpacity(0.2),
             border: Border.all(width: 1, color: Colors.orangeAccent),
             borderRadius: const BorderRadius.only(
               topRight: Radius.circular(20),
@@ -77,9 +100,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
             ),
           ),
           child: Text(
-            '${_currentStudying.length}',
-            style: const TextStyle(
-              color: Colors.deepOrange,
+            _isStudyingDrag ? '+1' : '${_currentStudying.length}',
+            style: TextStyle(
+              color: _isStudyingDrag ? Colors.white : Colors.deepOrange,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -89,7 +112,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
           alignment: Alignment.center,
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: Colors.greenAccent.withOpacity(0.2),
+            color: _isLearnedDrag
+                ? Colors.greenAccent
+                : Colors.greenAccent.withOpacity(0.2),
             border: Border.all(width: 1, color: Colors.greenAccent),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
@@ -97,9 +122,9 @@ class _FlashCardPageState extends State<FlashCardPage> {
             ),
           ),
           child: Text(
-            '${_currentLearned.length}',
-            style: const TextStyle(
-              color: Colors.green,
+            _isLearnedDrag ? '+1' : '${_currentLearned.length}',
+            style: TextStyle(
+              color: _isLearnedDrag ? Colors.white : Colors.green,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -121,49 +146,50 @@ class _FlashCardPageState extends State<FlashCardPage> {
           icon: const Icon(Icons.settings_outlined),
         ),
       ],
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: _buildProgressIndicator(),
+      ),
     );
   }
 
-  buildToolButtons() {
+  _buildToolButtons() {
     const textStyle = TextStyle(color: Colors.black, fontSize: 11);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50.0),
+    return Container(
+      margin: const EdgeInsets.all(40),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           IconButton(
             onPressed: _currentWordIndex == 0 ? null : () {},
             icon: const Icon(Icons.undo),
           ),
           Visibility(
-            visible: _isMessageVisible,
-            child: Expanded(
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 500),
-                opacity: _isMessageVisible ? 1.0 : 0.0,
-                child: ListTile(
-                  leading: const Icon(Icons.play_arrow),
-                  title: _isPlaying
-                      ? const Text(
-                          'Tự động cuộn thẻ đang được BẬT',
-                          style: textStyle,
-                          textAlign: TextAlign.center,
-                        )
-                      : const Text(
-                          'Tự động cuộn thẻ đang được TẮT',
-                          style: textStyle,
-                          textAlign: TextAlign.center,
-                        ),
+              visible: _isMessageVisible,
+              child: Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.play_arrow),
+                    const SizedBox(width: 10),
+                    _isPlaying
+                        ? const Text(
+                            'Tự động cuộn thẻ đang được BẬT',
+                            style: textStyle,
+                            textAlign: TextAlign.center,
+                          )
+                        : const Text(
+                            'Tự động cuộn thẻ đang được TẮT',
+                            style: textStyle,
+                            textAlign: TextAlign.center,
+                          ),
+                  ],
                 ),
-              ),
-            ),
-          ),
+              )),
           IconButton(
             onPressed: () {
               setState(() => _isPlaying = !_isPlaying);
-              _showText();
+              _showAutoPlayText();
             },
             icon: _isPlaying
                 ? const Icon(Icons.pause)
@@ -214,6 +240,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
                 onPressed: () {},
                 style: TextButton.styleFrom(
                   minimumSize: const Size.fromHeight(55),
+                  shape: const BeveledRectangleBorder(),
                 ),
                 child: const Text(
                   'Đặt lại thẻ nhớ',
@@ -329,13 +356,35 @@ class _FlashCardPageState extends State<FlashCardPage> {
     );
   }
 
-  _buildFlashCard() {
+  _buildFlashCardDragTarget(double height, double width) {
+    return DragTarget(
+      builder: (context, candidateData, rejectedData) {
+        return Container(
+          height: height,
+          width: width,
+          color: Colors.transparent,
+        );
+      },
+      onWillAcceptWithDetails: (details) {
+        return details.data is WordModel;
+      },
+      onAcceptWithDetails: (details) {
+        _changeFlashCard(details.data as WordModel);
+      },
+      onLeave: (data) {},
+    );
+  }
+
+  _buildFlashCard(BuildContext context) {
     return Draggable(
       data: widget.words[_currentWordIndex],
       onDragUpdate: _dragProcess,
+      onDragEnd: _dragEnd,
       feedback: Container(
         margin: const EdgeInsets.symmetric(horizontal: 40),
-        child: FlashCard(word: widget.words[_currentWordIndex]),
+        child: FlashCard(
+          word: widget.words[_currentWordIndex],
+        ),
       ),
       childWhenDragging: Container(
         width: MediaQuery.of(context).size.width - 100,
@@ -352,15 +401,14 @@ class _FlashCardPageState extends State<FlashCardPage> {
           ),
         ),
       ),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 40),
-        child: FlashCard(word: widget.words[_currentWordIndex]),
+      child: FlashCard(
+        word: widget.words[_currentWordIndex],
       ),
     );
   }
 
   // Handle data
-  _showText() {
+  _showAutoPlayText() {
     setState(() {
       _isMessageVisible = true;
     });
@@ -374,9 +422,55 @@ class _FlashCardPageState extends State<FlashCardPage> {
     );
   }
 
-  _dragProcess(DragUpdateDetails details) {}
+  _dragProcess(DragUpdateDetails details) {
+    var dx = details.delta.dx;
 
-  _dragCanceled() {}
+    if (dx > 0) {
+      setState(() {
+        _isLearnedDrag = true;
+        _isStudyingDrag = false;
+      });
+    } else if (dx < 0) {
+      setState(() {
+        _isStudyingDrag = true;
+        _isLearnedDrag = false;
+      });
+    } else {
+      setState(() {
+        _isLearnedDrag = false;
+        _isStudyingDrag = false;
+      });
+    }
+  }
 
-  _dragSuccess() {}
+  _dragEnd(DraggableDetails details) {
+    setState(() {
+      _isStudyingDrag = false;
+      _isLearnedDrag = false;
+    });
+
+    var dx = details.velocity.pixelsPerSecond.dx;
+
+    // if (dx > 0) {
+    //   _changeFlashCard(widget.words[_currentWordIndex]);
+    // } else if (dx < 0) {
+    //   _changeFlashCard(widget.words[_currentWordIndex]);
+    // }
+  }
+
+  _changeFlashCard(WordModel word) {
+    int nextIndex = _currentWordIndex + 1;
+    if (nextIndex < widget.words.length) {
+      setState(() {
+        _currentWordIndex++;
+        if (_isStudyingDrag) {
+          _currentStudying.add(word);
+        } else if (_isLearnedDrag) {
+          _currentLearned.add(word);
+        }
+      });
+    } else {
+      setState(() => _isFinished = true);
+    }
+  }
 }

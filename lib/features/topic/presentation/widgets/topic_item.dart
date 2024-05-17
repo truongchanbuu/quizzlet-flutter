@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic_detail_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_detail_page.dart';
 
 class TopicItem extends StatelessWidget {
   final TopicModel topic;
