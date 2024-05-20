@@ -1,8 +1,13 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/exam_settings_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/flashcard/flash_card_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/create_topic_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flash_card_preview_section.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/learn_feature_item_widget.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/word_card_list.dart';
@@ -31,7 +36,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     );
   }
 
-  _buildAppBar(BuildContext context) {
+  _buildAppBar(BuildContext ctx) {
     return AppBar(
       actions: [
         IconButton(
@@ -39,14 +44,14 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           icon: const Icon(Icons.share_outlined),
         ),
         IconButton(
-          onPressed: () => _showBottomSheetOptions(context),
+          onPressed: () => _showBottomSheetOptions(ctx),
           icon: const Icon(Icons.more_vert),
         ),
       ],
     );
   }
 
-  _showBottomSheetOptions(BuildContext context) {
+  _showBottomSheetOptions(BuildContext ctx) {
     String email = sl.get<FirebaseAuth>().currentUser!.email!;
 
     showModalBottomSheet(
@@ -70,13 +75,13 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
               ),
               if (email == widget.topic.createdBy)
                 ListTile(
-                  onTap: () {},
+                  onTap: _editTopic,
                   leading: const Icon(Icons.edit),
                   title: const Text('Chỉnh sửa'),
                 ),
               if (email == widget.topic.createdBy)
                 ListTile(
-                  onTap: () {},
+                  onTap: () => _deleteTopic(ctx),
                   leading: const Icon(
                     Icons.delete,
                     color: Colors.red,
@@ -94,36 +99,49 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   }
 
   _buildBody(context) {
-    if (widget.topic.words.isEmpty) {
-      return const Center(
-        child: Text(
-          'Hiện tại chưa có từ vựng nào',
-          style: TextStyle(fontSize: 25),
-        ),
-      );
-    }
+    return BlocConsumer<TopicBloc, TopicState>(
+      builder: (context, state) {
+        if (state is Deleting) {
+          return const LoadingIndicator();
+        }
 
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            PreviewFlashCardSection(words: widget.topic.words),
-            const SizedBox(height: 10),
-            _buildTopicInfoSection(),
-            const SizedBox(height: 20),
-            _buildLearnFeatureSection(),
-            const SizedBox(height: 20),
-            const Text(
-              'Thẻ',
-              style: TextStyle(fontWeight: FontWeight.bold),
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                PreviewFlashCardSection(words: widget.topic.words),
+                const SizedBox(height: 10),
+                _buildTopicInfoSection(),
+                const SizedBox(height: 20),
+                _buildLearnFeatureSection(),
+                const SizedBox(height: 20),
+                const Text(
+                  'Thẻ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                WordCardList(words: widget.topic.words),
+              ],
             ),
-            const SizedBox(height: 20),
-            WordCardList(words: widget.topic.words),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
+      listener: (context, state) {
+        if (state is DeleteTopicFailed) {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            headerAnimationLoop: false,
+            title: 'Xóa thất bại',
+            desc: 'Hãy thử lại: ${state.message}',
+            btnCancelOnPress: () {},
+          ).show();
+        } else if (state is DeleteTopicSuccess) {
+          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+        }
+      },
     );
   }
 
@@ -210,6 +228,43 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       MaterialPageRoute(
         builder: (context) => FlashCardPage(words: widget.topic.words),
         settings: RouteSettings(name: fullRouteName),
+      ),
+    );
+  }
+
+  _editTopic() {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider(
+            create: (context) => sl.get<TopicBloc>(),
+            child: CreateTopicPage(
+              topic: widget.topic,
+            ),
+          ),
+        ));
+  }
+
+  _deleteTopic(BuildContext ctx) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Bạn muốn xóa học phần này vĩnh viễn',
+          style: TextStyle(
+            fontSize: 15,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              ctx.read<TopicBloc>().add(RemoveTopic(widget.topic.topicId));
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text('Delete'),
+          )
+        ],
       ),
     );
   }

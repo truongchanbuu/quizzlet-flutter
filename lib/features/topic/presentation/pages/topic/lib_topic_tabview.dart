@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/core/util/date_time_util.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic_item.dart';
 
 class LibTopicTabView extends StatefulWidget {
@@ -11,18 +14,20 @@ class LibTopicTabView extends StatefulWidget {
 }
 
 class _LibTopicTabViewState extends State<LibTopicTabView> {
-  List<TopicModel> topics = List.empty(growable: true);
   final Map<String, List<TopicModel>> groupTopics = {};
 
   @override
-  void initState() {
-    super.initState();
-    _topicsByDate(topics);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return groupTopics.isEmpty ? _buildNoTopicShowedUI() : _buildTopics();
+    return BlocBuilder<TopicBloc, TopicState>(
+      builder: (context, state) {
+        if (state is TopicsLoadSuccess) {
+          _topicsByDate(state.topics);
+          return groupTopics.isEmpty ? _buildNoTopicShowedUI() : _buildTopics();
+        } else {
+          return const LoadingIndicator();
+        }
+      },
+    );
   }
 
   _buildNoTopicShowedUI() {

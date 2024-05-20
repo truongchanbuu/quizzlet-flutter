@@ -29,7 +29,23 @@ class WordInfoSection extends StatefulWidget {
 class _WordInfoSectionState extends State<WordInfoSection> {
   final formKey = GlobalKey<FormState>();
 
-  String? imagePath;
+  String? initialTerm;
+  String? initialDef;
+  String? initialDesc;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.word.terminology.isNotEmpty) {
+      initialTerm = widget.word.terminology;
+    }
+    if (widget.word.meaning.isNotEmpty) {
+      initialDef = widget.word.meaning;
+    }
+    if (widget.word.wordDesc != null && widget.word.wordDesc!.isNotEmpty) {
+      initialDesc = widget.word.wordDesc;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +80,7 @@ class _WordInfoSectionState extends State<WordInfoSection> {
                   return null;
                 },
                 onSaved: (term) => widget.word.terminology = term!,
+                initialValue: initialTerm,
                 decoration: InputDecoration(
                     hintText: 'Thuật ngữ',
                     border: const UnderlineInputBorder(),
@@ -90,6 +107,7 @@ class _WordInfoSectionState extends State<WordInfoSection> {
                   return null;
                 },
                 onSaved: (meaning) => widget.word.meaning = meaning!,
+                initialValue: initialDef,
                 decoration: const InputDecoration(
                   hintText: 'Định nghĩa',
                   border: UnderlineInputBorder(),
@@ -113,6 +131,7 @@ class _WordInfoSectionState extends State<WordInfoSection> {
                   border: UnderlineInputBorder(),
                   focusColor: Colors.indigo,
                 ),
+                initialValue: initialDesc,
                 textInputAction: TextInputAction.done,
               ),
               const SizedBox(height: 5),
@@ -126,19 +145,26 @@ class _WordInfoSectionState extends State<WordInfoSection> {
               if (widget.word.illustratorUrl != null)
                 const SizedBox(height: 20),
               if (widget.word.illustratorUrl != null)
-                Text(widget.word.illustratorUrl!),
-              if (widget.word.illustratorUrl != null && !kIsWeb)
-                Image.file(
-                  File(widget.word.illustratorUrl!),
-                  width: 100,
-                  height: 100,
-                ),
-              if (widget.word.illustratorUrl != null && kIsWeb)
-                Image.network(
-                  widget.word.illustratorUrl!,
-                  width: 100,
-                  height: 100,
-                ),
+                widget.word.illustratorUrl != null &&
+                        !kIsWeb &&
+                        (widget.word.illustratorUrl!.startsWith('https://') ||
+                            widget.word.illustratorUrl!.startsWith('http://'))
+                    ? Image.network(
+                        widget.word.illustratorUrl!,
+                        width: 100,
+                        height: 100,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.error),
+                      )
+                    : widget.word.illustratorUrl != null
+                        ? Image.file(
+                            File(widget.word.illustratorUrl!),
+                            width: 100,
+                            height: 100,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.error),
+                          )
+                        : const SizedBox.shrink(),
               // ImageField(
               //   multipleUpload: false,
               //   cardinality: 1,

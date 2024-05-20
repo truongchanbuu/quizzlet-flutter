@@ -33,3 +33,25 @@ final class CreateTopicFailed extends TopicState {
   final String? message;
   const CreateTopicFailed(this.message);
 }
+
+final class DeleteTopicSuccess extends TopicState {
+  const DeleteTopicSuccess();
+}
+
+final class Deleting extends TopicState {}
+
+final class DeleteTopicFailed extends TopicState {
+  final String? message;
+  const DeleteTopicFailed(this.message);
+}
+
+final class UpdateTopicSuccess extends TopicState {
+  const UpdateTopicSuccess();
+}
+
+final class Updating extends TopicState {}
+
+final class UpdateTopicFailed extends TopicState {
+  final String? message;
+  const UpdateTopicFailed(this.message);
+}

@@ -1,4 +1,5 @@
 import 'package:quizzlet_fluttter/core/resources/data_state.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/domain/entities/folder.dart';
 import 'package:quizzlet_fluttter/features/topic/domain/entities/word.dart';
@@ -7,7 +8,7 @@ abstract class TopicRepository {
   // Topic
   Stream<List<TopicModel>> topics();
   Future<DataState<void>> createTopic(TopicModel topic);
-  Future<DataState<void>> editTopic(String topicId, TopicModel editedTopic);
+  Future<DataState<void>> editTopic(TopicModel editedTopic);
   Future<DataState<void>> deleteTopic(String topicId);
 
   // Word
@@ -20,6 +21,7 @@ abstract class TopicRepository {
   Future<DataState<void>> removeWordFromTopic(String topicId, String wordId);
 
   // Folder
+  Stream<List<FolderModel>> folders();
   Future<DataState<void>> createFolder(FolderEntity folder);
   Future<DataState<void>> deleteFolder(String folderId);
   Future<DataState<void>> addTopicToFolder(String topicId, String folderId);

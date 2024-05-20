@@ -4,7 +4,7 @@ import 'package:quizzlet_fluttter/features/topic/domain/entities/folder.dart';
 
 part 'folder.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(anyMap: true, explicitToJson: true)
 class FolderModel extends FolderEntity {
   const FolderModel({
     required super.folderId,

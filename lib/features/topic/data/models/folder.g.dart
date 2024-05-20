@@ -6,11 +6,11 @@ part of 'folder.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-FolderModel _$FolderModelFromJson(Map<String, dynamic> json) => FolderModel(
+FolderModel _$FolderModelFromJson(Map json) => FolderModel(
       folderId: json['folderId'] as String,
       folderName: json['folderName'] as String,
       topics: (json['topics'] as List<dynamic>)
-          .map((e) => TopicModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => TopicModel.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList(),
       creator: json['creator'] as String?,
     );
@@ -19,6 +19,6 @@ Map<String, dynamic> _$FolderModelToJson(FolderModel instance) =>
     <String, dynamic>{
       'folderId': instance.folderId,
       'folderName': instance.folderName,
-      'topics': instance.topics,
+      'topics': instance.topics.map((e) => e.toJson()).toList(),
       'creator': instance.creator,
     };

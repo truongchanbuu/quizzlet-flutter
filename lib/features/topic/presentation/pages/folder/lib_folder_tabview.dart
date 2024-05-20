@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 
 class LibFolderTabView extends StatefulWidget {
   const LibFolderTabView({super.key});
@@ -9,27 +12,37 @@ class LibFolderTabView extends StatefulWidget {
 }
 
 class _LibFolderTabViewState extends State<LibFolderTabView> {
-  late final List<FolderModel> _folders;
-
-  @override
-  void initState() {
-    super.initState();
-    _folders = [
-      const FolderModel(
-          folderId: '001', folderName: 'Folder 1', topics: [], creator: null),
-    ];
-  }
+  late List<FolderModel> _folders;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: _createItem,
-      itemCount: _folders.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 10),
+    return BlocBuilder<FolderBloc, FolderState>(
+      builder: (context, state) {
+        if (state is FolderLoaded) {
+          _folders = state.folders;
+
+          if (_folders.isEmpty) {
+            return const Center(
+              child: Text(
+                'Hiện tại chưa có thư mục nào',
+                style: TextStyle(color: Colors.grey),
+              ),
+            );
+          }
+
+          return ListView.separated(
+            itemBuilder: _createItem,
+            itemCount: _folders.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+          );
+        }
+
+        return const LoadingIndicator();
+      },
     );
   }
 
-  Widget _createItem(BuildContext context, int index) {
+  Widget _createItem(BuildContext ctx, int index) {
     return InkWell(
       onTap: () {},
       borderRadius: const BorderRadius.all(Radius.circular(10)),

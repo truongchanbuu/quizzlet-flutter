@@ -18,6 +18,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/remote_update_info_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/data/repository/topic_repository_impl.dart';
 import 'package:quizzlet_fluttter/features/topic/domain/repository/topic_repository.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 
 final sl = GetIt.instance;
@@ -71,4 +72,5 @@ Future<void> initializaDependencies() async {
   sl.registerFactory<ResetPasswordBloc>(() => ResetPasswordBloc(sl()));
 
   sl.registerFactory<TopicBloc>(() => TopicBloc(sl()));
+  sl.registerFactory<FolderBloc>(() => FolderBloc(sl()));
 }

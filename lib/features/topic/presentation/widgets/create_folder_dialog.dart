@@ -19,16 +19,9 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
     _formKey = GlobalKey();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   _handleFolderCreation() {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
-
-      // Create folder
     }
   }
 

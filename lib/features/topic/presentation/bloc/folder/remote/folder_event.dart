@@ -1,0 +1,19 @@
+part of 'folder_bloc.dart';
+
+sealed class FolderEvent extends Equatable {
+  const FolderEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+final class GetFolders extends FolderEvent {
+  final List<FolderModel> folders;
+
+  const GetFolders(this.folders);
+}
+
+final class CreateFolder extends FolderEvent {
+  final FolderModel folder;
+  const CreateFolder(this.folder);
+}

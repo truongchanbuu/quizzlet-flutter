@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_detail_page.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class TopicItem extends StatelessWidget {
   final TopicModel topic;
@@ -13,7 +16,10 @@ class TopicItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TopicDetailPage(topic: topic),
+            builder: (context) => BlocProvider(
+              create: (context) => sl.get<TopicBloc>(),
+              child: TopicDetailPage(topic: topic),
+            ),
             settings: RouteSettings(
               name: '/topic/detail/${topic.topicId}',
             ),
@@ -54,10 +60,6 @@ class TopicItem extends StatelessWidget {
             contentPadding: const EdgeInsets.all(20),
             subtitle: Row(
               children: [
-                const CircleAvatar(
-                  radius: 15,
-                ),
-                const SizedBox(width: 10),
                 Text(
                   topic.createdBy,
                   style: const TextStyle(color: Colors.black),

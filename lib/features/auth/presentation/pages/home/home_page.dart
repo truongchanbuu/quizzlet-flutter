@@ -1,12 +1,14 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/core/constants/constants.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/user_info_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/search_box.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/streak_section.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/create_topic_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/lib_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/create_folder_dialog.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -217,7 +219,10 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pop(context);
                         showDialog(
                           context: context,
-                          builder: (context) => const CreateFolderDialog(),
+                          builder: (context) => BlocProvider(
+                            create: (context) => sl.get<FolderBloc>(),
+                            child: const CreateFolderDialog(),
+                          ),
                         );
                       },
                       borderRadius: const BorderRadius.all(Radius.circular(10)),

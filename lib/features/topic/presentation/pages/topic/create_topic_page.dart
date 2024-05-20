@@ -13,7 +13,8 @@ import 'package:quizzlet_fluttter/features/topic/presentation/widgets/word_info_
 import 'package:quizzlet_fluttter/injection_container.dart';
 
 class CreateTopicPage extends StatefulWidget {
-  const CreateTopicPage({super.key});
+  final TopicModel? topic;
+  const CreateTopicPage({super.key, this.topic});
 
   @override
   State<CreateTopicPage> createState() => _CreateTopicPageState();
@@ -37,6 +38,20 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
     super.initState();
     _mainFormKey = GlobalKey();
     wordSections = List.empty(growable: true);
+
+    if (widget.topic != null) {
+      topic = widget.topic!;
+      topicName = topic.topicName;
+      topicDesc = topic.topicDesc;
+      isPublic = topic.isPublic;
+      for (var word in topic.words) {
+        wordSections.add(WordInfoSection(
+          index: wordSections.length - 1,
+          word: word,
+          onDelete: () => _deleteWordForm(word),
+        ));
+      }
+    }
   }
 
   @override
@@ -52,9 +67,11 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
   _buildAppBar() {
     return AppBar(
       title: Text(
-        wordSections.length <= 2
-            ? 'Tạo học phần'
-            : '${wordSections.length} / ${wordSections.length}',
+        widget.topic != null
+            ? 'Chỉnh sửa học phần'
+            : wordSections.length <= 2
+                ? 'Tạo học phần'
+                : '${wordSections.length} / ${wordSections.length}',
         style: const TextStyle(color: Colors.black),
       ),
       actions: [
@@ -82,24 +99,33 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
   _buildBody() {
     return BlocConsumer<TopicBloc, TopicState>(
       listener: (context, state) {
-        if (state is CreateTopicFailed) {
+        if (state is CreateTopicFailed || state is UpdateTopicFailed) {
+          String title =
+              state is CreateTopicFailed ? 'Tạo thất bại' : 'Cập nhật thất bại';
+
           AwesomeDialog(
             context: context,
             dialogType: DialogType.error,
             headerAnimationLoop: false,
-            title: 'Tạo thất bại',
-            desc: 'Hãy thử lại sau: ${state.message}',
+            title: title,
+            desc: 'Hãy thử lại sau',
+            btnCancelOnPress: () {},
           ).show();
-        } else if (state is CreateTopicSuccess) {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TopicDetailPage(topic: topic),
-              ));
+        } else if (state is CreateTopicSuccess || state is UpdateTopicSuccess) {
+          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => sl.get<TopicBloc>(),
+                child: TopicDetailPage(topic: topic),
+              ),
+            ),
+          );
         }
       },
       builder: (context, state) {
-        if (state is Creating) {
+        if (state is Creating || state is Updating) {
           return const LoadingIndicator();
         }
 
@@ -120,6 +146,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                       return null;
                     },
                     onSaved: (newValue) => topicName = newValue,
+                    initialValue: topicName,
                     decoration: const InputDecoration(
                       hintText: 'Chủ đề',
                       border: UnderlineInputBorder(),
@@ -138,6 +165,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                   const SizedBox(height: 20),
                   TextFormField(
                     onSaved: (newValue) => topicDesc = newValue,
+                    initialValue: topicDesc,
                     decoration: const InputDecoration(
                       hintText: 'Mô tả',
                       border: UnderlineInputBorder(),
@@ -238,7 +266,11 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
       if (isAllValidated) {
         topic = await createTopic();
         if (context.mounted) {
-          context.read<TopicBloc>().add(CreateTopic(topic));
+          if (widget.topic != null) {
+            context.read<TopicBloc>().add(EditTopic(topic));
+          } else {
+            context.read<TopicBloc>().add(CreateTopic(topic));
+          }
         }
       }
     }
@@ -251,7 +283,9 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
     for (var wordSection in wordSections) {
       WordModel word = wordSection.word;
 
-      if (word.illustratorUrl != null) {
+      if (word.illustratorUrl != null &&
+          (!word.illustratorUrl!.startsWith('https://') &&
+              !word.illustratorUrl!.startsWith('http://'))) {
         String illustrator =
             await uploadIllustrator(topicId, word.wordId, word.illustratorUrl!);
         word.illustratorUrl = illustrator;
@@ -267,7 +301,8 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
   }
 
   Future<TopicModel> createTopic() async {
-    String topicId = generateTopicId();
+    String topicId =
+        widget.topic != null ? widget.topic!.topicId : generateTopicId();
     List<WordModel> words = await createWords(context, topicId);
     return TopicModel(
       topicId: topicId,

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/lib_folder_tabview.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/pages/lib_topic_tabview.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/folder/lib_folder_tabview.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/lib_topic_tabview.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/create_folder_dialog.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class LibraryPage extends StatefulWidget {
   const LibraryPage({super.key});
@@ -36,8 +40,14 @@ class _LibraryPageState extends State<LibraryPage>
       ),
     ];
     _tabBarView = [
-      const LibTopicTabView(),
-      const LibFolderTabView(),
+      BlocProvider(
+        create: (context) => sl.get<TopicBloc>(),
+        child: const LibTopicTabView(),
+      ),
+      BlocProvider(
+        create: (context) => sl.get<FolderBloc>(),
+        child: const LibFolderTabView(),
+      ),
       Container(),
     ];
     _tabController = TabController(length: _tabs.length, vsync: this);
@@ -109,7 +119,10 @@ class _LibraryPageState extends State<LibraryPage>
   _addNewFolder() {
     showDialog(
       context: context,
-      builder: (context) => const CreateFolderDialog(),
+      builder: (context) => BlocProvider(
+        create: (context) => sl.get<FolderBloc>(),
+        child: const CreateFolderDialog(),
+      ),
     );
   }
 }

@@ -27,20 +27,6 @@ final class RemoveTopic extends TopicEvent {
   const RemoveTopic(this.topicId);
 }
 
-final class AddWordToTopic extends TopicEvent {
-  final String topicId;
-  final WordModel word;
-
-  const AddWordToTopic({required this.topicId, required this.word});
-}
-
-final class RemoveWordFromTopic extends TopicEvent {
-  final String topicId;
-  final String wordId;
-
-  const RemoveWordFromTopic({required this.topicId, required this.wordId});
-}
-
 final class StarWord extends TopicEvent {
   final WordModel word;
   const StarWord(this.word);

@@ -1,19 +1,18 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 import 'package:quizzlet_fluttter/core/resources/data_state.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/domain/entities/folder.dart';
-import 'package:quizzlet_fluttter/features/topic/domain/entities/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/domain/entities/word.dart';
 import 'package:quizzlet_fluttter/features/topic/domain/repository/topic_repository.dart';
 
 class TopicRepositoryImpl implements TopicRepository {
   final topicCollection = sl.get<FirebaseFirestore>().collection('topics');
+  final folderCollection = sl.get<FirebaseFirestore>().collection('folders');
   final storage = sl.get<FirebaseStorage>();
 
   // Topic
@@ -41,6 +40,25 @@ class TopicRepositoryImpl implements TopicRepository {
   }
 
   @override
+  Future<DataState<void>> editTopic(TopicModel editedTopic) async {
+    try {
+      await topicCollection
+          .doc(editedTopic.topicId)
+          .update(editedTopic.toJson());
+      return const DataSuccess();
+    } on FirebaseException catch (e) {
+      debugPrint('Updated failed: ${e.message}');
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
   Future<DataState<void>> addTopicToFolder(String topicId, String folderId) {
     // TODO: implement addTopicToFolder
     throw UnimplementedError();
@@ -53,6 +71,12 @@ class TopicRepositoryImpl implements TopicRepository {
   }
 
   // Folder
+  @override
+  Stream<List<FolderModel>> folders() {
+    return folderCollection.snapshots().map((snapshot) =>
+        snapshot.docs.map((doc) => FolderModel.fromJson(doc.data())).toList());
+  }
+
   @override
   Future<DataState<void>> createFolder(FolderEntity folder) {
     // TODO: implement createFolder
@@ -72,20 +96,26 @@ class TopicRepositoryImpl implements TopicRepository {
   }
 
   @override
-  Future<DataState<void>> deleteTopic(String topicId) {
-    // TODO: implement deleteTopic
-    throw UnimplementedError();
+  Future<DataState<void>> deleteTopic(String topicId) async {
+    try {
+      await topicCollection.doc(topicId).delete();
+
+      return const DataSuccess();
+    } on FirebaseException catch (e) {
+      debugPrint('Deleted failed: ${e.message}');
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
   }
 
   @override
   Future<DataState<void>> deleteWord(String wordId) {
     // TODO: implement deleteWord
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<DataState<void>> editTopic(String topicId, TopicEntity editedTopic) {
-    // TODO: implement editTopic
     throw UnimplementedError();
   }
 
