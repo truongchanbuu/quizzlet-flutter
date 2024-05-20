@@ -4,7 +4,7 @@ import 'package:quizzlet_fluttter/features/topic/domain/entities/topic.dart';
 
 part 'topic.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(anyMap: true, explicitToJson: true)
 class TopicModel extends TopicEntity {
   const TopicModel({
     required super.topicId,

@@ -6,7 +6,7 @@ part of 'word.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-WordModel _$WordModelFromJson(Map<String, dynamic> json) => WordModel(
+WordModel _$WordModelFromJson(Map json) => WordModel(
       wordId: json['wordId'] as String,
       terminology: json['terminology'] as String,
       meaning: json['meaning'] as String,

@@ -388,13 +388,13 @@ class UserRepositoryImpl implements UserRepository {
       String photoURL = await refUploadFile.getDownloadURL();
 
       return DataSuccess(data: photoURL);
-    } catch (e) {
+    } on FirebaseException catch (e) {
       log('Upload Failed: ${e.toString()}');
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),
-          message: e.toString(),
-          error: e,
+          message: e.message,
+          error: e.code,
         ),
       );
     }

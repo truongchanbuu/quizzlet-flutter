@@ -16,7 +16,7 @@ abstract class TopicRepository {
   Future<DataState<void>> editWord(String wordId);
   Future<DataState<void>> addWordToTopic(String topicId, WordEntity word);
   Future<DataState<void>> editWordInTopic(
-      String topicId, WordEntity edittedWord);
+      String topicId, WordEntity editedWord);
   Future<DataState<void>> removeWordFromTopic(String topicId, String wordId);
 
   // Folder

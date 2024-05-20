@@ -16,7 +16,9 @@ import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/remote_update_info_bloc.dart';
-import 'package:text_to_speech/text_to_speech.dart';
+import 'package:quizzlet_fluttter/features/topic/data/repository/topic_repository_impl.dart';
+import 'package:quizzlet_fluttter/features/topic/domain/repository/topic_repository.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -53,11 +55,12 @@ Future<void> initializaDependencies() async {
   }
 
   sl.registerSingleton<UserRepository>(UserRepositoryImpl(sl(), sl()));
+  sl.registerSingleton<TopicRepository>(TopicRepositoryImpl());
 
   // Text-2-Speech
-  sl.registerSingleton<TextToSpeech>(TextToSpeech());
-  String language = 'en-US';
-  sl.get<TextToSpeech>().setLanguage(language);
+  // sl.registerSingleton<TextToSpeech>(TextToSpeech());
+  // String language = 'en-US';
+  // sl.get<TextToSpeech>().setLanguage(language);
 
   // Blocs
   sl.registerFactory<AuthenticationBloc>(() => AuthenticationBloc(sl()));
@@ -66,4 +69,6 @@ Future<void> initializaDependencies() async {
   sl.registerFactory<SignOutBloc>(() => SignOutBloc(sl()));
   sl.registerFactory<UpdateInfoBloc>(() => UpdateInfoBloc(sl()));
   sl.registerFactory<ResetPasswordBloc>(() => ResetPasswordBloc(sl()));
+
+  sl.registerFactory<TopicBloc>(() => TopicBloc(sl()));
 }

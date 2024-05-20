@@ -36,7 +36,7 @@ class _WordCardListState extends State<WordCardList> {
           children: [
             GestureDetector(
               onTap: () {
-                pronounce(widget.words[index].terminology);
+                // pronounce(widget.words[index].terminology);
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -71,7 +71,7 @@ class _WordCardListState extends State<WordCardList> {
             const SizedBox(height: 10),
             GestureDetector(
               onTap: () {
-                pronounce(widget.words[index].meaning);
+                // pronounce(widget.words[index].meaning);
               },
               child: Text(
                 widget.words[index].meaning,

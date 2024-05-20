@@ -1,33 +1,35 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:quizzlet_fluttter/core/util/image_util.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
 
 class WordInfoSection extends StatefulWidget {
   final int index;
-  final Function(int) onDelete;
-  const WordInfoSection(
-      {super.key, required this.onDelete, required this.index});
+  final Function() onDelete;
+  final WordModel word;
+
+  WordInfoSection({
+    super.key,
+    required this.word,
+    required this.onDelete,
+    required this.index,
+  });
+
+  final _WordInfoSectionState state = _WordInfoSectionState();
 
   @override
-  State<WordInfoSection> createState() => _WordInfoSectionState();
+  State<WordInfoSection> createState() => state;
+
+  bool isValidated() => state.validate();
 }
 
 class _WordInfoSectionState extends State<WordInfoSection> {
-  late final GlobalKey<FormState> _formKey;
+  final formKey = GlobalKey<FormState>();
 
-  String? terminology;
-  String? meaning;
-  String? desc;
-
-  @override
-  void initState() {
-    super.initState();
-    _formKey = GlobalKey();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  String? imagePath;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,7 @@ class _WordInfoSectionState extends State<WordInfoSection> {
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
-            onPressed: (context) => widget.onDelete(widget.index),
+            onPressed: (context) => widget.onDelete(),
             icon: Icons.delete,
             backgroundColor: Colors.red,
           )
@@ -49,23 +51,25 @@ class _WordInfoSectionState extends State<WordInfoSection> {
           borderRadius: const BorderRadius.all(Radius.circular(10)),
         ),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextFormField(
-                onSaved: (newValue) => terminology = newValue,
+                validator: (term) {
+                  if (term?.isEmpty ?? true) {
+                    return 'HÃY NHẬP THUẬT NGỮ';
+                  }
+
+                  return null;
+                },
+                onSaved: (term) => widget.word.terminology = term!,
                 decoration: InputDecoration(
-                  hintText: 'Thuật ngữ',
-                  border: const UnderlineInputBorder(),
-                  focusColor: Colors.indigo,
-                  suffixIcon: IconButton(
-                    onPressed: _pickVocabIllustrator,
-                    icon: const Icon(Icons.image),
-                    tooltip:
-                        'Chọn hình minh họa (Chỉ duy nhất một hình minh họa)',
-                  ),
-                ),
+                    hintText: 'Thuật ngữ',
+                    border: const UnderlineInputBorder(),
+                    focusColor: Colors.indigo,
+                    suffixIcon: IconButton(
+                        onPressed: _pickImage, icon: const Icon(Icons.image))),
                 textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 5),
@@ -78,7 +82,14 @@ class _WordInfoSectionState extends State<WordInfoSection> {
               ),
               const SizedBox(height: 10),
               TextFormField(
-                onSaved: (newValue) => meaning = newValue,
+                validator: (meaning) {
+                  if (meaning?.isEmpty ?? true) {
+                    return 'HÃY NHẬP ĐỊNH NGHĨA';
+                  }
+
+                  return null;
+                },
+                onSaved: (meaning) => widget.word.meaning = meaning!,
                 decoration: const InputDecoration(
                   hintText: 'Định nghĩa',
                   border: UnderlineInputBorder(),
@@ -96,7 +107,7 @@ class _WordInfoSectionState extends State<WordInfoSection> {
               ),
               const SizedBox(height: 10),
               TextFormField(
-                onSaved: (newValue) => desc = newValue,
+                onSaved: (desc) => widget.word.wordDesc = desc,
                 decoration: const InputDecoration(
                   hintText: 'Mô tả',
                   border: UnderlineInputBorder(),
@@ -112,6 +123,29 @@ class _WordInfoSectionState extends State<WordInfoSection> {
                   fontSize: 15,
                 ),
               ),
+              if (widget.word.illustratorUrl != null)
+                const SizedBox(height: 20),
+              if (widget.word.illustratorUrl != null)
+                Text(widget.word.illustratorUrl!),
+              if (widget.word.illustratorUrl != null && !kIsWeb)
+                Image.file(
+                  File(widget.word.illustratorUrl!),
+                  width: 100,
+                  height: 100,
+                ),
+              if (widget.word.illustratorUrl != null && kIsWeb)
+                Image.network(
+                  widget.word.illustratorUrl!,
+                  width: 100,
+                  height: 100,
+                ),
+              // ImageField(
+              //   multipleUpload: false,
+              //   cardinality: 1,
+              //   onSave: (List<ImageAndCaptionModel?>? imageAndCaptionList) {
+              //     widget.file = imageAndCaptionList![0]!.file;
+              //   },
+              // ),
             ],
           ),
         ),
@@ -120,5 +154,17 @@ class _WordInfoSectionState extends State<WordInfoSection> {
   }
 
   // Handle Data
-  _pickVocabIllustrator() {}
+  bool validate() {
+    bool validate = formKey.currentState?.validate() ?? false;
+    if (validate) formKey.currentState?.save();
+
+    return validate;
+  }
+
+  _pickImage() async {
+    String? imagePath = await pickImage();
+    setState(() {
+      widget.word.illustratorUrl = imagePath;
+    });
+  }
 }

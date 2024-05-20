@@ -4,9 +4,9 @@ import 'package:quizzlet_fluttter/features/topic/domain/entities/word.dart';
 
 part 'word.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(anyMap: true)
 class WordModel extends WordEntity {
-  const WordModel({
+  WordModel({
     required super.wordId,
     required super.terminology,
     required super.meaning,

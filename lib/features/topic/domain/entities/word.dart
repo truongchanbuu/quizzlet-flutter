@@ -3,15 +3,15 @@ import 'package:quizzlet_fluttter/features/topic/domain/entities/learn_state.dar
 
 class WordEntity extends Equatable {
   final String wordId;
-  final String terminology;
-  final String meaning;
-  final String? wordDesc;
-  final String? phonetic;
-  final String? illustratorUrl;
-  final LearnState learnState;
-  final bool starred;
+  String terminology;
+  String meaning;
+  String? wordDesc;
+  String? phonetic;
+  String? illustratorUrl;
+  LearnState learnState;
+  bool starred;
 
-  const WordEntity({
+  WordEntity({
     required this.wordId,
     required this.terminology,
     required this.meaning,

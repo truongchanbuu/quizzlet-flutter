@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
 
-class QuizExam extends StatefulWidget {
+class QuizExamPage extends StatefulWidget {
   final List<WordModel> words;
   final String mode;
-  const QuizExam({super.key, required this.words, this.mode = 'en-vie'});
+  const QuizExamPage({super.key, required this.words, this.mode = 'en-vie'});
 
   @override
-  State<QuizExam> createState() => _QuizExamState();
+  State<QuizExamPage> createState() => _QuizExamPageState();
 }
 
-class _QuizExamState extends State<QuizExam> {
+class _QuizExamPageState extends State<QuizExamPage> {
   int _currentWordIndex = 0;
 
-  double percentage = 0;
+  List<WordModel> wrongAnswers = [];
+  List<WordModel> correctAnswers = [];
 
-  late String questionText;
-  late List<String> options;
-
-  late WordModel currentWord;
+  bool _isFinished = false;
 
   getCorrectAnswer() {
     return widget.mode == 'en-vie'
-        ? currentWord.meaning
-        : currentWord.terminology;
+        ? widget.words[_currentWordIndex].meaning
+        : widget.words[_currentWordIndex].terminology;
   }
 
   List<String> getOptions() {
     var correctAnswer = getCorrectAnswer();
     var incorrectAnswers = widget.words
-        .where((word) => word != currentWord)
+        .where((word) => word != widget.words[_currentWordIndex])
         .map((word) =>
             widget.mode == 'en-vie' ? word.meaning : word.terminology);
 
@@ -37,18 +35,14 @@ class _QuizExamState extends State<QuizExam> {
       incorrectAnswers.take(3);
     }
 
-    var options = incorrectAnswers.toList()..add(correctAnswer);
-
-    return options;
+    return incorrectAnswers.toList()
+      ..add(correctAnswer)
+      ..shuffle();
   }
 
   @override
   void initState() {
     super.initState();
-    currentWord = widget.words[_currentWordIndex];
-    percentage = _currentWordIndex / widget.words.length;
-    questionText =
-        widget.mode == 'en-vie' ? currentWord.terminology : currentWord.meaning;
   }
 
   @override
@@ -60,6 +54,7 @@ class _QuizExamState extends State<QuizExam> {
   }
 
   _buildAppBar() {
+    var percentage = _currentWordIndex / widget.words.length;
     return AppBar(
       title: Text(
         '${_currentWordIndex + 1} / ${widget.words.length}',
@@ -80,16 +75,26 @@ class _QuizExamState extends State<QuizExam> {
   }
 
   _buildBody() {
+    var options = getOptions();
+    var questionText = widget.mode == 'en-vie'
+        ? widget.words[_currentWordIndex].terminology
+        : widget.words[_currentWordIndex].meaning;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Center(
-            child: Text(
-              questionText,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  questionText,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
               ),
             ),
           ),
@@ -97,9 +102,9 @@ class _QuizExamState extends State<QuizExam> {
         Expanded(
           child: ListView.separated(
             separatorBuilder: (context, index) => const SizedBox(height: 10),
-            itemCount: getOptions().length,
+            itemCount: options.length,
             itemBuilder: (context, index) => _createOptions(
-              getOptions()[index],
+              options[index],
             ),
           ),
         ),
@@ -113,9 +118,35 @@ class _QuizExamState extends State<QuizExam> {
         border: Border.all(color: Colors.indigo),
       ),
       child: ListTile(
-        onTap: () {},
+        onTap: () => _checkAnswer(option),
         title: Text(option),
       ),
+    );
+  }
+
+  _checkAnswer(String answer) {
+    var currentWord = widget.words[_currentWordIndex];
+    bool isCorrect = answer == getCorrectAnswer();
+
+    if (isCorrect) {
+      correctAnswers.add(currentWord);
+    } else {
+      wrongAnswers.add(currentWord);
+    }
+
+    _nextQuiz();
+  }
+
+  _nextQuiz() {
+    Future.delayed(
+      const Duration(seconds: 1),
+      () => setState(() {
+        if (_currentWordIndex < widget.words.length - 1) {
+          _currentWordIndex++;
+        } else {
+          _isFinished = true;
+        }
+      }),
     );
   }
 }

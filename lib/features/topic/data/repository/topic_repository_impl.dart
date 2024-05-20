@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 import 'package:quizzlet_fluttter/core/resources/data_state.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
@@ -12,21 +14,13 @@ import 'package:quizzlet_fluttter/features/topic/domain/repository/topic_reposit
 
 class TopicRepositoryImpl implements TopicRepository {
   final topicCollection = sl.get<FirebaseFirestore>().collection('topics');
+  final storage = sl.get<FirebaseStorage>();
 
+  // Topic
   @override
   Stream<List<TopicModel>> topics() {
-    return topicCollection.snapshots().map((snapshot) => snapshot.docs
-        .map((doc) => TopicModel(
-              topicId: doc.data()['topicId'],
-              topicName: doc.data()['topicName'],
-              topicDesc: doc.data()['topicDesc'],
-              isPublic: doc.data()['isPublic'],
-              createdBy: doc.data()['createdBy'],
-              createdAt: doc.data()['createdAt'],
-              words: doc.data()['words'],
-              lastAccess: doc.data()['lastAccess'],
-            ))
-        .toList());
+    return topicCollection.snapshots().map((snapshot) =>
+        snapshot.docs.map((doc) => TopicModel.fromJson(doc.data())).toList());
   }
 
   @override
@@ -35,7 +29,7 @@ class TopicRepositoryImpl implements TopicRepository {
       await topicCollection.doc(topic.topicId).set(topic.toJson());
       return const DataSuccess();
     } on FirebaseException catch (e) {
-      log(e.toString());
+      debugPrint('Created failed: ${e.message}');
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),
@@ -58,6 +52,7 @@ class TopicRepositoryImpl implements TopicRepository {
     throw UnimplementedError();
   }
 
+  // Folder
   @override
   Future<DataState<void>> createFolder(FolderEntity folder) {
     // TODO: implement createFolder
@@ -102,7 +97,7 @@ class TopicRepositoryImpl implements TopicRepository {
 
   @override
   Future<DataState<void>> editWordInTopic(
-      String topicId, WordEntity edittedWord) {
+      String topicId, WordEntity editedWord) {
     // TODO: implement editWordInTopic
     throw UnimplementedError();
   }

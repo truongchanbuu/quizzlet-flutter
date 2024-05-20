@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/quizz_exam_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/typing_exam_page.dart';
 
 class ExamSettingPage extends StatefulWidget {
   final TopicModel topic;
@@ -139,11 +140,12 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
         ),
         actions: [
           TextButton(
-              onPressed: () {
-                //DO SOMETHING
-                Navigator.pop(context);
-              },
-              child: const Text('OK')),
+            onPressed: () {
+              //DO SOMETHING
+              Navigator.pop(context);
+            },
+            child: const Text('OK'),
+          ),
         ],
       ),
     );
@@ -206,24 +208,33 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
   }
 
   _doExam() {
+    String type = _examTypes[_examChosen];
     var currentRoute = ModalRoute.of(context);
     var currentRouteName = currentRoute?.settings.name ?? '';
     var segments = currentRouteName.split('/')
       ..removeLast()
       ..add('quiz');
-
     String fullRouteName = segments.join('/');
 
-    print(fullRouteName);
-    if (_examTypes[_examChosen] == 'quiz') {
+    if (type == 'quiz') {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => QuizExam(
+          builder: (context) => QuizExamPage(
             words: widget.topic.words,
-            mode: _examTypes[_examChosen],
+            mode: _qnALang[_qnALangUserChosen],
           ),
           settings: RouteSettings(name: fullRouteName),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TypingExamPage(
+            words: widget.topic.words,
+            mode: _qnALang[_qnALangUserChosen],
+          ),
         ),
       );
     }

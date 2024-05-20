@@ -1,5 +1,16 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quizzlet_fluttter/core/util/image_util.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_detail_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_setting_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/word_info_section.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class CreateTopicPage extends StatefulWidget {
   const CreateTopicPage({super.key});
@@ -9,23 +20,23 @@ class CreateTopicPage extends StatefulWidget {
 }
 
 class _CreateTopicPageState extends State<CreateTopicPage> {
-  late final GlobalKey<FormState> _formKey;
+  late final GlobalKey<FormState> _mainFormKey;
 
-  late final List<Widget> wordSections;
+  late final List<WordInfoSection> wordSections;
 
-  String? topic;
-  String? desc;
+  late TopicModel topic;
+
+  String? topicName;
+  String? topicDesc;
+  dynamic isPublic = false;
+
+  final currentUser = sl.get<FirebaseAuth>().currentUser!;
 
   @override
   void initState() {
     super.initState();
-    _formKey = GlobalKey();
-    wordSections = [];
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+    _mainFormKey = GlobalKey();
+    wordSections = List.empty(growable: true);
   }
 
   @override
@@ -40,19 +51,28 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
   // Build UI methods
   _buildAppBar() {
     return AppBar(
-      title: const Text(
-        'Tạo học phần',
-        style: TextStyle(color: Colors.black),
+      title: Text(
+        wordSections.length <= 2
+            ? 'Tạo học phần'
+            : '${wordSections.length} / ${wordSections.length}',
+        style: const TextStyle(color: Colors.black),
       ),
       actions: [
         IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, 'topic/create/setting');
+          onPressed: () async {
+            isPublic = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TopicSettingPage(
+                  isPublic: isPublic,
+                ),
+              ),
+            );
           },
-          icon: const Icon(Icons.settings),
+          icon: const Icon(Icons.settings_outlined),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () => _validateMainForm(context),
           icon: const Icon(Icons.check),
         ),
       ],
@@ -60,62 +80,94 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
   }
 
   _buildBody() {
-    return SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                onSaved: (newValue) => topic = newValue,
-                decoration: const InputDecoration(
-                  hintText: 'Chủ đề',
-                  border: UnderlineInputBorder(),
-                  focusColor: Colors.indigo,
-                ),
-                textInputAction: TextInputAction.next,
+    return BlocConsumer<TopicBloc, TopicState>(
+      listener: (context, state) {
+        if (state is CreateTopicFailed) {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            headerAnimationLoop: false,
+            title: 'Tạo thất bại',
+            desc: 'Hãy thử lại sau: ${state.message}',
+          ).show();
+        } else if (state is CreateTopicSuccess) {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TopicDetailPage(topic: topic),
+              ));
+        }
+      },
+      builder: (context, state) {
+        if (state is Creating) {
+          return const LoadingIndicator();
+        }
+
+        return SingleChildScrollView(
+          child: Form(
+            key: _mainFormKey,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    validator: (name) {
+                      if (name?.isEmpty ?? true) {
+                        return 'HÃY NHẬP TÊN CỦA CHỦ ĐỀ CẦN TẠO';
+                      }
+
+                      return null;
+                    },
+                    onSaved: (newValue) => topicName = newValue,
+                    decoration: const InputDecoration(
+                      hintText: 'Chủ đề',
+                      border: UnderlineInputBorder(),
+                      focusColor: Colors.indigo,
+                    ),
+                    textInputAction: TextInputAction.next,
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'CHỦ ĐỀ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    onSaved: (newValue) => topicDesc = newValue,
+                    decoration: const InputDecoration(
+                      hintText: 'Mô tả',
+                      border: UnderlineInputBorder(),
+                      focusColor: Colors.indigo,
+                    ),
+                    textInputAction: TextInputAction.done,
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'MÔ TẢ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) => wordSections[index],
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 10),
+                    itemCount: wordSections.length,
+                  ),
+                ],
               ),
-              const SizedBox(height: 5),
-              const Text(
-                'CHỦ ĐỀ',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                onSaved: (newValue) => desc = newValue,
-                decoration: const InputDecoration(
-                  hintText: 'Mô tả',
-                  border: UnderlineInputBorder(),
-                  focusColor: Colors.indigo,
-                ),
-                textInputAction: TextInputAction.done,
-              ),
-              const SizedBox(height: 5),
-              const Text(
-                'MÔ TẢ',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) => wordSections[index],
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 10),
-                itemCount: wordSections.length,
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -123,9 +175,12 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
     return FloatingActionButton(
       onPressed: () {
         setState(() {
+          WordModel word = WordModel(
+              wordId: '${wordSections.length}', terminology: '', meaning: '');
           wordSections.add(WordInfoSection(
-            index: wordSections.length,
-            onDelete: _deleteWordForm,
+            index: wordSections.length - 1,
+            word: word,
+            onDelete: () => _deleteWordForm(word),
           ));
         });
       },
@@ -139,8 +194,98 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
     );
   }
 
-  _deleteWordForm(int index) {
+  _showAlertAboutNotEnoughWord() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Cần điền ít nhất 2 thuật ngữ và định nghĩa',
+          style: TextStyle(fontSize: 20),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK')),
+        ],
+      ),
+    );
+  }
+
+  // Handle data
+  bool validateAllForm() {
+    bool isValidated = true;
+
+    if (wordSections.length < 2) {
+      _showAlertAboutNotEnoughWord();
+      isValidated = false;
+    }
+
+    for (var form in wordSections) {
+      isValidated = isValidated && form.isValidated();
+    }
+
+    return isValidated;
+  }
+
+  _validateMainForm(BuildContext context) async {
+    if (_mainFormKey.currentState?.validate() ?? false) {
+      _mainFormKey.currentState?.save();
+
+      bool isAllValidated = validateAllForm();
+
+      if (isAllValidated) {
+        topic = await createTopic();
+        if (context.mounted) {
+          context.read<TopicBloc>().add(CreateTopic(topic));
+        }
+      }
+    }
+  }
+
+  Future<List<WordModel>> createWords(
+      BuildContext context, String topicId) async {
+    List<WordModel> words = List.empty(growable: true);
+
+    for (var wordSection in wordSections) {
+      WordModel word = wordSection.word;
+
+      if (word.illustratorUrl != null) {
+        String illustrator =
+            await uploadIllustrator(topicId, word.wordId, word.illustratorUrl!);
+        word.illustratorUrl = illustrator;
+      }
+      words.add(word);
+    }
+
+    return words;
+  }
+
+  String generateTopicId() {
+    return '${topicName!.trim().toLowerCase().replaceAll(' ', '')}_${DateTime.now().millisecondsSinceEpoch}';
+  }
+
+  Future<TopicModel> createTopic() async {
+    String topicId = generateTopicId();
+    List<WordModel> words = await createWords(context, topicId);
+    return TopicModel(
+      topicId: topicId,
+      topicName: topicName!,
+      words: words,
+      topicDesc: topicDesc,
+      isPublic: isPublic,
+      createdBy: currentUser.email ?? 'Unknown',
+      lastAccess: null,
+      createdAt: DateTime.now(),
+    );
+  }
+
+  _deleteWordForm(WordModel word) {
     setState(() {
+      var index = wordSections
+          .indexWhere((wordSection) => wordSection.word.wordId == word.wordId);
+
       wordSections.removeAt(index);
     });
   }

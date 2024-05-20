@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/core/util/date_time_util.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
-import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic_item.dart';
 
 class LibTopicTabView extends StatefulWidget {
@@ -12,72 +11,12 @@ class LibTopicTabView extends StatefulWidget {
 }
 
 class _LibTopicTabViewState extends State<LibTopicTabView> {
-  List<TopicModel> topics = [];
+  List<TopicModel> topics = List.empty(growable: true);
   final Map<String, List<TopicModel>> groupTopics = {};
 
   @override
   void initState() {
     super.initState();
-    topics = [
-      TopicModel(
-        topicId: '001',
-        topicName: 'Culture',
-        words: const [],
-        isPublic: false,
-        createdBy: 'truongbuu1593@gmail.com',
-        lastAccess: DateTime.now(),
-        createdAt: DateTime(2024, 5, 12),
-      ),
-      TopicModel(
-        topicId: '002',
-        topicName: 'Culture',
-        words: const [],
-        isPublic: false,
-        createdBy: 'test@gmail.com',
-        lastAccess: null,
-        createdAt: DateTime(2024, 5, 12),
-      ),
-      TopicModel(
-        topicId: '003',
-        topicName: 'Culture',
-        words: const [],
-        isPublic: false,
-        createdBy: 'test@gmail.com',
-        lastAccess: DateTime.now(),
-        createdAt: DateTime(2024, 5, 12),
-      ),
-      TopicModel(
-        topicId: '004',
-        topicName: 'Culture',
-        words: const [
-          WordModel(
-              wordId: 'W001',
-              terminology: 'Blue Archive',
-              meaning: 'Hocsinheptoi'),
-          WordModel(
-              wordId: 'W002',
-              terminology: 'Blue Archive',
-              meaning: 'Motdoiliemkhiet'),
-          WordModel(
-              wordId: 'W003',
-              terminology: 'Blue Archive',
-              meaning: 'hocsinhngaycangmatday'),
-        ],
-        isPublic: false,
-        createdBy: 'test@gmail.com',
-        lastAccess: DateTime.now(),
-        createdAt: DateTime(2024, 5, 12),
-      ),
-      TopicModel(
-        topicId: '005',
-        topicName: 'Culture 1',
-        words: const [],
-        isPublic: false,
-        createdBy: 'test@gmail.com',
-        lastAccess: DateTime(2023, 10, 10),
-        createdAt: DateTime(2024, 5, 12),
-      ),
-    ];
     _topicsByDate(topics);
   }
 
