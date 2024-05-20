@@ -13,6 +13,12 @@ final class GetFolders extends FolderEvent {
   const GetFolders(this.folders);
 }
 
+final class GetFoldersByEmail extends FolderEvent {
+  final String email;
+
+  const GetFoldersByEmail(this.email);
+}
+
 final class CreateFolder extends FolderEvent {
   final FolderModel folder;
   const CreateFolder(this.folder);

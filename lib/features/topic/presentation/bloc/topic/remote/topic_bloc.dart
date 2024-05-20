@@ -20,7 +20,24 @@ class TopicBloc extends Bloc<TopicEvent, TopicState> {
     });
 
     on<GetTopics>((event, emit) {
-      emit(TopicsLoadSuccess(event.topics));
+      emit(AllTopicsLoaded(event.topics));
+    });
+
+    on<GetTopicsByUser>((event, emit) async {
+      try {
+        var dataState = await _topicRepository.getTopicsByEmail(event.email);
+
+        if (dataState is DataFailed) {
+          emit(TopicsLoadFailure(
+              dataState.error?.message ?? 'There is something wrong'));
+        } else if (dataState is DataSuccess && dataState.data != null) {
+          emit(TopicsLoaded(dataState.data!));
+        } else {
+          emit(TopicLoading());
+        }
+      } catch (e) {
+        emit(TopicsLoadFailure(e.toString()));
+      }
     });
 
     on<CreateTopic>((event, emit) async {

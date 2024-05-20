@@ -250,7 +250,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text(
-          'Bạn muốn xóa học phần này vĩnh viễn',
+          'Bạn muốn xóa chủ đề này vĩnh viễn',
           style: TextStyle(
             fontSize: 15,
           ),
@@ -261,6 +261,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
               ctx.read<TopicBloc>().add(RemoveTopic(widget.topic.topicId));
               Navigator.pop(context);
               Navigator.pop(context);
+              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
             },
             child: const Text('Delete'),
           )

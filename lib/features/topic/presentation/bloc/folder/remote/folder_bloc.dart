@@ -5,22 +5,38 @@ import 'package:equatable/equatable.dart';
 import 'package:quizzlet_fluttter/core/resources/data_state.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 import 'package:quizzlet_fluttter/features/topic/domain/repository/topic_repository.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 
 part 'folder_event.dart';
 part 'folder_state.dart';
 
 class FolderBloc extends Bloc<FolderEvent, FolderState> {
   final TopicRepository _topicRepository;
-  late final StreamSubscription<List<FolderModel>> _folderSubscription;
+  // late final StreamSubscription<List<FolderModel>> _folderSubscription;
 
   FolderBloc(this._topicRepository) : super(FolderInitial()) {
-    _folderSubscription = _topicRepository.folders().listen((folders) {
-      add(GetFolders(folders));
-    });
+    // _folderSubscription = _topicRepository.folders().listen((folders) {
+    //   add(GetFolders(folders));
+    // });
 
     on<GetFolders>((event, emit) {
       emit(FolderLoaded(event.folders));
+    });
+
+    on<GetFoldersByEmail>((event, emit) async {
+      try {
+        var dataState = await _topicRepository.getFoldersByEmail(event.email);
+
+        if (dataState is DataFailed) {
+          emit(FolderLoadFailed(
+              dataState.error?.message ?? 'There is something wrong'));
+        } else if (dataState is DataSuccess && dataState.data != null) {
+          emit(FolderLoaded(dataState.data!));
+        } else {
+          emit(FolderLoading());
+        }
+      } catch (e) {
+        emit(FolderLoadFailed(e.toString()));
+      }
     });
 
     on<CreateFolder>((event, emit) async {
@@ -77,7 +93,7 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
 
   @override
   Future<void> close() {
-    _folderSubscription.cancel();
+    // _folderSubscription.cancel();
     return super.close();
   }
 }

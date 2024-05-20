@@ -11,10 +11,15 @@ final class TopicInitial extends TopicState {}
 
 final class TopicLoading extends TopicState {}
 
-final class TopicsLoadSuccess extends TopicState {
+final class AllTopicsLoaded extends TopicState {
   final List<TopicModel> topics;
 
-  const TopicsLoadSuccess(this.topics);
+  const AllTopicsLoaded(this.topics);
+}
+
+final class TopicsLoaded extends TopicState {
+  final List<TopicModel> topics;
+  const TopicsLoaded(this.topics);
 }
 
 final class TopicsLoadFailure extends TopicState {

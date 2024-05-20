@@ -2,13 +2,11 @@ import 'package:quizzlet_fluttter/core/resources/data_state.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
-import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
-import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
-import 'package:quizzlet_fluttter/features/topic/domain/entities/word.dart';
 
 abstract class TopicRepository {
   // Topic
   Stream<List<TopicModel>> topics();
+  Future<DataState<List<TopicModel>>> getTopicsByEmail(String email);
   Future<DataState<void>> createTopic(TopicModel topic);
   Future<DataState<void>> editTopic(TopicModel editedTopic);
   Future<DataState<void>> deleteTopic(String topicId);
@@ -23,6 +21,7 @@ abstract class TopicRepository {
 
   // Folder
   Stream<List<FolderModel>> folders();
+  Future<DataState<List<FolderModel>>> getFoldersByEmail(String email);
   Future<DataState<void>> createFolder(FolderModel folder);
   Future<DataState<void>> editFolder(FolderModel editedFolder);
   Future<DataState<void>> deleteFolder(String folderId);

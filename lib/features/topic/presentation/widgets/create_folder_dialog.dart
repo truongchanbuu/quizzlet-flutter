@@ -51,6 +51,8 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
       } else {
         context.read<FolderBloc>().add(CreateFolder(folder));
       }
+
+      Navigator.pushReplacementNamed(context, '/');
     }
   }
 
@@ -58,8 +60,7 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
   Widget build(BuildContext context) {
     return BlocConsumer<FolderBloc, FolderState>(
       listener: (context, state) {
-        print('STATE: $state');
-        if (state is CreateFolderFailed) {
+        if (state is CreateFolderFailed || state is UpdateFolderFailed) {
           AwesomeDialog(
             context: context,
             dialogType: DialogType.error,
@@ -69,17 +70,20 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
             padding: const EdgeInsets.all(10),
             btnCancelOnPress: () {},
           ).show();
-        } else if (state is CreateFolderSuccess) {
+        } else if (state is CreateFolderSuccess ||
+            state is UpdateFolderSuccess) {
           Navigator.pop(context);
         }
       },
       builder: (context, state) {
-        if (state is Creating) {
+        if (state is Creating || state is Updating) {
           return const LoadingIndicator();
         }
 
         return AlertDialog(
-          title: const Text('Tạo thư mục'),
+          title: widget.folder != null
+              ? const Text('Sửa thư mục')
+              : const Text('Tạo thư mục'),
           content: SingleChildScrollView(
             child: Form(
               key: _formKey,
@@ -94,6 +98,7 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
                       return null;
                     },
                     onSaved: (newValue) => folderName = newValue,
+                    initialValue: folderName,
                     decoration: const InputDecoration(
                       border: UnderlineInputBorder(),
                       hintText: 'Tên thư mục',
@@ -105,6 +110,7 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
                       return null;
                     },
                     onSaved: (newValue) => folderDesc = newValue,
+                    initialValue: folderDesc,
                     decoration: const InputDecoration(
                       border: UnderlineInputBorder(),
                       hintText: 'Mô tả (tùy chọn)',
@@ -118,12 +124,14 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
+                Navigator.pop(context);
               },
               child: const Text('HỦY'),
             ),
             TextButton(
               onPressed: _handleFolderCreation,
-              child: const Text('OK'),
+              child:
+                  widget.folder != null ? const Text('Sửa') : const Text('Tạo'),
             ),
           ],
         );
@@ -132,6 +140,6 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
   }
 
   String generateFolderId() {
-    return '${folderName}_${DateTime.now().millisecondsSinceEpoch}';
+    return '${folderName?.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}';
   }
 }

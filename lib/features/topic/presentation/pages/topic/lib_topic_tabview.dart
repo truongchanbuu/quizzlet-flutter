@@ -20,7 +20,7 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
   Widget build(BuildContext context) {
     return BlocBuilder<TopicBloc, TopicState>(
       builder: (context, state) {
-        if (state is TopicsLoadSuccess) {
+        if (state is AllTopicsLoaded) {
           _topicsByDate(state.topics);
           return groupTopics.isEmpty ? _buildNoTopicShowedUI() : _buildTopics();
         } else {

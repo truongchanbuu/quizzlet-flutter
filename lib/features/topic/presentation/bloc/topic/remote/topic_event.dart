@@ -12,6 +12,12 @@ final class GetTopics extends TopicEvent {
   const GetTopics(this.topics);
 }
 
+final class GetTopicsByUser extends TopicEvent {
+  final String email;
+
+  const GetTopicsByUser(this.email);
+}
+
 final class CreateTopic extends TopicEvent {
   final TopicModel topic;
   const CreateTopic(this.topic);

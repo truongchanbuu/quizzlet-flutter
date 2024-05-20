@@ -17,7 +17,7 @@ class LibraryPage extends StatefulWidget {
 class _LibraryPageState extends State<LibraryPage>
     with SingleTickerProviderStateMixin {
   late final List<Widget> _tabs;
-  late final List<Widget> _tabBarView;
+  late final List<Widget> _tabBarViews;
   late final TabController _tabController;
 
   int _currentTabIndex = 0;
@@ -39,7 +39,7 @@ class _LibraryPageState extends State<LibraryPage>
         // icon: Icon(Icons.switch_account),
       ),
     ];
-    _tabBarView = [
+    _tabBarViews = [
       BlocProvider(
         create: (context) => sl.get<TopicBloc>(),
         child: const LibTopicTabView(),
@@ -86,7 +86,7 @@ class _LibraryPageState extends State<LibraryPage>
       padding: const EdgeInsets.all(20.0),
       child: TabBarView(
         controller: _tabController,
-        children: _tabBarView,
+        children: _tabBarViews,
       ),
     );
   }

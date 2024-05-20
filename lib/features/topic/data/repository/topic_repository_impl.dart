@@ -22,6 +22,27 @@ class TopicRepositoryImpl implements TopicRepository {
   }
 
   @override
+  Future<DataState<List<TopicModel>>> getTopicsByEmail(String email) async {
+    try {
+      var topics =
+          (await topicCollection.where('createdBy', isEqualTo: email).get())
+              .docs
+              .map((doc) => TopicModel.fromJson(doc.data()))
+              .toList();
+
+      return DataSuccess(data: topics);
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
   Future<DataState<void>> createTopic(TopicModel topic) async {
     try {
       await topicCollection.doc(topic.topicId).set(topic.toJson());
@@ -148,6 +169,28 @@ class TopicRepositoryImpl implements TopicRepository {
     }
   }
 
+  @override
+  Future<DataState<List<FolderModel>>> getFoldersByEmail(String email) async {
+    try {
+      var folders =
+          (await folderCollection.where('creator', isEqualTo: email).get())
+              .docs
+              .map((doc) => FolderModel.fromJson(doc.data()))
+              .toList();
+
+      return DataSuccess(data: folders);
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  // Word
   @override
   Future<DataState<void>> createWord(WordModel word) {
     // TODO: implement createWord

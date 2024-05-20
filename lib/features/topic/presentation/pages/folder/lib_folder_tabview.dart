@@ -1,3 +1,5 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
@@ -14,11 +16,18 @@ class LibFolderTabView extends StatefulWidget {
 }
 
 class _LibFolderTabViewState extends State<LibFolderTabView> {
+  final currentUser = sl.get<FirebaseAuth>().currentUser!;
   late List<FolderModel> _folders;
 
   @override
+  void initState() {
+    super.initState();
+    context.read<FolderBloc>().add(GetFoldersByEmail(currentUser.email!));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FolderBloc, FolderState>(
+    return BlocConsumer<FolderBloc, FolderState>(
       builder: (context, state) {
         if (state is FolderLoaded) {
           _folders = state.folders;
@@ -40,6 +49,18 @@ class _LibFolderTabViewState extends State<LibFolderTabView> {
         }
 
         return const LoadingIndicator();
+      },
+      listener: (context, state) {
+        if (state is FolderLoadFailed) {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            headerAnimationLoop: false,
+            title: 'Tải dữ liệu thất bại',
+            desc: 'Hãy thử lại sau',
+            btnCancelOnPress: () {},
+          ).show();
+        }
       },
     );
   }
