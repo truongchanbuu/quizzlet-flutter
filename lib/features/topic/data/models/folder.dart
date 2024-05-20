@@ -9,6 +9,7 @@ class FolderModel extends FolderEntity {
   const FolderModel({
     required super.folderId,
     required super.folderName,
+    super.folderDesc,
     required super.topics,
     required super.creator,
   });
@@ -17,6 +18,7 @@ class FolderModel extends FolderEntity {
     return FolderEntity(
       folderId: folderId,
       folderName: folderName,
+      folderDesc: folderDesc,
       topics: topics,
       creator: creator,
     );
@@ -26,6 +28,7 @@ class FolderModel extends FolderEntity {
     return FolderModel(
       folderId: entity.folderId,
       folderName: entity.folderName,
+      folderDesc: entity.folderDesc,
       topics: entity.topics,
       creator: entity.creator,
     );
@@ -34,12 +37,14 @@ class FolderModel extends FolderEntity {
   FolderModel copyWith({
     String? folderId,
     String? folderName,
+    String? folderDesc,
     List<TopicModel>? topics,
     String? creator,
   }) {
     return FolderModel(
       folderId: folderId ?? this.folderId,
       folderName: folderName ?? this.folderName,
+      folderDesc: folderDesc ?? this.folderDesc,
       topics: topics ?? this.topics,
       creator: creator ?? this.creator,
     );

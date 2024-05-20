@@ -17,3 +17,13 @@ final class CreateFolder extends FolderEvent {
   final FolderModel folder;
   const CreateFolder(this.folder);
 }
+
+final class DeleteFolder extends FolderEvent {
+  final String folderId;
+  const DeleteFolder(this.folderId);
+}
+
+final class EditFolder extends FolderEvent {
+  final FolderModel editedFolder;
+  const EditFolder(this.editedFolder);
+}

@@ -31,3 +31,25 @@ final class CreateFolderFailed extends FolderState {
   final String? message;
   const CreateFolderFailed(this.message);
 }
+
+final class DeleteFolderSuccess extends FolderState {
+  const DeleteFolderSuccess();
+}
+
+final class Deleting extends FolderState {}
+
+final class DeleteFolderFailed extends FolderState {
+  final String? message;
+  const DeleteFolderFailed(this.message);
+}
+
+final class UpdateFolderSuccess extends FolderState {
+  const UpdateFolderSuccess();
+}
+
+final class Updating extends FolderState {}
+
+final class UpdateFolderFailed extends FolderState {
+  final String? message;
+  const UpdateFolderFailed(this.message);
+}

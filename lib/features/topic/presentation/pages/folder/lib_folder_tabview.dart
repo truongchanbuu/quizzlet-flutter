@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/folder/folder_detail_page.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class LibFolderTabView extends StatefulWidget {
   const LibFolderTabView({super.key});
@@ -44,7 +46,7 @@ class _LibFolderTabViewState extends State<LibFolderTabView> {
 
   Widget _createItem(BuildContext ctx, int index) {
     return InkWell(
-      onTap: () {},
+      onTap: () => _navigatorFolderDetailPage(_folders[index]),
       borderRadius: const BorderRadius.all(Radius.circular(10)),
       child: Material(
         elevation: 1,
@@ -71,16 +73,26 @@ class _LibFolderTabViewState extends State<LibFolderTabView> {
             contentPadding: const EdgeInsets.all(20),
             subtitle: Row(
               children: [
-                const CircleAvatar(
-                  radius: 15,
-                ),
-                const SizedBox(width: 10),
                 Text(
                   _folders[index].creator ?? 'Unknown',
                   style: const TextStyle(color: Colors.black),
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  _navigatorFolderDetailPage(FolderModel folder) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => sl.get<FolderBloc>(),
+          child: FolderDetailPage(
+            folder: folder,
           ),
         ),
       ),
