@@ -6,7 +6,7 @@ import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic_item.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic/topic_item.dart';
 
 class AddTopicFolderPage extends StatefulWidget {
   final FolderModel folder;

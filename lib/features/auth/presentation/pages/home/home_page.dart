@@ -7,7 +7,7 @@ import 'package:quizzlet_fluttter/features/auth/presentation/widgets/search_box.
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/streak_section.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/lib_page.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/widgets/create_folder_dialog.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/folder/create_folder_dialog.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 
 class HomePage extends StatefulWidget {

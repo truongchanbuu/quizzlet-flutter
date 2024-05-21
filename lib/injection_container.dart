@@ -20,6 +20,7 @@ import 'package:quizzlet_fluttter/features/topic/data/repository/topic_repositor
 import 'package:quizzlet_fluttter/features/topic/domain/repository/topic_repository.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 final sl = GetIt.instance;
 
@@ -59,9 +60,7 @@ Future<void> initializaDependencies() async {
   sl.registerSingleton<TopicRepository>(TopicRepositoryImpl());
 
   // Text-2-Speech
-  // sl.registerSingleton<TextToSpeech>(TextToSpeech());
-  // String language = 'en-US';
-  // sl.get<TextToSpeech>().setLanguage(language);
+  sl.registerSingleton<FlutterTts>(FlutterTts());
 
   // Blocs
   sl.registerFactory<AuthenticationBloc>(() => AuthenticationBloc(sl()));

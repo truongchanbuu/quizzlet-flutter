@@ -5,7 +5,7 @@ import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_ind
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_detail_page.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic_item.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic/topic_item.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 
 class LibTopicTabView extends StatefulWidget {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:quizzlet_fluttter/core/util/text_to_speech_util.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class WordCardList extends StatefulWidget {
   final List<WordModel> words;
@@ -11,9 +12,33 @@ class WordCardList extends StatefulWidget {
 }
 
 class _WordCardListState extends State<WordCardList> {
+  final flutterTTS = sl.get<FlutterTts>();
+
+  Map? _currentVoice;
+
   bool _isStarred = false;
   int? _termPronouncingIndex;
   int? _meanPronouncingIndex;
+
+  void initTTS() {
+    flutterTTS.getVoices.then((data) {
+      try {
+        List<Map> voices = List.from(data);
+        voices = voices.where((voice) => voice['name'].contains('en')).toList();
+        setState(() {
+          _currentVoice = voices.first;
+        });
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initTTS();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +52,8 @@ class _WordCardListState extends State<WordCardList> {
   }
 
   Widget _buildWordCardItem(BuildContext context, int index) {
+    var word = widget.words[index];
+
     return Material(
       elevation: 2,
       child: Padding(
@@ -36,13 +63,13 @@ class _WordCardListState extends State<WordCardList> {
           children: [
             GestureDetector(
               onTap: () {
-                // pronounce(widget.words[index].terminology);
+                flutterTTS.speak(word.terminology);
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.words[index].terminology,
+                    word.terminology,
                     style: TextStyle(
                       fontSize: 15,
                       color:
@@ -71,10 +98,10 @@ class _WordCardListState extends State<WordCardList> {
             const SizedBox(height: 10),
             GestureDetector(
               onTap: () {
-                // pronounce(widget.words[index].meaning);
+                flutterTTS.speak(word.meaning);
               },
               child: Text(
-                widget.words[index].meaning,
+                word.meaning,
                 style: TextStyle(
                     fontSize: 15,
                     color:

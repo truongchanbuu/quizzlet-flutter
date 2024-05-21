@@ -9,7 +9,7 @@ import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_detail_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_setting_page.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/widgets/word_info_section.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/word/word_info_section.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 
 class CreateTopicPage extends StatefulWidget {

@@ -8,9 +8,9 @@ import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/exam_settings_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/flashcard/flash_card_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/create_topic_page.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flash_card_preview_section.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/widgets/learn_feature_item_widget.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/widgets/word_card_list.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flashcard/flash_card_preview_section.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic/learn_feature_item_widget.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/word/word_card_list.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 
 class TopicDetailPage extends StatefulWidget {
@@ -158,10 +158,6 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         const SizedBox(height: 8),
         Row(
           children: [
-            const CircleAvatar(
-              radius: 15,
-            ),
-            const SizedBox(width: 5),
             Text(
               widget.topic.createdBy,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),

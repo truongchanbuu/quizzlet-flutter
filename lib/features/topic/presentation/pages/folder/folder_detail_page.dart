@@ -7,8 +7,8 @@ import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/folder/add_topic_to_folder_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_detail_page.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/widgets/create_folder_dialog.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic_item.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/folder/create_folder_dialog.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic/topic_item.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 
 class FolderDetailPage extends StatefulWidget {
