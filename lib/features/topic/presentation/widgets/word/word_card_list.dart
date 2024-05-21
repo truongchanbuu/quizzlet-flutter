@@ -13,12 +13,9 @@ class WordCardList extends StatefulWidget {
 
 class _WordCardListState extends State<WordCardList> {
   final flutterTTS = sl.get<FlutterTts>();
-
   Map? _currentVoice;
-
   bool _isStarred = false;
-  int? _termPronouncingIndex;
-  int? _meanPronouncingIndex;
+  int? _speakingIndex;
 
   void initTTS() {
     flutterTTS.getVoices.then((data) {
@@ -53,64 +50,79 @@ class _WordCardListState extends State<WordCardList> {
 
   Widget _buildWordCardItem(BuildContext context, int index) {
     var word = widget.words[index];
+    bool isSpeaking = _speakingIndex == index;
 
-    return Material(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                flutterTTS.speak(word.terminology);
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    word.terminology,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color:
-                          _termPronouncingIndex == index ? Colors.yellow : null,
-                    ),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
+    return GestureDetector(
+      onTap: () => _speakText(word.terminology, index),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSpeaking ? Colors.orange : Colors.transparent,
+          ),
+        ),
+        child: Material(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () => _speakText(word.terminology, index),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(Icons.volume_up),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isStarred = !_isStarred;
-                          });
-                        },
-                        icon: _isStarred
-                            ? const Icon(Icons.star)
-                            : const Icon(Icons.star_border),
+                      Text(
+                        word.terminology,
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () =>
+                                _speakText(word.terminology, index),
+                            icon: const Icon(Icons.volume_up),
+                            tooltip: 'Phát âm',
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _isStarred = !_isStarred;
+                              });
+                            },
+                            icon: _isStarred
+                                ? const Icon(Icons.star)
+                                : const Icon(Icons.star_border),
+                          )
+                        ],
                       )
                     ],
-                  )
-                ],
-              ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () => _speakText(word.meaning, index),
+                  child: Text(word.meaning),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            GestureDetector(
-              onTap: () {
-                flutterTTS.speak(word.meaning);
-              },
-              child: Text(
-                word.meaning,
-                style: TextStyle(
-                    fontSize: 15,
-                    color:
-                        _meanPronouncingIndex == index ? Colors.yellow : null),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  _speakText(String text, int index) {
+    setState(() {
+      _speakingIndex = index;
+    });
+    flutterTTS.speak(text).then((value) {
+      if (value == 1) {
+        setState(() {
+          _speakingIndex = null;
+        });
+      }
+    });
   }
 }

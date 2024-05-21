@@ -11,29 +11,21 @@ final class QuizLearningInitial extends QuizLearningState {}
 
 final class QuizLoading extends QuizLearningState {}
 
-final class QuizLoaded extends QuizLearningState {
-  final List<WordModel> words;
-  final int currentIndex;
-  final List<String> options;
-  final String mode;
+final class QuizInProgress extends QuizLearningState {
+  final int currentWordIndex;
   final List<WordModel> correctAnswers;
   final List<WordModel> wrongAnswers;
-  final bool isFinished;
 
-  const QuizLoaded({
-    required this.words,
-    required this.currentIndex,
-    required this.options,
-    required this.mode,
-    this.correctAnswers = const [],
-    this.wrongAnswers = const [],
-    this.isFinished = false,
+  const QuizInProgress({
+    required this.currentWordIndex,
+    required this.correctAnswers,
+    required this.wrongAnswers,
   });
 }
 
-final class QuizCompletedState extends QuizLearningState {
-  final List<WordModel> correctAnswers;
-  final List<WordModel> wrongAnswers;
+final class QuizCompleted extends QuizLearningState {}
 
-  const QuizCompletedState(this.correctAnswers, this.wrongAnswers);
+final class QuizError extends QuizLearningState {
+  final String message;
+  const QuizError(this.message);
 }

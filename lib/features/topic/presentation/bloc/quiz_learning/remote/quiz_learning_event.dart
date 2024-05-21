@@ -14,16 +14,14 @@ final class LoadQuiz extends QuizLearningEvent {
   const LoadQuiz({required this.words, required this.mode});
 }
 
-final class AnswerQuiz extends QuizLearningEvent {
+final class StartQuiz extends QuizLearningEvent {}
+
+class NextQuestionEvent extends QuizLearningEvent {}
+
+class CheckAnswerEvent extends QuizLearningEvent {
   final String answer;
-  const AnswerQuiz(this.answer);
+
+  const CheckAnswerEvent(this.answer);
 }
 
-final class ChangeNextQuiz extends QuizLearningEvent {}
-
-final class FinishQuiz extends QuizLearningEvent {}
-
-final class ChangeLanguageMode extends QuizLearningEvent {
-  final String mode;
-  const ChangeLanguageMode(this.mode);
-}
+class FinishQuizEvent extends QuizLearningEvent {}

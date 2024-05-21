@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/quiz_learning/remote/quiz_learning_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/quizz_exam_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/typing_exam_page.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class ExamSettingPage extends StatefulWidget {
   final TopicModel topic;
@@ -50,7 +53,7 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
             ),
             const SizedBox(height: 20),
             ListTile(
-              onTap: _showqnALangSetting,
+              onTap: _showQnALangSetting,
               title: const Text(
                 'Hỏi và trả lời:',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -94,7 +97,7 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
     );
   }
 
-  _showqnALangSetting() {
+  _showQnALangSetting() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -110,43 +113,38 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                RadioListTile(
-                  value: 0,
-                  groupValue: _qnALangUserChosen,
-                  onChanged: (value) {
-                    setState(() {
-                      setDialogState(() {
-                        _qnALangUserChosen = value!;
-                      });
-                    });
+                ListTile(
+                  onTap: () {
+                    setState(
+                        () => setDialogState(() => _qnALangUserChosen = 0));
+                    Navigator.pop(context);
                   },
                   title: const Text('Tiếng Anh - Tiếng Việt'),
+                  trailing: _qnALang[_qnALangUserChosen] == 'en-vie'
+                      ? const Icon(
+                          Icons.check,
+                          color: Colors.blue,
+                        )
+                      : null,
                 ),
-                RadioListTile(
-                  value: 1,
-                  groupValue: _qnALangUserChosen,
-                  onChanged: (value) {
-                    setState(() {
-                      setDialogState(() {
-                        _qnALangUserChosen = value!;
-                      });
-                    });
+                ListTile(
+                  onTap: () {
+                    setState(
+                        () => setDialogState(() => _qnALangUserChosen = 1));
+                    Navigator.pop(context);
                   },
                   title: const Text('Tiếng Việt - Tiếng Anh'),
+                  trailing: _qnALang[_qnALangUserChosen] == 'vie-en'
+                      ? const Icon(
+                          Icons.check,
+                          color: Colors.blue,
+                        )
+                      : null,
                 ),
               ],
             );
           },
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              //DO SOMETHING
-              Navigator.pop(context);
-            },
-            child: const Text('OK'),
-          ),
-        ],
       ),
     );
   }
@@ -167,42 +165,36 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                RadioListTile(
-                  value: 0,
-                  groupValue: _examChosen,
-                  onChanged: (value) {
-                    setState(() {
-                      setDialogState(() {
-                        _examChosen = value!;
-                      });
-                    });
+                ListTile(
+                  onTap: () {
+                    setState(() => setDialogState(() => _examChosen = 0));
+                    Navigator.pop(context);
                   },
                   title: const Text('Nhiều lựa chọn'),
+                  trailing: _examTypes[_examChosen] == 'quiz'
+                      ? const Icon(
+                          Icons.check,
+                          color: Colors.blue,
+                        )
+                      : null,
                 ),
-                RadioListTile(
-                  value: 1,
-                  groupValue: _examChosen,
-                  onChanged: (value) {
-                    setState(() {
-                      setDialogState(() {
-                        _examChosen = value!;
-                      });
-                    });
+                ListTile(
+                  onTap: () {
+                    setState(() => setDialogState(() => _examChosen = 1));
+                    Navigator.pop(context);
                   },
                   title: const Text('Tự luận'),
+                  trailing: _examTypes[_examChosen] == 'typing'
+                      ? const Icon(
+                          Icons.check,
+                          color: Colors.blue,
+                        )
+                      : null,
                 ),
               ],
             );
           },
         ),
-        actions: [
-          TextButton(
-              onPressed: () {
-                //DO SOMETHING
-                Navigator.pop(context);
-              },
-              child: const Text('OK')),
-        ],
       ),
     );
   }
@@ -220,9 +212,15 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => QuizExamPage(
-            words: widget.topic.words,
-            mode: _qnALang[_qnALangUserChosen],
+          builder: (context) => BlocProvider(
+            create: (context) => QuizLearningBloc(
+              topic: widget.topic,
+              mode: _qnALang[_qnALangUserChosen],
+            ),
+            child: QuizExamPage(
+              topic: widget.topic,
+              mode: _qnALang[_qnALangUserChosen],
+            ),
           ),
           settings: RouteSettings(name: fullRouteName),
         ),
