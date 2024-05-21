@@ -217,7 +217,7 @@ class _ResultPageState extends State<ResultPage> {
 
     var userAnswer = widget.userAnswers[index];
 
-    bool isCorrect = correctAnswer == userAnswer;
+    bool isCorrect = correctAnswer.toLowerCase() == userAnswer?.toLowerCase();
 
     return Container(
       decoration: const BoxDecoration(
@@ -232,7 +232,8 @@ class _ResultPageState extends State<ResultPage> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text('Câu trả lời của bạn: $userAnswer'),
+            child: Text(
+                'Câu trả lời của bạn: ${userAnswer ?? '[Không có câu trả lời]'}'),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8, left: 8, right: 8),

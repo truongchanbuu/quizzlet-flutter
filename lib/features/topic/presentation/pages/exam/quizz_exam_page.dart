@@ -21,7 +21,6 @@ class _QuizExamPageState extends State<QuizExamPage> {
 
   List<WordModel> wrongAnswers = List.empty(growable: true);
   List<WordModel> correctAnswers = List.empty(growable: true);
-
   String? selectedAnswer;
   late List<String?> userAnswers;
 
@@ -39,28 +38,6 @@ class _QuizExamPageState extends State<QuizExamPage> {
         debugPrint(e.toString());
       }
     });
-  }
-
-  getCorrectAnswer() {
-    return widget.mode == 'en-vie'
-        ? widget.topic.words[_currentWordIndex].meaning
-        : widget.topic.words[_currentWordIndex].terminology;
-  }
-
-  List<String> getOptions() {
-    var correctAnswer = getCorrectAnswer();
-    var incorrectAnswers = widget.topic.words
-        .where((word) => word != widget.topic.words[_currentWordIndex])
-        .map((word) =>
-            widget.mode == 'en-vie' ? word.meaning : word.terminology);
-
-    if (incorrectAnswers.length > 3) {
-      incorrectAnswers.take(3);
-    }
-
-    return incorrectAnswers.toList()
-      ..add(correctAnswer)
-      ..shuffle();
   }
 
   @override
@@ -214,11 +191,34 @@ class _QuizExamPageState extends State<QuizExamPage> {
   }
 
   // Handle data
+  getCorrectAnswer() {
+    return widget.mode == 'en-vie'
+        ? widget.topic.words[_currentWordIndex].meaning
+        : widget.topic.words[_currentWordIndex].terminology;
+  }
+
+  List<String> getOptions() {
+    var correctAnswer = getCorrectAnswer();
+    var incorrectAnswers = widget.topic.words
+        .where((word) => word != widget.topic.words[_currentWordIndex])
+        .map((word) =>
+            widget.mode == 'en-vie' ? word.meaning : word.terminology);
+
+    if (incorrectAnswers.length > 3) {
+      incorrectAnswers.take(3);
+    }
+
+    return incorrectAnswers.toList()
+      ..add(correctAnswer)
+      ..shuffle();
+  }
+
   _checkAnswer(String answer) {
     setState(() {
       selectedAnswer = answer;
       userAnswers[_currentWordIndex] = answer;
     });
+
     var currentWord = widget.topic.words[_currentWordIndex];
     bool isCorrect = answer == getCorrectAnswer();
 

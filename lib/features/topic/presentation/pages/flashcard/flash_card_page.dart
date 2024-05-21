@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/result_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flashcard/flash_card_widget.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
@@ -73,7 +74,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
   }
 
   _buildProgressIndicator() {
-    percentage = _currentWordIndex / widget.words.length;
+    percentage = (_currentWordIndex + 1) / widget.words.length;
     return LinearProgressIndicator(
       value: percentage.toDouble(),
       semanticsLabel: 'Your learning progress',
@@ -157,7 +158,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
     const textStyle = TextStyle(color: Colors.black, fontSize: 11);
 
     return Container(
-      margin: const EdgeInsets.all(40),
+      margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -459,8 +460,7 @@ class _FlashCardPageState extends State<FlashCardPage> {
   }
 
   _changeFlashCard(WordModel word) {
-    int nextIndex = _currentWordIndex + 1;
-    if (nextIndex < widget.words.length) {
+    if (_currentWordIndex < widget.words.length - 1) {
       setState(() {
         _currentWordIndex++;
         if (_isStudyingDrag) {
@@ -471,6 +471,27 @@ class _FlashCardPageState extends State<FlashCardPage> {
       });
     } else {
       setState(() => _isFinished = true);
+    }
+
+    if (_isFinished) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(),
+            body: const Center(
+              child: Text(
+                'Chức năng hiện đang trong quá trình phát triển',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
     }
   }
 }

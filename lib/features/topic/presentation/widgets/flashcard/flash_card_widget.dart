@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class FlashCard extends StatefulWidget {
   final WordModel word;
@@ -16,12 +18,31 @@ class FlashCard extends StatefulWidget {
 }
 
 class _FlashCardState extends State<FlashCard> {
-  bool _isPronouncing = false;
+  final flutterTTS = sl.get<FlutterTts>();
+  Map? _currentVoice;
+
+  void initTTS() {
+    flutterTTS.getVoices.then((data) {
+      try {
+        List<Map> voices = List.from(data);
+        voices = voices.where((voice) => voice['name'].contains('en')).toList();
+        setState(() {
+          _currentVoice = voices.first;
+        });
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    });
+  }
+
   late final FlipCardController _flipCardController;
+
+  bool _isPronouncing = false;
 
   @override
   void initState() {
     super.initState();
+    initTTS();
     _flipCardController = FlipCardController();
   }
 
@@ -84,8 +105,19 @@ class _FlashCardState extends State<FlashCard> {
                   color: _isPronouncing ? Colors.grey.withOpacity(0.3) : null,
                 ),
                 child: IconButton(
-                  onPressed: () =>
-                      setState(() => _isPronouncing = !_isPronouncing),
+                  onPressed: () {
+                    flutterTTS.speak(title).then((value) => {
+                          if (value == 1)
+                            {
+                              Future.delayed(
+                                const Duration(seconds: 1),
+                                () => setState(
+                                    () => _isPronouncing = !_isPronouncing),
+                              )
+                            }
+                        });
+                    setState(() => _isPronouncing = !_isPronouncing);
+                  },
                   icon: const Icon(Icons.volume_up_outlined),
                 ),
               ),

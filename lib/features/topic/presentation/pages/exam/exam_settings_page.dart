@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/bloc/quiz_learning/remote/quiz_learning_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/quizz_exam_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/typing_exam_page.dart';
-import 'package:quizzlet_fluttter/injection_container.dart';
 
 class ExamSettingPage extends StatefulWidget {
   final TopicModel topic;
@@ -224,7 +221,7 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
         context,
         MaterialPageRoute(
           builder: (context) => TypingExamPage(
-            words: widget.topic.words,
+            topic: widget.topic,
             mode: _qnALang[_qnALangUserChosen],
           ),
         ),

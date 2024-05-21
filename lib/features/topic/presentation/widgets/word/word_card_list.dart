@@ -14,8 +14,10 @@ class WordCardList extends StatefulWidget {
 class _WordCardListState extends State<WordCardList> {
   final flutterTTS = sl.get<FlutterTts>();
   Map? _currentVoice;
-  bool _isStarred = false;
   int? _speakingIndex;
+
+  late List<bool> _starredStatus;
+  final List<WordModel> _starredWords = [];
 
   void initTTS() {
     flutterTTS.getVoices.then((data) {
@@ -35,6 +37,7 @@ class _WordCardListState extends State<WordCardList> {
   void initState() {
     super.initState();
     initTTS();
+    _starredStatus = List<bool>.filled(widget.words.length, false);
   }
 
   @override
@@ -88,10 +91,15 @@ class _WordCardListState extends State<WordCardList> {
                           IconButton(
                             onPressed: () {
                               setState(() {
-                                _isStarred = !_isStarred;
+                                _starredStatus[index] = !_starredStatus[index];
+                                if (_starredStatus[index]) {
+                                  _starredWords.add(word);
+                                } else {
+                                  _starredWords.remove(word);
+                                }
                               });
                             },
-                            icon: _isStarred
+                            icon: _starredStatus[index]
                                 ? const Icon(Icons.star)
                                 : const Icon(Icons.star_border),
                           )
@@ -119,9 +127,12 @@ class _WordCardListState extends State<WordCardList> {
     });
     flutterTTS.speak(text).then((value) {
       if (value == 1) {
-        setState(() {
-          _speakingIndex = null;
-        });
+        Future.delayed(
+          const Duration(milliseconds: 500),
+          () => setState(() {
+            _speakingIndex = null;
+          }),
+        );
       }
     });
   }
