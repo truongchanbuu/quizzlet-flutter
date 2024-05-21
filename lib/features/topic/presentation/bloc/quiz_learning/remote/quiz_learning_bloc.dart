@@ -14,12 +14,48 @@ class QuizLearningBloc extends Bloc<QuizLearningEvent, QuizLearningState> {
   QuizLearningBloc({required this.topic, required this.mode})
       : super(QuizLearningInitial()) {
     on<StartQuiz>((event, emit) {
-      _currentWordIndex = 0;
+      emit(QuizInProgress(
+        currentWordIndex: 0,
+        correctAnswers: [],
+        wrongAnswers: [],
+      ));
+    });
+
+    on<CheckAnswer>((event, emit) {
+      final currentState = state as QuizInProgress;
+      final currentWord = topic.words[_currentWordIndex];
+      final correctAnswer =
+          mode == 'en-vie' ? currentWord.meaning : currentWord.terminology;
+
+      if (event.answer == correctAnswer) {
+        currentState.correctAnswers.add(currentWord);
+      } else {
+        currentState.wrongAnswers.add(currentWord);
+      }
+
       emit(QuizInProgress(
         currentWordIndex: _currentWordIndex,
-        correctAnswers: const [],
-        wrongAnswers: const [],
+        correctAnswers: currentState.correctAnswers,
+        wrongAnswers: currentState.wrongAnswers,
+        selectedAnswer: event.answer,
       ));
+
+      Future.delayed(const Duration(seconds: 2), () {
+        add(NextQuestion());
+      });
+    });
+
+    on<NextQuestion>((event, emit) {
+      if (_currentWordIndex < topic.words.length - 1) {
+        _currentWordIndex++;
+        emit(QuizInProgress(
+          currentWordIndex: _currentWordIndex,
+          correctAnswers: (state as QuizInProgress).correctAnswers,
+          wrongAnswers: (state as QuizInProgress).wrongAnswers,
+        ));
+      } else {
+        emit(QuizCompleted());
+      }
     });
   }
 }

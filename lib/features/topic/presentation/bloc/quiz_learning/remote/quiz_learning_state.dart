@@ -13,11 +13,13 @@ final class QuizLoading extends QuizLearningState {}
 
 final class QuizInProgress extends QuizLearningState {
   final int currentWordIndex;
-  final List<WordModel> correctAnswers;
-  final List<WordModel> wrongAnswers;
+  List<WordModel> correctAnswers;
+  List<WordModel> wrongAnswers;
+  final String? selectedAnswer;
 
-  const QuizInProgress({
+  QuizInProgress({
     required this.currentWordIndex,
+    this.selectedAnswer,
     required this.correctAnswers,
     required this.wrongAnswers,
   });

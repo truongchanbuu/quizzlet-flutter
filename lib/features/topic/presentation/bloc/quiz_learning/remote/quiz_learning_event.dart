@@ -16,12 +16,12 @@ final class LoadQuiz extends QuizLearningEvent {
 
 final class StartQuiz extends QuizLearningEvent {}
 
-class NextQuestionEvent extends QuizLearningEvent {}
+class NextQuestion extends QuizLearningEvent {}
 
-class CheckAnswerEvent extends QuizLearningEvent {
+class CheckAnswer extends QuizLearningEvent {
   final String answer;
 
-  const CheckAnswerEvent(this.answer);
+  const CheckAnswer(this.answer);
 }
 
-class FinishQuizEvent extends QuizLearningEvent {}
+class FinishQuiz extends QuizLearningEvent {}

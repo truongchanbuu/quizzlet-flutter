@@ -212,15 +212,9 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (context) => QuizLearningBloc(
-              topic: widget.topic,
-              mode: _qnALang[_qnALangUserChosen],
-            ),
-            child: QuizExamPage(
-              topic: widget.topic,
-              mode: _qnALang[_qnALangUserChosen],
-            ),
+          builder: (context) => QuizExamPage(
+            topic: widget.topic,
+            mode: _qnALang[_qnALangUserChosen],
           ),
           settings: RouteSettings(name: fullRouteName),
         ),
