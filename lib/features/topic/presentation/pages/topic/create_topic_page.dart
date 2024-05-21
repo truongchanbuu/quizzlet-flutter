@@ -125,7 +125,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
         }
       },
       builder: (context, state) {
-        if (state is Creating || state is Updating) {
+        if (state is CreatingTopic || state is UpdatingTopic) {
           return const LoadingIndicator();
         }
 
@@ -311,8 +311,8 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
       topicDesc: topicDesc,
       isPublic: isPublic,
       createdBy: currentUser.email ?? 'Unknown',
-      lastAccess: null,
-      createdAt: DateTime.now(),
+      lastAccess: widget.topic != null ? DateTime.now() : null,
+      createdAt: widget.topic?.createdAt ?? DateTime.now(),
     );
   }
 

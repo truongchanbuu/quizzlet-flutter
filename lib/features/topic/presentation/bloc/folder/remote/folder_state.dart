@@ -25,7 +25,7 @@ final class CreateFolderSuccess extends FolderState {
   const CreateFolderSuccess();
 }
 
-final class Creating extends FolderState {}
+final class CreatingFolder extends FolderState {}
 
 final class CreateFolderFailed extends FolderState {
   final String? message;
@@ -36,7 +36,7 @@ final class DeleteFolderSuccess extends FolderState {
   const DeleteFolderSuccess();
 }
 
-final class Deleting extends FolderState {}
+final class DeletingFolder extends FolderState {}
 
 final class DeleteFolderFailed extends FolderState {
   final String? message;
@@ -47,9 +47,15 @@ final class UpdateFolderSuccess extends FolderState {
   const UpdateFolderSuccess();
 }
 
-final class Updating extends FolderState {}
+final class UpdatingFolder extends FolderState {}
 
 final class UpdateFolderFailed extends FolderState {
   final String? message;
   const UpdateFolderFailed(this.message);
 }
+
+final class AddTopicsSuccess extends FolderState {}
+
+final class AddTopicsFailed extends FolderState {}
+
+final class AddingTopics extends FolderState {}

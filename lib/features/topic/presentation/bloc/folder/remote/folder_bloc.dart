@@ -49,7 +49,7 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
         } else if (dataState is CreateFolderSuccess) {
           emit(const CreateFolderSuccess());
         } else {
-          emit(Creating());
+          emit(CreatingFolder());
         }
       } catch (e) {
         emit(CreateFolderFailed(e.toString()));
@@ -66,7 +66,7 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
         } else if (dataState is DataSuccess) {
           emit(const DeleteFolderSuccess());
         } else {
-          emit(Deleting());
+          emit(DeletingFolder());
         }
       } catch (e) {
         emit(DeleteFolderFailed(e.toString()));
@@ -83,10 +83,27 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
         } else if (dataState is DataSuccess) {
           emit(const UpdateFolderSuccess());
         } else {
-          emit(Updating());
+          emit(UpdatingFolder());
         }
       } catch (e) {
         emit(UpdateFolderFailed(e.toString()));
+      }
+    });
+
+    on<AddTopicsToFolder>((event, emit) async {
+      try {
+        var dataState = await _topicRepository.addTopicsToFolder(
+            event.folderId, event.topicIds);
+
+        if (dataState is DataFailed) {
+          emit(AddTopicsFailed());
+        } else if (dataState is DataSuccess) {
+          emit(AddTopicsSuccess());
+        } else {
+          emit(AddingTopics());
+        }
+      } catch (e) {
+        emit(AddTopicsFailed());
       }
     });
   }

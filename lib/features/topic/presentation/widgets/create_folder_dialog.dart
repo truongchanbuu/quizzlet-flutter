@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/home_page.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
@@ -51,8 +52,6 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
       } else {
         context.read<FolderBloc>().add(CreateFolder(folder));
       }
-
-      Navigator.pushReplacementNamed(context, '/');
     }
   }
 
@@ -72,11 +71,11 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
           ).show();
         } else if (state is CreateFolderSuccess ||
             state is UpdateFolderSuccess) {
-          Navigator.pop(context);
+          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
         }
       },
       builder: (context, state) {
-        if (state is Creating || state is Updating) {
+        if (state is CreatingFolder || state is UpdatingFolder) {
           return const LoadingIndicator();
         }
 
@@ -140,6 +139,6 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
   }
 
   String generateFolderId() {
-    return '${folderName?.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}';
+    return '${folderName?.trim().toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}';
   }
 }

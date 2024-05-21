@@ -97,9 +97,30 @@ class TopicRepositoryImpl implements TopicRepository {
   }
 
   @override
-  Future<DataState<void>> addTopicToFolder(String topicId, String folderId) {
-    // TODO: implement addTopicToFolder
-    throw UnimplementedError();
+  Future<DataState<void>> addTopicsToFolder(
+      String folderId, List<String> topicIds) async {
+    try {
+      var topics = List.empty(growable: true);
+      for (var id in topicIds) {
+        var topic = await topicCollection.doc(id).get();
+
+        if (topic.exists) {
+          topics.add(topic.data());
+        }
+      }
+
+      await folderCollection.doc(folderId).update({'topics': topics});
+
+      return const DataSuccess();
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
   }
 
   @override

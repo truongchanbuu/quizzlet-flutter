@@ -101,7 +101,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   _buildBody(context) {
     return BlocConsumer<TopicBloc, TopicState>(
       builder: (context, state) {
-        if (state is Deleting) {
+        if (state is DeletingTopic) {
           return const LoadingIndicator();
         }
 
@@ -139,6 +139,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             btnCancelOnPress: () {},
           ).show();
         } else if (state is DeleteTopicSuccess) {
+          Navigator.pop(context);
+          Navigator.pop(context);
           Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
         }
       },
@@ -259,9 +261,6 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           TextButton(
             onPressed: () {
               ctx.read<TopicBloc>().add(RemoveTopic(widget.topic.topicId));
-              Navigator.pop(context);
-              Navigator.pop(context);
-              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
             },
             child: const Text('Delete'),
           )

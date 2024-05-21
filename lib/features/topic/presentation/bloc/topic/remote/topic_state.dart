@@ -32,7 +32,7 @@ final class CreateTopicSuccess extends TopicState {
   const CreateTopicSuccess();
 }
 
-final class Creating extends TopicState {}
+final class CreatingTopic extends TopicState {}
 
 final class CreateTopicFailed extends TopicState {
   final String? message;
@@ -43,7 +43,7 @@ final class DeleteTopicSuccess extends TopicState {
   const DeleteTopicSuccess();
 }
 
-final class Deleting extends TopicState {}
+final class DeletingTopic extends TopicState {}
 
 final class DeleteTopicFailed extends TopicState {
   final String? message;
@@ -54,7 +54,7 @@ final class UpdateTopicSuccess extends TopicState {
   const UpdateTopicSuccess();
 }
 
-final class Updating extends TopicState {}
+final class UpdatingTopic extends TopicState {}
 
 final class UpdateTopicFailed extends TopicState {
   final String? message;

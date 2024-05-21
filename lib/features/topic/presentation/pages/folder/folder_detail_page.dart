@@ -1,10 +1,14 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/folder/add_topic_to_folder_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_detail_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/create_folder_dialog.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic_item.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 
 class FolderDetailPage extends StatefulWidget {
@@ -55,8 +59,8 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
                 leading: const Icon(Icons.edit),
               ),
               ListTile(
-                onTap: () {},
-                title: const Text('Thêm học phần'),
+                onTap: _addTopicToFolder,
+                title: const Text('Thêm chủ đề'),
                 leading: const Icon(Icons.add),
               ),
               ListTile(
@@ -79,12 +83,34 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
   }
 
   _buildBody() {
-    return ListView(
-      children: [
-        _buildInfoSection(),
-        const SizedBox(height: 20),
-        _buildTopics(),
-      ],
+    return BlocConsumer<FolderBloc, FolderState>(
+      listener: (context, state) {
+        if (state is DeleteFolderFailed) {
+          AwesomeDialog(
+            context: context,
+            padding: const EdgeInsets.all(10),
+            title: 'Xóa không thành công',
+            headerAnimationLoop: false,
+            dialogType: DialogType.error,
+            btnCancelOnPress: () {},
+          ).show();
+        } else if (state is DeleteFolderSuccess) {
+          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+        }
+      },
+      builder: (context, state) {
+        if (state is DeletingFolder) {
+          return const LoadingIndicator();
+        }
+
+        return ListView(
+          children: [
+            _buildInfoSection(),
+            const SizedBox(height: 20),
+            _buildTopics(),
+          ],
+        );
+      },
     );
   }
 
@@ -151,16 +177,22 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
                   'Thư mục này hiện chưa có chủ đề nào',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 TextButton(
                   onPressed: _addTopicToFolder,
                   style: TextButton.styleFrom(
                     shape: const RoundedRectangleBorder(),
                     backgroundColor: Colors.indigo,
                   ),
-                  child: const Text(
-                    'Thêm chủ đề',
-                    style: TextStyle(color: Colors.white),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      'Thêm chủ đề',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 )
               ],
@@ -173,19 +205,33 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) => Container(),
+      itemBuilder: (context, index) =>
+          _createTopicItem(widget.folder.topics[index]),
       itemCount: widget.folder.topics.length,
     );
   }
 
-  // _createTopicItem(topic) {
-  //   return Card(
-  //     margin: const EdgeInsets.all(20),
-  //     elevation: 1,
-  //     color: Colors.white,
-  //     child: Text(''),
-  //   );
-  // }
+  _createTopicItem(topic) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: TopicItem(
+          topic: topic,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => sl.get<TopicBloc>(),
+                  child: TopicDetailPage(topic: topic),
+                ),
+                settings: RouteSettings(
+                  name: '/topic/detail/${topic.topicId}',
+                ),
+              ),
+            );
+          }),
+    );
+  }
 
   _editTopic() {
     showDialog(
@@ -201,7 +247,7 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
 
   _deleteFolder(BuildContext ctx) {
     showDialog(
-      context: context,
+      context: ctx,
       builder: (context) => AlertDialog(
         title: const Text(
           'Bạn có chắc muốn xóa thư mục này vĩnh vễn? Các học phần sẽ không bị ảnh hưởng',
@@ -212,33 +258,38 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
         actions: [
           TextButton(
               onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
+                Navigator.pop(ctx);
+                Navigator.pop(ctx);
               },
               child: const Text('Cancel')),
           TextButton(
-              onPressed: () {
-                ctx
-                    .read<FolderBloc>()
-                    .add(DeleteFolder(widget.folder.folderId));
-                Navigator.pop(context);
-                Navigator.pop(context);
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/', (route) => false);
-              },
-              child: const Text('Delete')),
+            onPressed: () {
+              ctx.read<FolderBloc>().add(DeleteFolder(widget.folder.folderId));
+            },
+            child: const Text('Delete'),
+          ),
         ],
       ),
     );
   }
 
   _addTopicToFolder() {
+    Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (context) => sl.get<TopicBloc>(),
-          child: const AddTopicFolderPage(),
+        builder: (context) => MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => sl.get<TopicBloc>(),
+            ),
+            BlocProvider(
+              create: (context) => sl.get<FolderBloc>(),
+            ),
+          ],
+          child: AddTopicFolderPage(
+            folder: widget.folder,
+          ),
         ),
       ),
     );

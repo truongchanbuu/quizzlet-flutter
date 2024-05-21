@@ -14,7 +14,7 @@ class TopicBloc extends Bloc<TopicEvent, TopicState> {
   final TopicRepository _topicRepository;
   late final StreamSubscription<List<TopicModel>> _topicSubscription;
 
-  TopicBloc(this._topicRepository) : super(TopicInitial()) {
+  TopicBloc(this._topicRepository) : super(TopicLoading()) {
     _topicSubscription = _topicRepository.topics().listen((topics) {
       add(GetTopics(topics));
     });
@@ -50,7 +50,7 @@ class TopicBloc extends Bloc<TopicEvent, TopicState> {
         } else if (dataState is DataSuccess) {
           emit(const CreateTopicSuccess());
         } else {
-          emit(Creating());
+          emit(CreatingTopic());
         }
       } catch (e) {
         emit(CreateTopicFailed(e.toString()));
@@ -67,7 +67,7 @@ class TopicBloc extends Bloc<TopicEvent, TopicState> {
         } else if (dataState is DataSuccess) {
           emit(const DeleteTopicSuccess());
         } else {
-          emit(Deleting());
+          emit(DeletingTopic());
         }
       } catch (e) {
         emit(DeleteTopicFailed(e.toString()));
@@ -84,7 +84,7 @@ class TopicBloc extends Bloc<TopicEvent, TopicState> {
         } else if (dataState is DataSuccess) {
           emit(const UpdateTopicSuccess());
         } else {
-          emit(Updating());
+          emit(UpdatingTopic());
         }
       } catch (e) {
         emit(UpdateTopicFailed(e.toString()));

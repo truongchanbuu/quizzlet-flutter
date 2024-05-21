@@ -1,38 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_detail_page.dart';
-import 'package:quizzlet_fluttter/injection_container.dart';
 
 class TopicItem extends StatelessWidget {
   final TopicModel topic;
-  const TopicItem({super.key, required this.topic});
+  final Function() onTap;
+  final Color? borderColor;
+  const TopicItem({
+    super.key,
+    required this.topic,
+    required this.onTap,
+    this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlocProvider(
-              create: (context) => sl.get<TopicBloc>(),
-              child: TopicDetailPage(topic: topic),
-            ),
-            settings: RouteSettings(
-              name: '/topic/detail/${topic.topicId}',
-            ),
-          ),
-        );
-      },
+      onTap: onTap,
       borderRadius: const BorderRadius.all(Radius.circular(10)),
       child: Material(
-        elevation: 1,
+        elevation: 2,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(width: 0.5),
+            border: Border.all(
+              width: 2,
+              color: borderColor ?? Colors.transparent,
+            ),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
           child: ListTile(

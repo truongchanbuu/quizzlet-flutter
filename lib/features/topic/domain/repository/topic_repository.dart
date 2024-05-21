@@ -25,7 +25,8 @@ abstract class TopicRepository {
   Future<DataState<void>> createFolder(FolderModel folder);
   Future<DataState<void>> editFolder(FolderModel editedFolder);
   Future<DataState<void>> deleteFolder(String folderId);
-  Future<DataState<void>> addTopicToFolder(String topicId, String folderId);
+  Future<DataState<void>> addTopicsToFolder(
+      String folderId, List<String> topicIds);
   Future<DataState<void>> removeTopicFromFolder(
       String topicId, String folderId);
 }

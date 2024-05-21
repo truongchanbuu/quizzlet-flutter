@@ -135,6 +135,8 @@ class _HomePageState extends State<HomePage> {
     return AnimatedBottomNavigationBar.builder(
       backgroundColor: Colors.white,
       activeIndex: _currentPageIndex,
+      blurEffect: true,
+      borderColor: Colors.black.withOpacity(0.5),
       onTap: (int pageIndex) {
         setState(() => _currentPageIndex = pageIndex);
         pageController.jumpToPage(

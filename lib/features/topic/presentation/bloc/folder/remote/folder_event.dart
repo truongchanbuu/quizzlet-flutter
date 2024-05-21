@@ -33,3 +33,10 @@ final class EditFolder extends FolderEvent {
   final FolderModel editedFolder;
   const EditFolder(this.editedFolder);
 }
+
+final class AddTopicsToFolder extends FolderEvent {
+  final String folderId;
+  final List<String> topicIds;
+
+  const AddTopicsToFolder({required this.folderId, required this.topicIds});
+}

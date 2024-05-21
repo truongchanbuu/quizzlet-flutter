@@ -16,6 +16,7 @@ AppBarTheme appBarTheme() {
     titleTextStyle: TextStyle(
       fontSize: 18,
       color: Colors.white,
+      fontWeight: FontWeight.bold,
     ),
   );
 }

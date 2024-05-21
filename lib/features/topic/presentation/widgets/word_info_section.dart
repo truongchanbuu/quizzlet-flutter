@@ -144,27 +144,7 @@ class _WordInfoSectionState extends State<WordInfoSection> {
               ),
               if (widget.word.illustratorUrl != null)
                 const SizedBox(height: 20),
-              if (widget.word.illustratorUrl != null)
-                widget.word.illustratorUrl != null &&
-                        !kIsWeb &&
-                        (widget.word.illustratorUrl!.startsWith('https://') ||
-                            widget.word.illustratorUrl!.startsWith('http://'))
-                    ? Image.network(
-                        widget.word.illustratorUrl!,
-                        width: 100,
-                        height: 100,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.error),
-                      )
-                    : widget.word.illustratorUrl != null
-                        ? Image.file(
-                            File(widget.word.illustratorUrl!),
-                            width: 100,
-                            height: 100,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.error),
-                          )
-                        : const SizedBox.shrink(),
+              _buildIllustrator(),
               // ImageField(
               //   multipleUpload: false,
               //   cardinality: 1,
@@ -177,6 +157,49 @@ class _WordInfoSectionState extends State<WordInfoSection> {
         ),
       ),
     );
+  }
+
+  Widget _buildIllustrator() {
+    final String? url = widget.word.illustratorUrl;
+
+    if (url == null) {
+      return const SizedBox.shrink();
+    }
+
+    final bool isNetworkImage =
+        url.startsWith('https://') || url.startsWith('http://');
+
+    if (kIsWeb) {
+      if (isNetworkImage) {
+        return Image.network(
+          url,
+          width: 100,
+          height: 100,
+          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+        );
+      } else {
+        return const Center(
+          child: Text(
+              'Hiện không hỗ trợ chọn hình ảnh từ web. Tính năng sẽ được cập nhật sớm nhất có thể'),
+        );
+      }
+    } else {
+      if (isNetworkImage) {
+        return Image.network(
+          url,
+          width: 100,
+          height: 100,
+          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+        );
+      } else {
+        return Image.file(
+          File(url),
+          width: 100,
+          height: 100,
+          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+        );
+      }
+    }
   }
 
   // Handle Data
