@@ -106,17 +106,12 @@ class _FlashCardState extends State<FlashCard> {
                 ),
                 child: IconButton(
                   onPressed: () {
-                    flutterTTS.speak(title).then((value) => {
-                          if (value == 1)
-                            {
-                              Future.delayed(
-                                const Duration(seconds: 1),
-                                () => setState(
-                                    () => _isPronouncing = !_isPronouncing),
-                              )
-                            }
-                        });
-                    setState(() => _isPronouncing = !_isPronouncing);
+                    flutterTTS.speak(title).then((value) {
+                      Future.delayed(
+                        const Duration(seconds: 1),
+                        () => setState(() => _isPronouncing = !_isPronouncing),
+                      );
+                    });
                   },
                   icon: const Icon(Icons.volume_up_outlined),
                 ),

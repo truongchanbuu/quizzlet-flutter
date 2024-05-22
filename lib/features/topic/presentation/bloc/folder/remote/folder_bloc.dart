@@ -106,6 +106,23 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
         emit(AddTopicsFailed());
       }
     });
+
+    on<RemoveTopicsFromFolder>((event, emit) async {
+      try {
+        var dataState = await _topicRepository.removeTopicsFromFolder(event.folderId, event.topicIds);
+
+        if (dataState is DataFailed) {
+          emit(RemoveTopicsFailed(dataState.error?.message ?? 'There is something wrong'));
+        } else if (dataState is DataSuccess) {
+          emit(RemoveTopicsSuccess());
+        } else {
+          emit(RemovingTopics());
+        }
+
+      } catch (e) {
+        emit(RemoveTopicsFailed(e.toString()));
+      }
+    });
   }
 
   @override

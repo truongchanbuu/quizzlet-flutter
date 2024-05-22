@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/exam_settings_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/flashcard/flash_card_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/folder/folders_to_add_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/create_topic_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flashcard/flash_card_preview_section.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/topic/learn_feature_item_widget.dart';
@@ -22,11 +24,6 @@ class TopicDetailPage extends StatefulWidget {
 }
 
 class _TopicDetailPageState extends State<TopicDetailPage> {
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +61,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           child: ListView(
             children: [
               ListTile(
-                onTap: () {},
+                onTap: _addToFolder,
                 leading: const Icon(Icons.folder_outlined),
                 title: const Text('Thêm vào thư mục'),
               ),
@@ -261,6 +258,20 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             child: const Text('Delete'),
           )
         ],
+      ),
+    );
+  }
+
+  _addToFolder() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => sl.get<FolderBloc>(),
+          child: FoldersToAddPage(
+            topic: widget.topic,
+          ),
+        ),
       ),
     );
   }

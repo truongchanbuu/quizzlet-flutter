@@ -40,3 +40,10 @@ final class AddTopicsToFolder extends FolderEvent {
 
   const AddTopicsToFolder({required this.folderId, required this.topicIds});
 }
+
+final class RemoveTopicsFromFolder extends FolderEvent {
+  final String folderId;
+  final List<String> topicIds;
+
+  const RemoveTopicsFromFolder(this.folderId, this.topicIds);
+}

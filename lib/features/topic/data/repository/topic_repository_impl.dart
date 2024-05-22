@@ -97,33 +97,6 @@ class TopicRepositoryImpl implements TopicRepository {
   }
 
   @override
-  Future<DataState<void>> addTopicsToFolder(
-      String folderId, List<String> topicIds) async {
-    try {
-      var topics = List.empty(growable: true);
-      for (var id in topicIds) {
-        var topic = await topicCollection.doc(id).get();
-
-        if (topic.exists) {
-          topics.add(topic.data());
-        }
-      }
-
-      await folderCollection.doc(folderId).update({'topics': topics});
-
-      return const DataSuccess();
-    } on FirebaseException catch (e) {
-      return DataFailed(
-        error: DioException(
-          requestOptions: RequestOptions(),
-          error: e.code,
-          message: e.message,
-        ),
-      );
-    }
-  }
-
-  @override
   Future<DataState<void>> addWordToTopic(String topicId, WordModel word) {
     // TODO: implement addWordToTopic
     throw UnimplementedError();
@@ -211,6 +184,60 @@ class TopicRepositoryImpl implements TopicRepository {
     }
   }
 
+  @override
+  Future<DataState<void>> addTopicsToFolder(
+      String folderId, List<String> topicIds) async {
+    try {
+      var topics = List.empty(growable: true);
+      for (var id in topicIds) {
+        var topic = await topicCollection.doc(id).get();
+
+        if (topic.exists) {
+          topics.add(topic.data());
+        }
+      }
+
+      await folderCollection.doc(folderId).update({'topics': topics});
+
+      return const DataSuccess();
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<void>> removeTopicsFromFolder(
+      String folderId, List<String> topicIds) async {
+    try {
+      var topics = List.empty(growable: true);
+      for (var id in topicIds) {
+        var topic = await topicCollection.doc(id).get();
+
+        if (topic.exists) {
+          topics.add(topic.data());
+        }
+      }
+
+      await folderCollection.doc(folderId).update({'topics': FieldValue.arrayRemove(topics)});
+
+      return const DataSuccess();
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
   // Word
   @override
   Future<DataState<void>> createWord(WordModel word) {
@@ -234,13 +261,6 @@ class TopicRepositoryImpl implements TopicRepository {
   Future<DataState<void>> editWordInTopic(
       String topicId, WordModel editedWord) {
     // TODO: implement editWordInTopic
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<DataState<void>> removeTopicFromFolder(
-      String topicId, String folderId) {
-    // TODO: implement removeTopicFromFolder
     throw UnimplementedError();
   }
 

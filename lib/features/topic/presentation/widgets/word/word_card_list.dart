@@ -126,14 +126,10 @@ class _WordCardListState extends State<WordCardList> {
       _speakingIndex = index;
     });
     flutterTTS.speak(text).then((value) {
-      if (value == 1) {
-        Future.delayed(
-          const Duration(milliseconds: 500),
-          () => setState(() {
-            _speakingIndex = null;
-          }),
-        );
-      }
+      Future.delayed(
+        const Duration(seconds: 1),
+        () => setState(() => _speakingIndex = null),
+      );
     });
   }
 }

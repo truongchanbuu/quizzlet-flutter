@@ -72,7 +72,7 @@ class _PreviewFlashCardSectionState extends State<PreviewFlashCardSection> {
 
   _buildCard(int index, String title) {
     return Card(
-      elevation: 2,
+      elevation: 1,
       child: Stack(
         children: [
           GestureDetector(

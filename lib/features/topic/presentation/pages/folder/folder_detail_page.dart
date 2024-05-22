@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/folder/add_topic_to_folder_page.dart';
@@ -20,6 +21,15 @@ class FolderDetailPage extends StatefulWidget {
 }
 
 class _FolderDetailPageState extends State<FolderDetailPage> {
+  Offset _tapPosition = Offset.zero;
+
+  void _getTapPosition(TapDownDetails details) {
+    final RenderBox referenceBox = context.findRenderObject() as RenderBox;
+    setState(() {
+      _tapPosition = referenceBox.globalToLocal(details.globalPosition);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,8 +48,9 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
       elevation: 1,
       actions: [
         IconButton(
-            onPressed: () => _showBottomSheetSelection(ctx),
-            icon: const Icon(Icons.more_vert)),
+          onPressed: () => _showBottomSheetSelection(ctx),
+          icon: const Icon(Icons.more_vert),
+        ),
       ],
     );
   }
@@ -85,7 +96,7 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
   _buildBody() {
     return BlocConsumer<FolderBloc, FolderState>(
       listener: (context, state) {
-        if (state is DeleteFolderFailed) {
+        if (state is DeleteFolderFailed || state is RemoveTopicsFailed) {
           AwesomeDialog(
             context: context,
             padding: const EdgeInsets.all(10),
@@ -94,12 +105,12 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
             dialogType: DialogType.error,
             btnCancelOnPress: () {},
           ).show();
-        } else if (state is DeleteFolderSuccess) {
+        } else if (state is DeleteFolderSuccess || state is RemoveTopicsSuccess) {
           Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
         }
       },
       builder: (context, state) {
-        if (state is DeletingFolder) {
+        if (state is DeletingFolder || state is RemovingTopics) {
           return const LoadingIndicator();
         }
 
@@ -215,21 +226,46 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: TopicItem(
-          topic: topic,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BlocProvider(
-                  create: (context) => sl.get<TopicBloc>(),
-                  child: TopicDetailPage(topic: topic),
-                ),
-                settings: RouteSettings(
-                  name: '/topic/detail/${topic.topicId}',
-                ),
+        topic: topic,
+        onLongPress: () => _showPopupMenu(topic),
+        onTapDown: (details) => _getTapPosition(details),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => sl.get<TopicBloc>(),
+                child: TopicDetailPage(topic: topic),
               ),
-            );
-          }),
+              settings: RouteSettings(
+                name: '/topic/detail/${topic.topicId}',
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  _showPopupMenu(topic) {
+    final RenderObject? overlay =
+        Overlay.of(context).context.findRenderObject();
+
+    showMenu(
+      context: context,
+      position: RelativeRect.fromRect(
+        Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
+        Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
+            overlay.paintBounds.size.height),
+      ),
+      items: [
+        PopupMenuItem(
+          onTap: ()=> _deleteTopicFromFolder(topic),
+          child: const ListTile(
+            title: Text('Xóa'),
+          ),
+        ),
+      ],
     );
   }
 
@@ -244,6 +280,7 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
       ),
     );
   }
+
 
   _deleteFolder(BuildContext ctx) {
     showDialog(
@@ -293,5 +330,11 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
         ),
       ),
     );
+  }
+
+  _deleteTopicFromFolder(TopicModel topic) {
+    context
+        .read<FolderBloc>()
+        .add(RemoveTopicsFromFolder(widget.folder.folderId, [topic.topicId]));
   }
 }

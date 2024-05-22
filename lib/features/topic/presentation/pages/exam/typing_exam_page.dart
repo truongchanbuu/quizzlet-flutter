@@ -116,7 +116,12 @@ class _TypingExamPageState extends State<TypingExamPage> {
                         widget.topic.words[_currentWordIndex].illustratorUrl!,
                         width: 100,
                         height: 100,
-                      )
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                          Icons.error,
+                          semanticLabel: 'Cannot get the image',
+                        ),
+                      ),
                     ]
                   ],
                 ),

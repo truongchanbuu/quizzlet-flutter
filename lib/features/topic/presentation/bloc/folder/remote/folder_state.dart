@@ -59,3 +59,13 @@ final class AddTopicsSuccess extends FolderState {}
 final class AddTopicsFailed extends FolderState {}
 
 final class AddingTopics extends FolderState {}
+
+final class RemoveTopicsSuccess extends FolderState {}
+
+final class RemoveTopicsFailed extends FolderState {
+  final String message;
+
+  const RemoveTopicsFailed(this.message);
+}
+
+final class RemovingTopics extends FolderState {}

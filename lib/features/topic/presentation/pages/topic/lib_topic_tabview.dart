@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/core/util/date_time_util.dart';
@@ -16,6 +17,8 @@ class LibTopicTabView extends StatefulWidget {
 }
 
 class _LibTopicTabViewState extends State<LibTopicTabView> {
+  final currentUser = sl.get<FirebaseAuth>().currentUser!;
+
   Map<String, List<TopicModel>> groupTopics = {};
 
   @override
@@ -23,7 +26,10 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
     return BlocBuilder<TopicBloc, TopicState>(
       builder: (context, state) {
         if (state is AllTopicsLoaded) {
-          groupTopics = _topicsByDate(state.topics);
+          groupTopics = _topicsByDate(state.topics
+              .where((topic) =>
+                  topic.createdBy == currentUser.email || topic.isPublic)
+              .toList());
           return groupTopics.isEmpty ? _buildNoTopicShowedUI() : _buildTopics();
         } else {
           return const LoadingIndicator();

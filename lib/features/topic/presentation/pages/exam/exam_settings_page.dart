@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/quizz_exam_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/quiz_exam_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/typing_exam_page.dart';
 
 class ExamSettingPage extends StatefulWidget {

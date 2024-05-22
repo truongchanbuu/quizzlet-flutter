@@ -60,7 +60,7 @@ class _ResultPageState extends State<ResultPage> {
 
   _buildBody() {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: ListView(
         children: [
           _buildCongratulationSection(),
@@ -228,16 +228,83 @@ class _ResultPageState extends State<ResultPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Câu hỏi: $questionText'),
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Câu hỏi: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const WidgetSpan(child: SizedBox(width: 10)),
+                  TextSpan(text: questionText),
+                ],
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-                'Câu trả lời của bạn: ${userAnswer ?? '[Không có câu trả lời]'}'),
+            child: RichText(
+              text: TextSpan(
+                children: <InlineSpan>[
+                  const TextSpan(
+                    text: 'Câu trả lời của bạn: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const WidgetSpan(child: SizedBox(width: 10)),
+                  TextSpan(
+                    text: userAnswer ?? '[Không có câu trả lời]',
+                    style: TextStyle(
+                      color: isCorrect ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const WidgetSpan(child: SizedBox(width: 5)),
+                  WidgetSpan(
+                    child: Icon(
+                      isCorrect ? Icons.check : Icons.close,
+                      color: isCorrect ? Colors.green : Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
-            child: Text('Câu trả lời đúng: $correctAnswer'),
+            child: RichText(
+              text: TextSpan(
+                children: <InlineSpan>[
+                  const TextSpan(
+                    text: 'Câu trả lời đúng: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const WidgetSpan(child: SizedBox(width: 10)),
+                  TextSpan(
+                    text: correctAnswer,
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const WidgetSpan(child: SizedBox(width: 5)),
+                  const WidgetSpan(
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           Container(

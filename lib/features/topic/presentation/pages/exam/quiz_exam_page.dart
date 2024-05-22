@@ -124,7 +124,12 @@ class _QuizExamPageState extends State<QuizExamPage> {
                         widget.topic.words[_currentWordIndex].illustratorUrl!,
                         width: 100,
                         height: 100,
-                      )
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                          Icons.error,
+                          semanticLabel: 'Cannot get the image',
+                        ),
+                      ),
                     ]
                   ],
                 ),
@@ -151,44 +156,48 @@ class _QuizExamPageState extends State<QuizExamPage> {
     );
   }
 
-  Widget _createOptions(String option) {
-    final isCorrectAnswer = (selectedAnswer != null &&
-        selectedAnswer == option &&
-        selectedAnswer ==
-            (widget.mode == 'en-vie'
-                ? widget.topic.words[_currentWordIndex].meaning
-                : widget.topic.words[_currentWordIndex].terminology));
-    final isSelected = selectedAnswer == option;
+ Widget _createOptions(String option) {
+  final isCorrectAnswer = (widget.mode == 'en-vie'
+      ? option == widget.topic.words[_currentWordIndex].meaning
+      : option == widget.topic.words[_currentWordIndex].terminology);
 
-    Color tileColor;
-    if (selectedAnswer == null) {
-      tileColor = Colors.white;
-    } else if (isSelected) {
+  final isSelected = selectedAnswer == option;
+
+  Color tileColor = Colors.white;
+  Color textColor = Colors.black;
+
+  if (selectedAnswer != null) {
+    if (isSelected) {
       tileColor = isCorrectAnswer ? Colors.green : Colors.red;
+      textColor = Colors.white;
     } else if (isCorrectAnswer) {
       tileColor = Colors.green;
-    } else {
-      tileColor = Colors.white;
+      textColor = Colors.white;
     }
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.indigo, width: 2),
-        color: tileColor,
-      ),
-      child: ListTile(
-        onTap: selectedAnswer == null && !_isFinished
-            ? () {
-                if (widget.mode == 'vie-en') {
-                  flutterTTS.speak(option);
-                }
-                _checkAnswer(option);
-              }
-            : null,
-        title: Text(option),
-      ),
-    );
   }
+
+  return Container(
+    decoration: BoxDecoration(
+      border: Border.all(color: Colors.indigo, width: 2),
+      color: tileColor,
+    ),
+    child: ListTile(
+      onTap: selectedAnswer == null && !_isFinished
+          ? () {
+              if (widget.mode == 'vie-en') {
+                flutterTTS.speak(option);
+              }
+              _checkAnswer(option);
+            }
+          : null,
+      title: Text(
+        option,
+        style: TextStyle(color: textColor),
+      ),
+    ),
+  );
+}
+
 
   // Handle data
   getCorrectAnswer() {

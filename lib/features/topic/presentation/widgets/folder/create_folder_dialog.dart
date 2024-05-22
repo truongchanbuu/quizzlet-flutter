@@ -52,6 +52,8 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
       } else {
         context.read<FolderBloc>().add(CreateFolder(folder));
       }
+
+      Navigator.pop(context);
     }
   }
 

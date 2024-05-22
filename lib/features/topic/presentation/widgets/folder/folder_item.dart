@@ -1,27 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 
-class TopicItem extends StatelessWidget {
-  final TopicModel topic;
-  final Function()? onTap;
-  final Function()? onLongPress;
-  final Function(TapDownDetails details)? onTapDown;
+class FolderItem extends StatelessWidget {
+  final FolderModel folder;
+  final VoidCallback onTap;
   final Color? borderColor;
-  const TopicItem({
+
+  const FolderItem({
     super.key,
-    required this.topic,
-    this.onTap,
-    this.onTapDown,
-    this.onLongPress,
     this.borderColor,
+    required this.folder,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      onLongPress: onLongPress,
-      onTapDown: onTapDown,
       borderRadius: const BorderRadius.all(Radius.circular(10)),
       child: Material(
         elevation: 3,
@@ -41,17 +36,10 @@ class TopicItem extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Icon(Icons.folder_outlined),
                   Text(
-                    topic.topicName,
+                    folder.folderName,
                     style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '${topic.words.length} thuật ngữ',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
                 ],
               ),
@@ -60,7 +48,7 @@ class TopicItem extends StatelessWidget {
             subtitle: Row(
               children: [
                 Text(
-                  topic.createdBy,
+                  folder.creator ?? 'Unknown',
                   style: const TextStyle(color: Colors.black),
                 ),
               ],
