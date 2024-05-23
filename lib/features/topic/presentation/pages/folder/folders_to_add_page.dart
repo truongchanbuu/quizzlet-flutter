@@ -21,6 +21,7 @@ class _FoldersToAddPageState extends State<FoldersToAddPage> {
   final currentUser = sl.get<FirebaseAuth>().currentUser!;
   Set<String> selectedFolderIds = {};
   Set<String> initialFolderIds = {};
+  bool isSelectedFolderIdsInitialized = false;
 
   @override
   void initState() {
@@ -53,9 +54,10 @@ class _FoldersToAddPageState extends State<FoldersToAddPage> {
     return BlocConsumer<FolderBloc, FolderState>(
       builder: (context, state) {
         if (state is FolderLoaded) {
-          if (initialFolderIds.isEmpty) {
+          if (!isSelectedFolderIdsInitialized) {
             selectedFolderIds = _getFolderIdsBelongsToTopic(state.folders);
             initialFolderIds = Set.from(selectedFolderIds);
+            isSelectedFolderIdsInitialized = true;
           }
 
           return _buildFolderListWithCreateButton(state.folders);

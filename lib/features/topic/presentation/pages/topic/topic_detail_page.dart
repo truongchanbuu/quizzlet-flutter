@@ -263,6 +263,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   }
 
   _addToFolder() {
+    Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(
