@@ -16,7 +16,6 @@ WordModel _$WordModelFromJson(Map json) => WordModel(
       learnState:
           $enumDecodeNullable(_$LearnStateEnumMap, json['learnState']) ??
               LearnState.notLearn,
-      starred: json['starred'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$WordModelToJson(WordModel instance) => <String, dynamic>{
@@ -27,7 +26,6 @@ Map<String, dynamic> _$WordModelToJson(WordModel instance) => <String, dynamic>{
       'phonetic': instance.phonetic,
       'illustratorUrl': instance.illustratorUrl,
       'learnState': _$LearnStateEnumMap[instance.learnState]!,
-      'starred': instance.starred,
     };
 
 const _$LearnStateEnumMap = {

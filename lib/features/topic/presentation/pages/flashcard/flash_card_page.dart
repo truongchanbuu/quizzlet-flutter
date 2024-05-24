@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/result_page.dart';
+import 'package:quizzlet_fluttter/features/result/presentation/pages/result_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flashcard/flash_card_widget.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 

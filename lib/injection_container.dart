@@ -16,15 +16,19 @@ import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signout/remote
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/signup/remote/remote_signup_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/bloc/update-info/remote/remote_update_info_bloc.dart';
+import 'package:quizzlet_fluttter/features/result/data/repositories/result_repository_impl.dart';
+import 'package:quizzlet_fluttter/features/result/domain/repositories/result_repository.dart';
+import 'package:quizzlet_fluttter/features/result/presentation/bloc/result/result_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/data/repository/topic_repository_impl.dart';
 import 'package:quizzlet_fluttter/features/topic/domain/repository/topic_repository.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/word/remote/word_bloc.dart';
 
 final sl = GetIt.instance;
 
-Future<void> initializaDependencies() async {
+Future<void> initializeDependencies() async {
   // Dio
   sl.registerSingleton<Dio>(Dio());
 
@@ -58,6 +62,7 @@ Future<void> initializaDependencies() async {
 
   sl.registerSingleton<UserRepository>(UserRepositoryImpl(sl(), sl()));
   sl.registerSingleton<TopicRepository>(TopicRepositoryImpl());
+  sl.registerSingleton<ResultRepository>(ResultRepositoryImp());
 
   // Text-2-Speech
   sl.registerSingleton<FlutterTts>(FlutterTts());
@@ -72,4 +77,6 @@ Future<void> initializaDependencies() async {
 
   sl.registerFactory<TopicBloc>(() => TopicBloc(sl()));
   sl.registerFactory<FolderBloc>(() => FolderBloc(sl()));
+  sl.registerFactory<WordBloc>(() => WordBloc(sl()));
+  sl.registerFactory<ResultBloc>(() => ResultBloc(sl()));
 }

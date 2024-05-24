@@ -6,6 +6,7 @@ import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_ind
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/word/remote/word_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/exam_settings_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/flashcard/flash_card_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/folder/folders_to_add_page.dart';
@@ -119,7 +120,10 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
-                WordCardList(words: widget.topic.words),
+                BlocProvider(
+                  create: (context) => sl.get<WordBloc>(),
+                  child: WordCardList(topic: widget.topic),
+                ),
               ],
             ),
           ),
@@ -263,6 +267,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   }
 
   _addToFolder() {
+    Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(
