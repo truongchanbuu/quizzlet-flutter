@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/user_answer.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 class ResultPage extends StatefulWidget {
-  final TopicModel topic;
-  final List<WordModel> correctAnswers;
-  final List<WordModel> wrongAnswers;
-  final String mode;
-  final List<String?> userAnswers;
+  final String topicId;
+  final List<WordModel> words;
+  final List<UserAnswerModel?> userAnswers;
 
   const ResultPage({
     super.key,
-    required this.mode,
-    required this.correctAnswers,
-    required this.wrongAnswers,
+    required this.words,
     required this.userAnswers,
-    required this.topic,
+    required this.topicId,
   });
 
   @override
@@ -28,12 +24,18 @@ class _ResultPageState extends State<ResultPage> {
   var wrongColor = Colors.orange;
 
   late ValueNotifier<double> valueNotifier;
+  int correctAnswersCount = 0;
+  int wrongAnswersCount = 0;
 
   @override
   void initState() {
     super.initState();
-    var percentage =
-        (widget.correctAnswers.length * 100) / widget.topic.words.length;
+    correctAnswersCount = widget.userAnswers
+        .where((answer) => answer?.correctAnswer == answer?.userAnswer)
+        .length;
+    wrongAnswersCount = widget.words.length - correctAnswersCount;
+
+    var percentage = (correctAnswersCount * 100) / widget.words.length;
     valueNotifier = ValueNotifier(percentage);
   }
 
@@ -51,7 +53,7 @@ class _ResultPageState extends State<ResultPage> {
       leading: IconButton(
         onPressed: () => Navigator.popUntil(
           context,
-          ModalRoute.withName('/topic/detail/${widget.topic.topicId}'),
+          ModalRoute.withName('/topic/detail/${widget.topicId}'),
         ),
         icon: const Icon(Icons.close),
       ),
@@ -72,6 +74,7 @@ class _ResultPageState extends State<ResultPage> {
           _buildTitleSection('Đáp án của bạn'),
           const SizedBox(height: 20),
           _buildAnswers(),
+          const SizedBox(height: 10),
         ],
       ),
     );
@@ -90,8 +93,10 @@ class _ResultPageState extends State<ResultPage> {
   _buildCongratulationSection() {
     String congratulation = 'Well Done!!!';
 
-    if (widget.correctAnswers.length > widget.wrongAnswers.length) {
+    if (correctAnswersCount > widget.words.length / 2) {
       congratulation = 'Bạn đang không ngừng tiến bộ hơn!';
+    } else if (correctAnswersCount == widget.words.length) {
+      congratulation = 'Hoàn hảo là một từ ngữ dùng để miêu tả bạn đấy';
     } else {
       congratulation =
           'Cõ lẽ một chút may mắn là điều bạn mong lúc này nhưng đứng quên nâng cao kiến thức bản thân nữa nhé';
@@ -126,9 +131,11 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   _buildStatsSection() {
+    int wrongCount = widget.words.length - correctAnswersCount;
+
     return Row(
       children: [
-        Expanded(flex: 1, child: _buildProgressPie()),
+        Expanded(flex: 1, child: _buildProgressPie(correctAnswersCount)),
         const SizedBox(width: 20),
         Expanded(
           flex: 2,
@@ -145,7 +152,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                   ),
                   Text(
-                    '${widget.correctAnswers.length}',
+                    '$correctAnswersCount',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: correctColor,
@@ -165,7 +172,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                   ),
                   Text(
-                    '${widget.wrongAnswers.length}',
+                    '$wrongCount',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: wrongColor,
@@ -180,7 +187,7 @@ class _ResultPageState extends State<ResultPage> {
     );
   }
 
-  _buildProgressPie() {
+  _buildProgressPie(int correctCount) {
     return SimpleCircularProgressBar(
       mergeMode: true,
       valueNotifier: valueNotifier,
@@ -203,21 +210,24 @@ class _ResultPageState extends State<ResultPage> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       separatorBuilder: (context, index) => const SizedBox(height: 20),
-      itemCount: widget.topic.words.length,
+      itemCount: widget.words.length,
       itemBuilder: _createAnswer,
     );
   }
 
   Widget _createAnswer(BuildContext context, int index) {
-    var word = widget.topic.words[index];
-    var questionText =
-        widget.mode == 'en-vie' ? word.terminology : word.meaning;
-    var correctAnswer =
-        widget.mode == 'en-vie' ? word.meaning : word.terminology;
+    var word = widget.words[index];
 
     var userAnswer = widget.userAnswers[index];
 
-    bool isCorrect = correctAnswer.toLowerCase() == userAnswer?.toLowerCase();
+    var questionText = word.terminology;
+    if (userAnswer?.correctAnswer.toLowerCase() ==
+        word.terminology.toLowerCase()) {
+      questionText = word.meaning;
+    }
+
+    bool isCorrect = userAnswer?.userAnswer?.toLowerCase() ==
+        userAnswer?.correctAnswer.toLowerCase();
 
     return Container(
       decoration: const BoxDecoration(
@@ -258,7 +268,7 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                   const WidgetSpan(child: SizedBox(width: 10)),
                   TextSpan(
-                    text: userAnswer ?? '[Không có câu trả lời]',
+                    text: userAnswer?.userAnswer ?? '[Không có câu trả lời]',
                     style: TextStyle(
                       color: isCorrect ? Colors.green : Colors.red,
                       fontWeight: FontWeight.bold,
@@ -289,7 +299,7 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                   const WidgetSpan(child: SizedBox(width: 10)),
                   TextSpan(
-                    text: correctAnswer,
+                    text: userAnswer?.correctAnswer,
                     style: const TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.bold,

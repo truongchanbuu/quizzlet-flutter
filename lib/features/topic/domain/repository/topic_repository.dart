@@ -18,6 +18,12 @@ abstract class TopicRepository {
   Future<DataState<void>> addWordToTopic(String topicId, WordModel word);
   Future<DataState<void>> editWordInTopic(String topicId, WordModel editedWord);
   Future<DataState<void>> removeWordFromTopic(String topicId, String wordId);
+  Future<DataState<void>> starWord(
+      String email, String topicId, WordModel word);
+  Future<DataState<void>> unStarWord(
+      String email, String topicId, WordModel word);
+  Future<DataState<List<WordModel>>> getStarredWords(
+      String email, String topicId);
 
   // Folder
   Stream<List<FolderModel>> folders();

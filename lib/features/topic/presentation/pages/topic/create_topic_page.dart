@@ -103,12 +103,16 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
           String title =
               state is CreateTopicFailed ? 'Tạo thất bại' : 'Cập nhật thất bại';
 
+          String? message = state is CreateTopicFailed
+              ? state.message
+              : (state as UpdateTopicFailed).message;
+
           AwesomeDialog(
             context: context,
             dialogType: DialogType.error,
             headerAnimationLoop: false,
             title: title,
-            desc: 'Hãy thử lại sau',
+            desc: 'Hãy thử lại sau: $message',
             btnCancelOnPress: () {},
           ).show();
         } else if (state is CreateTopicSuccess || state is UpdateTopicSuccess) {

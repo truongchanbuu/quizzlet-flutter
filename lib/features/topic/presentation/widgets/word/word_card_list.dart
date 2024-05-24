@@ -1,11 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/widgets/loading_indicator.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/word/remote/word_bloc.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 
 class WordCardList extends StatefulWidget {
-  final List<WordModel> words;
-  const WordCardList({super.key, required this.words});
+  final TopicModel topic;
+  const WordCardList({super.key, required this.topic});
 
   @override
   State<WordCardList> createState() => _WordCardListState();
@@ -16,8 +21,9 @@ class _WordCardListState extends State<WordCardList> {
   Map? _currentVoice;
   int? _speakingIndex;
 
-  late List<bool> _starredStatus;
-  final List<WordModel> _starredWords = [];
+  final currentUser = sl.get<FirebaseAuth>().currentUser!;
+
+  List<WordModel>? _starredWords;
 
   void initTTS() {
     flutterTTS.getVoices.then((data) {
@@ -37,22 +43,43 @@ class _WordCardListState extends State<WordCardList> {
   void initState() {
     super.initState();
     initTTS();
-    _starredStatus = List<bool>.filled(widget.words.length, false);
+    context
+        .read<WordBloc>()
+        .add(GetStarredWords(currentUser.email!, widget.topic.topicId));
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: _buildWordCardItem,
-      itemCount: widget.words.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 10),
+    return BlocConsumer<WordBloc, WordState>(
+      builder: (context, state) {
+        if (state is GettingStarredWords) {
+          return const LoadingIndicator();
+        } else if (state is GetStarredWordsSuccess) {
+          _starredWords = state.starredWords;
+        } else {
+          _starredWords = [];
+        }
+
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: _buildWordCardItem,
+          itemCount: widget.topic.words.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 10),
+        );
+      },
+      listener: (context, state) {
+        if (state is WordStarred || state is UnStarred) {
+          context
+              .read<WordBloc>()
+              .add(GetStarredWords(currentUser.email!, widget.topic.topicId));
+        }
+      },
     );
   }
 
   Widget _buildWordCardItem(BuildContext context, int index) {
-    var word = widget.words[index];
+    var word = widget.topic.words[index];
     bool isSpeaking = _speakingIndex == index;
 
     return GestureDetector(
@@ -90,16 +117,19 @@ class _WordCardListState extends State<WordCardList> {
                           ),
                           IconButton(
                             onPressed: () {
-                              setState(() {
-                                _starredStatus[index] = !_starredStatus[index];
-                                if (_starredStatus[index]) {
-                                  _starredWords.add(word);
-                                } else {
-                                  _starredWords.remove(word);
-                                }
-                              });
+                              if (_starredWords?.contains(word) ?? false) {
+                                context.read<WordBloc>().add(UnStarWord(
+                                    email: currentUser.email!,
+                                    topicId: widget.topic.topicId,
+                                    word: word));
+                              } else {
+                                context.read<WordBloc>().add(StarWord(
+                                    email: currentUser.email!,
+                                    topicId: widget.topic.topicId,
+                                    word: word));
+                              }
                             },
-                            icon: _starredStatus[index]
+                            icon: _starredWords?.contains(word) ?? false
                                 ? const Icon(Icons.star)
                                 : const Icon(Icons.star_border),
                           )

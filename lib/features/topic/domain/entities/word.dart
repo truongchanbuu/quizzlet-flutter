@@ -9,7 +9,6 @@ class WordEntity extends Equatable {
   String? phonetic;
   String? illustratorUrl;
   LearnState learnState;
-  bool starred;
 
   WordEntity({
     required this.wordId,
@@ -19,7 +18,6 @@ class WordEntity extends Equatable {
     this.phonetic,
     this.illustratorUrl,
     this.learnState = LearnState.notLearn,
-    this.starred = false,
   });
 
   @override
@@ -31,6 +29,5 @@ class WordEntity extends Equatable {
         wordDesc,
         illustratorUrl,
         learnState,
-        starred
       ];
 }

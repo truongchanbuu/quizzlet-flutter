@@ -1,14 +1,25 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
+import 'package:quizzlet_fluttter/features/result/data/models/result.dart';
+import 'package:quizzlet_fluttter/features/result/presentation/bloc/result/result_bloc.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/user_answer.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
-import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/result_page.dart';
+import 'package:quizzlet_fluttter/features/result/presentation/pages/result_page.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
 
 class QuizExamPage extends StatefulWidget {
-  final TopicModel topic;
+  final String topicId;
+  final List<WordModel> words;
   final String mode;
-  const QuizExamPage({super.key, required this.topic, this.mode = 'en-vie'});
+
+  const QuizExamPage({
+    super.key,
+    required this.topicId,
+    required this.words,
+    this.mode = 'en-vie',
+  });
 
   @override
   State<QuizExamPage> createState() => _QuizExamPageState();
@@ -16,14 +27,13 @@ class QuizExamPage extends StatefulWidget {
 
 class _QuizExamPageState extends State<QuizExamPage> {
   final flutterTTS = sl.get<FlutterTts>();
-  Map? _currentVoice;
   int _currentWordIndex = 0;
 
-  List<WordModel> wrongAnswers = List.empty(growable: true);
-  List<WordModel> correctAnswers = List.empty(growable: true);
   String? selectedAnswer;
-  late List<String?> userAnswers;
+  late List<UserAnswerModel> userAnswers;
 
+  DateTime startTime = DateTime.now();
+  late Duration completedTime;
   bool _isFinished = false;
 
   void initTTS() {
@@ -31,9 +41,6 @@ class _QuizExamPageState extends State<QuizExamPage> {
       try {
         List<Map> voices = List.from(data);
         voices = voices.where((voice) => voice['name'].contains('en')).toList();
-        setState(() {
-          _currentVoice = voices.first;
-        });
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -44,22 +51,30 @@ class _QuizExamPageState extends State<QuizExamPage> {
   void initState() {
     super.initState();
     initTTS();
-    userAnswers = List.filled(widget.topic.words.length, null);
+    userAnswers = List.empty(growable: true);
   }
 
   @override
   Widget build(BuildContext context) {
+    final words = widget.words;
+
     return Scaffold(
-      appBar: _buildAppBar(),
-      body: _buildBody(),
+      appBar: _buildAppBar(words),
+      body: _buildBody(words),
     );
   }
 
-  _buildAppBar() {
-    var percentage = (_currentWordIndex + 1) / widget.topic.words.length;
+  _buildAppBar(List<WordModel> words) {
+    double percentage = 0;
+    if (words.isNotEmpty) {
+      percentage = (_currentWordIndex + 1) / words.length;
+    }
+
     return AppBar(
       title: Text(
-        '${_currentWordIndex + 1} / ${widget.topic.words.length}',
+        words.isEmpty
+            ? '0 / 0'
+            : '${_currentWordIndex + 1} / ${widget.words.length}',
         style: const TextStyle(
           color: Colors.black,
         ),
@@ -74,15 +89,28 @@ class _QuizExamPageState extends State<QuizExamPage> {
         ),
       ),
       leading: IconButton(
-        onPressed: () => Navigator.popUntil(context,
-            ModalRoute.withName('/topic/detail/${widget.topic.topicId}')),
+        onPressed: () => Navigator.popUntil(
+            context, ModalRoute.withName('/topic/detail/${widget.topicId}')),
         icon: const Icon(Icons.close),
       ),
     );
   }
 
   List<String>? currentOptions;
-  _buildBody() {
+  _buildBody(List<WordModel> words) {
+    if (words.isEmpty) {
+      return const Center(
+        child: Text(
+          'Bạn hiện đang không đánh sao bất kỳ từ vựng nào. Hãy đánh sao từ vựng cần thiết để học nhé',
+          style: TextStyle(
+            color: Colors.grey,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+      );
+    }
+
     List<String> options;
     if (selectedAnswer != null && currentOptions != null) {
       options = currentOptions!;
@@ -92,8 +120,8 @@ class _QuizExamPageState extends State<QuizExamPage> {
     }
 
     var questionText = widget.mode == 'en-vie'
-        ? widget.topic.words[_currentWordIndex].terminology
-        : widget.topic.words[_currentWordIndex].meaning;
+        ? words[_currentWordIndex].terminology
+        : words[_currentWordIndex].meaning;
 
     if (widget.mode == 'en-vie' && selectedAnswer == null && !_isFinished) {
       flutterTTS.speak(questionText);
@@ -117,11 +145,10 @@ class _QuizExamPageState extends State<QuizExamPage> {
                         fontSize: 18,
                       ),
                     ),
-                    if (widget.topic.words[_currentWordIndex].illustratorUrl !=
-                        null) ...[
+                    if (words[_currentWordIndex].illustratorUrl != null) ...[
                       const SizedBox(height: 5),
                       Image.network(
-                        widget.topic.words[_currentWordIndex].illustratorUrl!,
+                        words[_currentWordIndex].illustratorUrl!,
                         width: 100,
                         height: 100,
                         errorBuilder: (context, error, stackTrace) =>
@@ -145,9 +172,8 @@ class _QuizExamPageState extends State<QuizExamPage> {
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: 10),
                 itemCount: options.length,
-                itemBuilder: (context, index) => _createOptions(
-                  options[index],
-                ),
+                itemBuilder: (context, index) =>
+                    _createOptions(words, options[index]),
               ),
             ),
           ),
@@ -156,65 +182,65 @@ class _QuizExamPageState extends State<QuizExamPage> {
     );
   }
 
- Widget _createOptions(String option) {
-  final isCorrectAnswer = (widget.mode == 'en-vie'
-      ? option == widget.topic.words[_currentWordIndex].meaning
-      : option == widget.topic.words[_currentWordIndex].terminology);
+  Widget _createOptions(List<WordModel> words, String option) {
+    final isCorrectAnswer =
+        option == getCorrectAnswer(words[_currentWordIndex]);
 
-  final isSelected = selectedAnswer == option;
+    final isSelected = selectedAnswer == option;
 
-  Color tileColor = Colors.white;
-  Color textColor = Colors.black;
+    Color tileColor = Colors.white;
+    Color textColor = Colors.black;
 
-  if (selectedAnswer != null) {
-    if (isSelected) {
-      tileColor = isCorrectAnswer ? Colors.green : Colors.red;
-      textColor = Colors.white;
-    } else if (isCorrectAnswer) {
-      tileColor = Colors.green;
-      textColor = Colors.white;
+    if (selectedAnswer != null) {
+      if (isSelected) {
+        tileColor = isCorrectAnswer ? Colors.green : Colors.red;
+        textColor = Colors.white;
+      } else if (isCorrectAnswer) {
+        tileColor = Colors.green;
+        textColor = Colors.white;
+      }
     }
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.indigo, width: 2),
+        color: tileColor,
+      ),
+      child: ListTile(
+        onTap: selectedAnswer == null && !_isFinished
+            ? () {
+                if (widget.mode == 'vie-en') {
+                  flutterTTS.speak(option);
+                }
+
+                _checkAnswer(option);
+              }
+            : null,
+        title: Text(
+          option,
+          style: TextStyle(color: textColor),
+        ),
+      ),
+    );
   }
 
-  return Container(
-    decoration: BoxDecoration(
-      border: Border.all(color: Colors.indigo, width: 2),
-      color: tileColor,
-    ),
-    child: ListTile(
-      onTap: selectedAnswer == null && !_isFinished
-          ? () {
-              if (widget.mode == 'vie-en') {
-                flutterTTS.speak(option);
-              }
-              _checkAnswer(option);
-            }
-          : null,
-      title: Text(
-        option,
-        style: TextStyle(color: textColor),
-      ),
-    ),
-  );
-}
-
-
   // Handle data
-  getCorrectAnswer() {
-    return widget.mode == 'en-vie'
-        ? widget.topic.words[_currentWordIndex].meaning
-        : widget.topic.words[_currentWordIndex].terminology;
+  getCorrectAnswer(WordModel word) {
+    return widget.mode == 'en-vie' ? word.meaning : word.terminology;
   }
 
   List<String> getOptions() {
-    var correctAnswer = getCorrectAnswer();
-    var incorrectAnswers = widget.topic.words
-        .where((word) => word != widget.topic.words[_currentWordIndex])
-        .map((word) =>
-            widget.mode == 'en-vie' ? word.meaning : word.terminology);
+    var words = widget.words;
+    var correctAnswer = getCorrectAnswer(words[_currentWordIndex]);
+    var incorrectAnswers = words
+        .where((word) => word != words[_currentWordIndex])
+        .map(
+            (word) => widget.mode == 'en-vie' ? word.meaning : word.terminology)
+        .toList()
+      ..shuffle();
 
     if (incorrectAnswers.length > 3) {
-      incorrectAnswers.take(3);
+      incorrectAnswers = incorrectAnswers.take(3).toList();
     }
 
     return incorrectAnswers.toList()
@@ -225,25 +251,23 @@ class _QuizExamPageState extends State<QuizExamPage> {
   _checkAnswer(String answer) {
     setState(() {
       selectedAnswer = answer;
-      userAnswers[_currentWordIndex] = answer;
+      userAnswers.add(UserAnswerModel(
+        topicId: widget.topicId,
+        wordId: widget.words[_currentWordIndex].wordId,
+        userAnswer: selectedAnswer,
+        correctAnswer: getCorrectAnswer(widget.words[_currentWordIndex]),
+      ));
     });
-
-    var currentWord = widget.topic.words[_currentWordIndex];
-    bool isCorrect = answer == getCorrectAnswer();
-
-    if (isCorrect) {
-      correctAnswers.add(currentWord);
-    } else {
-      wrongAnswers.add(currentWord);
-    }
 
     Future.delayed(const Duration(seconds: 1), () => _nextQuiz());
   }
 
   _nextQuiz() {
+    var words = widget.words;
     setState(() {
       selectedAnswer = null;
-      if (_currentWordIndex < widget.topic.words.length - 1) {
+
+      if (_currentWordIndex < words.length - 1) {
         _currentWordIndex++;
       } else {
         _isFinished = true;
@@ -251,18 +275,55 @@ class _QuizExamPageState extends State<QuizExamPage> {
     });
 
     if (_isFinished) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResultPage(
-            topic: widget.topic,
-            mode: widget.mode,
-            correctAnswers: correctAnswers,
-            wrongAnswers: wrongAnswers,
-            userAnswers: userAnswers,
-          ),
-        ),
-      );
+      completedTime = DateTime.now().difference(startTime);
+      _finishExam();
     }
+  }
+
+  _finishExam() {
+    _storeResult();
+    _navigateToResultPage();
+  }
+
+  _storeResult() {
+    var currentUser = sl.get<FirebaseAuth>().currentUser!;
+    var result = ResultModel(
+      email: currentUser.email!,
+      topicId: widget.topicId,
+      userAnswers: userAnswers,
+      totalQuestions: widget.words.length,
+      completionTime: completedTime,
+      score: calculateScore(),
+    );
+
+    context.read<ResultBloc>().add(StoreResult(
+        result: result,
+        topicId: widget.topicId,
+        email: currentUser.email!,
+        examType: 'quiz'));
+  }
+
+  double calculateScore() {
+    int correctAnswers = 0;
+    for (var answer in userAnswers) {
+      if (answer.userAnswer == answer.correctAnswer) {
+        correctAnswers++;
+      }
+    }
+
+    return (correctAnswers / widget.words.length) * 100;
+  }
+
+  _navigateToResultPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(
+          topicId: widget.topicId,
+          words: widget.words,
+          userAnswers: userAnswers,
+        ),
+      ),
+    );
   }
 }

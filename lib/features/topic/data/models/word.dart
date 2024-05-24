@@ -14,7 +14,6 @@ class WordModel extends WordEntity {
     super.phonetic,
     super.illustratorUrl,
     super.learnState,
-    super.starred,
   });
 
   WordEntity toEntity() {
@@ -26,7 +25,6 @@ class WordModel extends WordEntity {
       phonetic: phonetic,
       illustratorUrl: illustratorUrl,
       learnState: learnState,
-      starred: starred,
     );
   }
 
@@ -39,7 +37,6 @@ class WordModel extends WordEntity {
       phonetic: entity.phonetic,
       illustratorUrl: entity.illustratorUrl,
       learnState: entity.learnState,
-      starred: entity.starred,
     );
   }
 
@@ -51,7 +48,6 @@ class WordModel extends WordEntity {
     String? phonetic,
     String? illustratorUrl,
     LearnState? learnState,
-    bool? starred,
   }) {
     return WordModel(
       wordId: wordId ?? this.wordId,
@@ -61,7 +57,6 @@ class WordModel extends WordEntity {
       phonetic: phonetic ?? this.phonetic,
       illustratorUrl: illustratorUrl ?? this.illustratorUrl,
       learnState: learnState ?? this.learnState,
-      starred: starred ?? this.starred,
     );
   }
 

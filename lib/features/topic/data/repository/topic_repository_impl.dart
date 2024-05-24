@@ -12,6 +12,8 @@ import 'package:quizzlet_fluttter/features/topic/domain/repository/topic_reposit
 class TopicRepositoryImpl implements TopicRepository {
   final topicCollection = sl.get<FirebaseFirestore>().collection('topics');
   final folderCollection = sl.get<FirebaseFirestore>().collection('folders');
+  final starredWordsCollection =
+      sl.get<FirebaseFirestore>().collection('starred_words');
   final storage = sl.get<FirebaseStorage>();
 
   // Topic
@@ -86,6 +88,98 @@ class TopicRepositoryImpl implements TopicRepository {
       return const DataSuccess();
     } on FirebaseException catch (e) {
       debugPrint('Deleted failed: ${e.message}');
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<void>> starWord(
+      String email, String topicId, WordModel word) async {
+    try {
+      var userStarredWordDoc =
+          starredWordsCollection.doc(email).collection('topics').doc(topicId);
+      var snapshot = await userStarredWordDoc.get();
+
+      if (snapshot.exists && snapshot.data() != null) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        List<dynamic> words = data['words'] ?? [];
+
+        if (!words.any((wordInDoc) => wordInDoc['wordId'] == word.wordId)) {
+          words.add(word.toJson());
+          await userStarredWordDoc.update({'words': words});
+        }
+      } else {
+        await userStarredWordDoc.set({
+          'words': [word.toJson()]
+        });
+      }
+
+      return const DataSuccess();
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<void>> unStarWord(
+      String email, String topicId, WordModel word) async {
+    try {
+      var userStarredWordDoc =
+          starredWordsCollection.doc(email).collection('topics').doc(topicId);
+      var snapshot = await userStarredWordDoc.get();
+
+      if (snapshot.exists && snapshot.data() != null) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        List<dynamic> words = data['words'] ?? [];
+
+        words.removeWhere((wordInDoc) => wordInDoc['wordId'] == word.wordId);
+
+        await userStarredWordDoc.update({'words': words});
+      }
+
+      return const DataSuccess();
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<List<WordModel>>> getStarredWords(
+      String email, String topicId) async {
+    try {
+      List<WordModel> starredWords = [];
+      var userStarredWordDoc =
+          starredWordsCollection.doc(email).collection('topics').doc(topicId);
+
+      var snapshot = await userStarredWordDoc.get();
+
+      if (snapshot.exists && snapshot.data() != null) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        List<dynamic> words = data['words'] ?? [];
+
+        starredWords = words.map((word) => WordModel.fromJson(word)).toList();
+      }
+
+      return DataSuccess(data: starredWords);
+    } on FirebaseException catch (e) {
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),
@@ -224,7 +318,9 @@ class TopicRepositoryImpl implements TopicRepository {
         }
       }
 
-      await folderCollection.doc(folderId).update({'topics': FieldValue.arrayRemove(topics)});
+      await folderCollection
+          .doc(folderId)
+          .update({'topics': FieldValue.arrayRemove(topics)});
 
       return const DataSuccess();
     } on FirebaseException catch (e) {

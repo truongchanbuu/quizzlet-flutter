@@ -32,8 +32,3 @@ final class RemoveTopic extends TopicEvent {
   final String topicId;
   const RemoveTopic(this.topicId);
 }
-
-final class StarWord extends TopicEvent {
-  final WordModel word;
-  const StarWord(this.word);
-}

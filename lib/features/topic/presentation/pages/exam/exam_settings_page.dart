@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quizzlet_fluttter/features/result/presentation/bloc/result/result_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/quiz_exam_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/exam/typing_exam_page.dart';
+import 'package:toggle_switch/toggle_switch.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class ExamSettingPage extends StatefulWidget {
   final TopicModel topic;
@@ -15,8 +19,9 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
   final _qnALang = const ['en-vie', 'vie-en'];
   final _examTypes = const ['quiz', 'typing'];
 
-  late int _qnALangUserChosen = 0;
-  late int _examChosen = 0;
+  int _qnALangUserChosen = 0;
+  int _examChosen = 0;
+  int _currentLearningContentSelected = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +75,8 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
               subtitle: Text(_examChosen == 0 ? 'Nhiều lựa chọn' : 'Tự luận'),
               trailing: const Icon(Icons.arrow_forward_ios),
             ),
+            const SizedBox(height: 20),
+            _buildContentSelection(),
             const SizedBox(height: 20),
             TextButton(
               onPressed: _doExam,
@@ -196,6 +203,31 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
     );
   }
 
+  _buildContentSelection() {
+    return SizedBox(
+      width: double.infinity,
+      child: ToggleSwitch(
+        onToggle: (index) =>
+            setState(() => _currentLearningContentSelected = index ?? 0),
+        initialLabelIndex: _currentLearningContentSelected,
+        totalSwitches: 2,
+        labels: const ['Tất cả các thẻ', 'Chỉ các thẻ được gắn sao'],
+        activeBgColor: const [Colors.indigo],
+        inactiveBgColor: Colors.white,
+        activeFgColor: Colors.white,
+        inactiveFgColor: Colors.indigo,
+        customWidths: const [double.infinity, double.infinity],
+        customTextStyles: const [
+          TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ],
+        centerText: true,
+        borderColor: const [Colors.indigo],
+      ),
+    );
+  }
+
   _doExam() {
     String type = _examTypes[_examChosen];
     var currentRoute = ModalRoute.of(context);
@@ -209,9 +241,13 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => QuizExamPage(
-            topic: widget.topic,
-            mode: _qnALang[_qnALangUserChosen],
+          builder: (context) => BlocProvider(
+            create: (context) => sl.get<ResultBloc>(),
+            child: QuizExamPage(
+              topicId: widget.topic.topicId,
+              words: widget.topic.words,
+              mode: _qnALang[_qnALangUserChosen],
+            ),
           ),
           settings: RouteSettings(name: fullRouteName),
         ),
@@ -220,9 +256,13 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => TypingExamPage(
-            topic: widget.topic,
-            mode: _qnALang[_qnALangUserChosen],
+          builder: (context) => BlocProvider(
+            create: (context) => sl.get<ResultBloc>(),
+            child: TypingExamPage(
+              words: widget.topic.words,
+              topicId: widget.topic.topicId,
+              mode: _qnALang[_qnALangUserChosen],
+            ),
           ),
         ),
       );
