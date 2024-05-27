@@ -1,13 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
-import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/flashcard/flash_card_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PreviewFlashCardSection extends StatefulWidget {
-  final List<WordModel> words;
-  const PreviewFlashCardSection({super.key, required this.words});
+  final TopicModel topic;
+  const PreviewFlashCardSection({super.key, required this.topic});
 
   @override
   State<PreviewFlashCardSection> createState() =>
@@ -25,7 +25,7 @@ class _PreviewFlashCardSectionState extends State<PreviewFlashCardSection> {
     super.initState();
     _carouselController = CarouselController();
     _flipCardControllers =
-        List.generate(widget.words.length, (_) => FlipCardController());
+        List.generate(widget.topic.words.length, (_) => FlipCardController());
   }
 
   @override
@@ -34,15 +34,16 @@ class _PreviewFlashCardSectionState extends State<PreviewFlashCardSection> {
       children: [
         CarouselSlider.builder(
           carouselController: _carouselController,
-          itemCount: widget.words.length,
+          itemCount: widget.topic.words.length,
           itemBuilder: (context, index, realIndex) => FlipCard(
             controller: _flipCardControllers[index],
             axis: FlipAxis.horizontal,
             onTapFlipping: true,
             rotateSide: RotateSide.bottom,
             animationDuration: const Duration(milliseconds: 500),
-            frontWidget: _buildCard(index, widget.words[index].terminology),
-            backWidget: _buildCard(index, widget.words[index].meaning),
+            frontWidget:
+                _buildCard(index, widget.topic.words[index].terminology),
+            backWidget: _buildCard(index, widget.topic.words[index].meaning),
           ),
           options: CarouselOptions(
             onPageChanged: (index, reason) =>
@@ -58,7 +59,7 @@ class _PreviewFlashCardSectionState extends State<PreviewFlashCardSection> {
         const SizedBox(height: 15),
         AnimatedSmoothIndicator(
           activeIndex: _currentIndex,
-          count: widget.words.length,
+          count: widget.topic.words.length,
           onDotClicked: (index) {
             setState(() => _currentIndex = index);
             _carouselController.animateToPage(index);
@@ -106,7 +107,9 @@ class _PreviewFlashCardSectionState extends State<PreviewFlashCardSection> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FlashCardPage(words: widget.words),
+        builder: (context) => FlashCardPage(
+          topic: widget.topic,
+        ),
         settings: RouteSettings(name: fullRouteName),
       ),
     );

@@ -14,11 +14,13 @@ class TypingExamPage extends StatefulWidget {
   final List<WordModel> words;
   final String topicId;
   final String mode;
+  final bool isShuffling;
 
   const TypingExamPage({
     super.key,
     required this.topicId,
     required this.words,
+    this.isShuffling = false,
     this.mode = 'en-vie',
   });
 
@@ -54,6 +56,10 @@ class _TypingExamPageState extends State<TypingExamPage> {
     initTTS();
     _answerController = TextEditingController();
     userAnswers = List.empty(growable: true);
+
+    if (widget.isShuffling) {
+      widget.words.shuffle();
+    }
   }
 
   @override
@@ -240,11 +246,13 @@ class _TypingExamPageState extends State<TypingExamPage> {
       score: calculateScore(),
     );
 
-    context.read<ResultBloc>().add(StoreResult(
-        result: result,
-        topicId: widget.topicId,
-        email: currentUser.email!,
-        examType: 'typing'));
+    context.read<ResultBloc>().add(
+          StoreResult(
+              result: result,
+              topicId: widget.topicId,
+              email: currentUser.email!,
+              examType: 'typing'),
+        );
   }
 
   double calculateScore() {

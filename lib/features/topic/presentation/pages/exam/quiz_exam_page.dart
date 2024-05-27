@@ -12,10 +12,12 @@ import 'package:quizzlet_fluttter/injection_container.dart';
 class QuizExamPage extends StatefulWidget {
   final String topicId;
   final List<WordModel> words;
+  final bool isShuffling;
   final String mode;
 
   const QuizExamPage({
     super.key,
+    this.isShuffling = false,
     required this.topicId,
     required this.words,
     this.mode = 'en-vie',
@@ -52,6 +54,10 @@ class _QuizExamPageState extends State<QuizExamPage> {
     super.initState();
     initTTS();
     userAnswers = List.empty(growable: true);
+
+    if (widget.isShuffling) {
+      widget.words.shuffle();
+    }
   }
 
   @override

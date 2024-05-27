@@ -162,6 +162,7 @@ class _SignInPageState extends State<SignInPage> {
                 validator: _validateEmail,
                 onSaved: (newValue) => email = newValue,
                 onChanged: (value) => email = value,
+                onFieldSubmitted: (value) => _submitSignInForm(context),
                 autofillHints: const [AutofillHints.email],
                 decoration: InputDecoration(
                   labelText: 'ĐỊA CHỈ EMAIL',
@@ -176,6 +177,7 @@ class _SignInPageState extends State<SignInPage> {
               const SizedBox(height: 10),
               TextFormField(
                 validator: _validatePassword,
+                onFieldSubmitted: (value) => _submitSignInForm(context),
                 onSaved: (newValue) => password = newValue,
                 onChanged: (value) => password = value,
                 obscureText: _isHiddenPassword,

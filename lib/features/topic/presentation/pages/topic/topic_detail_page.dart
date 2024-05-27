@@ -109,7 +109,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PreviewFlashCardSection(words: widget.topic.words),
+                PreviewFlashCardSection(topic: widget.topic),
                 const SizedBox(height: 10),
                 _buildTopicInfoSection(),
                 const SizedBox(height: 20),
@@ -225,7 +225,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FlashCardPage(words: widget.topic.words),
+        builder: (context) => FlashCardPage(
+          topic: widget.topic,
+        ),
         settings: RouteSettings(name: fullRouteName),
       ),
     );

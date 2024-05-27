@@ -131,8 +131,6 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   _buildStatsSection() {
-    int wrongCount = widget.words.length - correctAnswersCount;
-
     return Row(
       children: [
         Expanded(flex: 1, child: _buildProgressPie(correctAnswersCount)),
@@ -172,7 +170,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                   ),
                   Text(
-                    '$wrongCount',
+                    '$wrongAnswersCount',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: wrongColor,

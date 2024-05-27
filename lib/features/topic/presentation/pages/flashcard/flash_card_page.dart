@@ -1,21 +1,43 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_flip_card/flipcard/flip_card.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:quizzlet_fluttter/features/result/presentation/pages/conclusion_page.dart';
+import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/word.dart';
-import 'package:quizzlet_fluttter/features/result/presentation/pages/result_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/flashcard/flash_card_widget.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class FlashCardPage extends StatefulWidget {
-  final List<WordModel> words;
-  const FlashCardPage({super.key, required this.words});
+  final TopicModel topic;
+  final List<WordModel>? words;
+  const FlashCardPage({super.key, required this.topic, this.words});
 
   @override
   State<FlashCardPage> createState() => _FlashCardPageState();
 }
 
 class _FlashCardPageState extends State<FlashCardPage> {
+  final StreamController changeNotifier = StreamController.broadcast();
+  final GlobalKey<FlipCardState> _flipCardKey = GlobalKey();
+
+  final flutterTTS = sl.get<FlutterTts>();
+  void initTTS() {
+    flutterTTS.getVoices.then((data) {
+      try {
+        List<Map> voices = List.from(data);
+        voices = voices.where((voice) => voice['name'].contains('en')).toList();
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    });
+  }
+
   int _currentWordIndex = 0;
-  var _currentStudying = [];
-  var _currentLearned = [];
+  final List<WordModel> _currentStudying = List.empty(growable: true);
+  final List<WordModel> _currentLearned = List.empty(growable: true);
   int _currentFrontFaceSelected = 0;
   int _currentLearningContentSelected = 0;
 
@@ -28,53 +50,43 @@ class _FlashCardPageState extends State<FlashCardPage> {
   bool _isLearnedDrag = false;
   bool _isFinished = false;
 
-  num percentage = 0;
-
   @override
   void initState() {
     super.initState();
+    initTTS();
+  }
+
+  @override
+  void dispose() {
+    changeNotifier.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    var words = widget.words ?? widget.topic.words;
+
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: _buildAppBar(),
-      body: Stack(
+      appBar: _buildAppBar(words),
+      body: Column(
         children: [
-          Column(
-            children: [
-              const SizedBox(height: 10),
-              _buildLearningStats(),
-              const SizedBox(height: 20),
-              _buildFlashCard(context),
-            ],
+          const SizedBox(height: 10),
+          _buildLearningStats(),
+          const SizedBox(height: 10),
+          Expanded(
+            child: _buildFlashCard(words[_currentWordIndex]),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: _buildToolButtons(),
-          ),
-          Positioned(
-            left: 0,
-            child: _buildFlashCardDragTarget(
-              MediaQuery.of(context).size.height,
-              20,
-            ),
-          ),
-          Positioned(
-            right: 0,
-            child: _buildFlashCardDragTarget(
-              MediaQuery.of(context).size.height,
-              20,
-            ),
-          ),
+          const SizedBox(height: 10),
+          _buildToolButtons(),
+          const SizedBox(height: 10),
         ],
       ),
     );
   }
 
-  _buildProgressIndicator() {
-    percentage = (_currentWordIndex + 1) / widget.words.length;
+  _buildProgressIndicator(words) {
+    var percentage = (_currentWordIndex + 1) / words.length;
     return LinearProgressIndicator(
       value: percentage.toDouble(),
       semanticsLabel: 'Your learning progress',
@@ -134,10 +146,10 @@ class _FlashCardPageState extends State<FlashCardPage> {
     );
   }
 
-  _buildAppBar() {
+  _buildAppBar(words) {
     return AppBar(
       title: Text(
-        '${_currentWordIndex + 1} / ${widget.words.length}',
+        '${_currentWordIndex + 1} / ${words.length}',
         style: const TextStyle(color: Colors.black),
       ),
       centerTitle: true,
@@ -149,27 +161,27 @@ class _FlashCardPageState extends State<FlashCardPage> {
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: _buildProgressIndicator(),
+        child: _buildProgressIndicator(words),
       ),
     );
   }
 
   _buildToolButtons() {
     const textStyle = TextStyle(color: Colors.black, fontSize: 11);
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            onPressed: _currentWordIndex == 0 ? null : () {},
+            onPressed: _currentWordIndex == 0 ? null : _undoCard,
             icon: const Icon(Icons.undo),
           ),
           Visibility(
               visible: _isMessageVisible,
               child: Expanded(
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.play_arrow),
                     const SizedBox(width: 10),
@@ -191,6 +203,10 @@ class _FlashCardPageState extends State<FlashCardPage> {
             onPressed: () {
               setState(() => _isPlaying = !_isPlaying);
               _showAutoPlayText();
+
+              if (_isPlaying) {
+                _playAllFlashCard();
+              }
             },
             icon: _isPlaying
                 ? const Icon(Icons.pause)
@@ -357,54 +373,80 @@ class _FlashCardPageState extends State<FlashCardPage> {
     );
   }
 
-  _buildFlashCardDragTarget(double height, double width) {
+  _buildDragTarget(word) {
     return DragTarget(
-      builder: (context, candidateData, rejectedData) {
-        return Container(
-          height: height,
-          width: width,
-          color: Colors.transparent,
-        );
-      },
-      onWillAcceptWithDetails: (details) {
-        return details.data is WordModel;
-      },
+      builder: (context, candidateData, rejectedData) => SizedBox(
+        height: MediaQuery.of(context).size.height,
+      ),
+      onWillAcceptWithDetails: (details) => details.data is WordModel,
       onAcceptWithDetails: (details) {
-        _changeFlashCard(details.data as WordModel);
+        if (_isStudyingDrag) {
+          _currentStudying.add(word);
+        } else {
+          _currentLearned.add(word);
+        }
+        _changeFlashCard();
       },
-      onLeave: (data) {},
+      onMove: (details) {
+        var dx = details.offset.dx;
+        if (dx > 0) {
+          setState(() {
+            _isLearnedDrag = true;
+            _isStudyingDrag = false;
+          });
+        } else if (dx < 0) {
+          setState(() {
+            _isStudyingDrag = true;
+            _isLearnedDrag = false;
+          });
+        } else {
+          setState(() {
+            _isLearnedDrag = false;
+            _isStudyingDrag = false;
+          });
+        }
+      },
     );
   }
 
-  _buildFlashCard(BuildContext context) {
-    return Draggable(
-      data: widget.words[_currentWordIndex],
-      onDragUpdate: _dragProcess,
-      onDragEnd: _dragEnd,
-      feedback: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 40),
-        child: FlashCard(
-          word: widget.words[_currentWordIndex],
-        ),
-      ),
-      childWhenDragging: Container(
-        width: MediaQuery.of(context).size.width - 100,
-        height: MediaQuery.of(context).size.height - 250,
-        margin: const EdgeInsets.symmetric(horizontal: 40),
-        child: const Card(
-          elevation: 3,
-          child: Center(
-            child: Text(
-              '',
-              semanticsLabel: '',
-              textAlign: TextAlign.center,
+  _buildFlashCard(WordModel word) {
+    return Row(
+      children: [
+        Expanded(flex: 1, child: _buildDragTarget(word)),
+        Expanded(
+          flex: 5,
+          child: Draggable(
+            data: word,
+            onDragEnd: _dragEnd,
+            feedback: FlashCard(word: word),
+            childWhenDragging: Card(
+              shape: const RoundedRectangleBorder(
+                side: BorderSide(color: Colors.transparent),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              elevation: 3,
+              child: GestureDetector(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 100,
+                  height: MediaQuery.of(context).size.height - 200,
+                  child: const Center(
+                    child: Text(
+                      '',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            child: FlashCard(
+              key: _flipCardKey,
+              word: word,
+              notifyToFlipCard: changeNotifier.stream,
             ),
           ),
         ),
-      ),
-      child: FlashCard(
-        word: widget.words[_currentWordIndex],
-      ),
+        Expanded(flex: 1, child: _buildDragTarget(word)),
+      ],
     );
   }
 
@@ -423,75 +465,91 @@ class _FlashCardPageState extends State<FlashCardPage> {
     );
   }
 
-  _dragProcess(DragUpdateDetails details) {
-    var dx = details.delta.dx;
-
-    if (dx > 0) {
-      setState(() {
-        _isLearnedDrag = true;
-        _isStudyingDrag = false;
-      });
-    } else if (dx < 0) {
-      setState(() {
-        _isStudyingDrag = true;
-        _isLearnedDrag = false;
-      });
-    } else {
-      setState(() {
-        _isLearnedDrag = false;
-        _isStudyingDrag = false;
-      });
-    }
-  }
-
   _dragEnd(DraggableDetails details) {
     setState(() {
       _isStudyingDrag = false;
       _isLearnedDrag = false;
     });
-
-    var dx = details.velocity.pixelsPerSecond.dx;
-
-    // if (dx > 0) {
-    //   _changeFlashCard(widget.words[_currentWordIndex]);
-    // } else if (dx < 0) {
-    //   _changeFlashCard(widget.words[_currentWordIndex]);
-    // }
   }
 
-  _changeFlashCard(WordModel word) {
-    if (_currentWordIndex < widget.words.length - 1) {
+  _changeFlashCard() {
+    var words = widget.words ?? widget.topic.words;
+
+    if (_currentWordIndex < words.length - 1) {
       setState(() {
         _currentWordIndex++;
-        if (_isStudyingDrag) {
-          _currentStudying.add(word);
-        } else if (_isLearnedDrag) {
-          _currentLearned.add(word);
-        }
       });
     } else {
-      setState(() => _isFinished = true);
+      setState(() {
+        _isPlaying = false;
+        _isFinished = true;
+      });
     }
 
     if (_isFinished) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Scaffold(
-            appBar: AppBar(),
-            body: const Center(
-              child: Text(
-                'Chức năng hiện đang trong quá trình phát triển',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-          ),
+      _navigateConclusionPage();
+    }
+  }
+
+  _navigateConclusionPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ConclusionPage(
+          studyingWords: _currentStudying,
+          learnedWords: _currentLearned,
+          topic: widget.topic,
         ),
-      );
+      ),
+    );
+  }
+
+  _undoCard() {
+    var words = widget.words ?? widget.topic.words;
+
+    setState(() {
+      _currentWordIndex--;
+      _currentLearned.removeWhere(
+          (word) => word.wordId == words[_currentWordIndex].wordId);
+      _currentStudying.removeWhere(
+          (word) => word.wordId == words[_currentWordIndex].wordId);
+    });
+  }
+
+  Future<void> _speak(String text) async {
+    await flutterTTS.speak(text);
+  }
+
+  Future<void> _playAllFlashCard() async {
+    var words = widget.words ?? widget.topic.words;
+
+    while (_currentWordIndex < words.length && _isPlaying) {
+      var currentWord = words[_currentWordIndex];
+
+      String firstText = _flipCardKey.currentState?.isFront ?? true
+          ? currentWord.terminology
+          : currentWord.meaning;
+
+      String secondText = firstText == currentWord.terminology
+          ? currentWord.meaning
+          : currentWord.terminology;
+
+      await _speak(firstText);
+      await flutterTTS.awaitSpeakCompletion(true);
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (_isPlaying) {
+        changeNotifier.sink.add(null);
+        await Future.delayed(const Duration(seconds: 1));
+        await _speak(secondText);
+        await flutterTTS.awaitSpeakCompletion(true);
+        await Future.delayed(const Duration(seconds: 1));
+
+        setState(() {
+          _currentLearned.add(currentWord);
+          _changeFlashCard();
+        });
+      }
     }
   }
 }
