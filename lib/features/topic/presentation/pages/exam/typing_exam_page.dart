@@ -146,7 +146,23 @@ class _TypingExamPageState extends State<TypingExamPage> {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: TextField(
-                onSubmitted: _checkAnswer,
+                onSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    _checkAnswer(value);
+                  } else {
+                    AwesomeDialog(
+                      context: context,
+                      title:
+                          'Bạn chưa nhập câu trả lới! Bạn có chắc muốn bỏ qua câu hỏi này không?',
+                      dialogType: DialogType.info,
+                      headerAnimationLoop: false,
+                      btnCancelOnPress: () {},
+                      btnCancelText: 'Đóng',
+                      btnOkText: 'Bỏ qua',
+                      btnOkOnPress: () => _checkAnswer(value),
+                    ).show();
+                  }
+                },
                 controller: _answerController,
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
@@ -258,12 +274,13 @@ class _TypingExamPageState extends State<TypingExamPage> {
   double calculateScore() {
     int correctAnswers = 0;
     for (var answer in userAnswers) {
-      if (answer.userAnswer == answer.correctAnswer) {
+      if (answer.userAnswer?.toLowerCase() ==
+          answer.correctAnswer.toLowerCase()) {
         correctAnswers++;
       }
     }
 
-    return (correctAnswers / widget.words.length) * 100;
+    return ((correctAnswers / widget.words.length) * 100).roundToDouble();
   }
 
   _navigateToResultPage() {

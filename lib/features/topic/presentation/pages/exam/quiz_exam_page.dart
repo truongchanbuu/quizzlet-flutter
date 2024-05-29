@@ -317,7 +317,7 @@ class _QuizExamPageState extends State<QuizExamPage> {
       }
     }
 
-    return (correctAnswers / widget.words.length) * 100;
+    return ((correctAnswers / widget.words.length) * 100).roundToDouble();
   }
 
   _navigateToResultPage() {

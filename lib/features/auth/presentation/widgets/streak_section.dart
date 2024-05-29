@@ -23,6 +23,7 @@ class _StreakDaySectionState extends State<StreakDaySection> {
           'Thành tựu',
           style: TextStyle(
             fontWeight: FontWeight.bold,
+            color: Colors.grey,
           ),
         ),
         const SizedBox(height: 10),
@@ -124,7 +125,8 @@ class _StreakDaySectionState extends State<StreakDaySection> {
       direction: Axis.horizontal,
       crossAxisAlignment: WrapCrossAlignment.center,
       alignment: WrapAlignment.spaceBetween,
-      spacing: 20,
+      spacing: 50,
+      runSpacing: 20,
       children: weekDays.map((day) {
         var streakDays = _getStreakDays(streak);
         final weekDate = _getWeekdayDay(day);

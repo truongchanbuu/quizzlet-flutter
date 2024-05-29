@@ -21,7 +21,11 @@ final class GetUserResultFailed extends ResultState {}
 
 final class GettingUserResult extends ResultState {}
 
-final class GetAllResultsByTopicSuccess extends ResultState {}
+final class GetAllResultsByTopicSuccess extends ResultState {
+  final List<ResultModel> results;
+
+  const GetAllResultsByTopicSuccess(this.results);
+}
 
 final class GetAllResultsByTopicFailed extends ResultState {}
 

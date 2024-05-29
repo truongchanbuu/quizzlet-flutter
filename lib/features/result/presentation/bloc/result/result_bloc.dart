@@ -27,5 +27,23 @@ class ResultBloc extends Bloc<ResultEvent, ResultState> {
         emit(ResultStoreFailed());
       }
     });
+
+    on<GetAllResultsByTopicAndExamType>((event, emit) async {
+      try {
+        var dataState = await _resultRepository.getResultsByTopicAndExamType(
+            event.topicId, event.examType);
+
+        if (dataState is DataFailed) {
+          emit(GetAllResultsByTopicFailed());
+        } else if (dataState is DataSuccess && dataState.data != null) {
+          emit(GettingAllResultsByTopic());
+          emit(GetAllResultsByTopicSuccess(dataState.data!));
+        } else {
+          emit(GettingAllResultsByTopic());
+        }
+      } catch (e) {
+        emit(GetAllResultsByTopicFailed());
+      }
+    });
   }
 }

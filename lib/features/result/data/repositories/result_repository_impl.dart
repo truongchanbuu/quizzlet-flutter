@@ -9,10 +9,11 @@ class ResultRepositoryImp implements ResultRepository {
   final resultCollections = sl.get<FirebaseFirestore>().collection('results');
 
   @override
-  Future<DataState<ResultModel>> getResult(String email, String topicId) async {
+  Future<DataState<ResultModel>> getResult(
+      String email, String topicId, String examType) async {
     try {
       var docRef =
-          resultCollections.doc(email).collection('topics').doc(topicId);
+          resultCollections.doc(topicId).collection(examType).doc(email);
       var snapshot = await docRef.get();
       var data = snapshot.data();
 
@@ -33,7 +34,7 @@ class ResultRepositoryImp implements ResultRepository {
       String email, String topicId, String examType, ResultModel result) async {
     try {
       var docRef =
-          resultCollections.doc(email).collection(topicId).doc(examType);
+          resultCollections.doc(topicId).collection(examType).doc(email);
       var snapshot = await docRef.get();
 
       if (snapshot.exists && snapshot.data() != null) {
@@ -55,12 +56,21 @@ class ResultRepositoryImp implements ResultRepository {
   }
 
   @override
-  Future<DataState<List<ResultModel>>> getResultsByTopic(String topicId) async {
+  Future<DataState<List<ResultModel>>> getResultsByTopicAndExamType(
+      String topicId, String examType) async {
     try {
-      var docRef = resultCollections.get();
-      print(docRef);
+      List<ResultModel> results = [];
 
-      return const DataSuccess(data: []);
+      var examTypeCollection =
+          resultCollections.doc(topicId).collection(examType);
+
+      var snapshot = await examTypeCollection.get();
+
+      for (var doc in snapshot.docs) {
+        results.add(ResultModel.fromJson(doc.data()));
+      }
+
+      return DataSuccess(data: results);
     } on FirebaseException catch (e) {
       return DataFailed(
         error: DioException(

@@ -5,9 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/core/constants/constants.dart';
 import 'package:quizzlet_fluttter/core/util/shared_preference_util.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/user_info_page.dart';
+import 'package:quizzlet_fluttter/features/result/presentation/bloc/result/result_bloc.dart';
+import 'package:quizzlet_fluttter/features/result/presentation/widgets/ranking_table.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/search_box.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/streak_section.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/pages/lib_page.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/widgets/folder/create_folder_dialog.dart';
 import 'package:quizzlet_fluttter/injection_container.dart';
@@ -61,12 +64,20 @@ class _HomePageState extends State<HomePage> {
     storeStreakInfo();
     pageController = PageController();
     pages = [
-      const Padding(
-        padding: EdgeInsets.all(20.0),
+      Padding(
+        padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              StreakDaySection(),
+              const StreakDaySection(),
+              const SizedBox(height: 20),
+              MultiBlocProvider(
+                providers: [
+                  BlocProvider(create: (context) => sl.get<TopicBloc>()),
+                  BlocProvider(create: (context) => sl.get<ResultBloc>()),
+                ],
+                child: const RankingTable(),
+              ),
             ],
           ),
         ),

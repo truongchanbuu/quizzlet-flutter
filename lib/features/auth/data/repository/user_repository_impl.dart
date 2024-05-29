@@ -103,7 +103,8 @@ class UserRepositoryImpl implements UserRepository {
       switch (loginResult.status) {
         case LoginStatus.success:
           final OAuthCredential facebookAuthCredential =
-              FacebookAuthProvider.credential(loginResult.accessToken!.token);
+              FacebookAuthProvider.credential(
+                  loginResult.accessToken!.tokenString);
           var userCredential =
               await firebaseAuth.signInWithCredential(facebookAuthCredential);
 

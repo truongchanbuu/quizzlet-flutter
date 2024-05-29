@@ -31,7 +31,9 @@ class _ResultPageState extends State<ResultPage> {
   void initState() {
     super.initState();
     correctAnswersCount = widget.userAnswers
-        .where((answer) => answer?.correctAnswer == answer?.userAnswer)
+        .where((answer) =>
+            answer?.correctAnswer.toLowerCase() ==
+            answer?.userAnswer?.toLowerCase())
         .length;
     wrongAnswersCount = widget.words.length - correctAnswersCount;
 

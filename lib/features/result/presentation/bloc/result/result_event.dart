@@ -28,8 +28,12 @@ final class GetUserResultByTopic extends ResultEvent {
   const GetUserResultByTopic(this.email, this.topicId);
 }
 
-final class GetAllResultsByTopic extends ResultEvent {
+final class GetAllResultsByTopicAndExamType extends ResultEvent {
   final String topicId;
+  final String examType;
 
-  const GetAllResultsByTopic(this.topicId);
+  const GetAllResultsByTopicAndExamType({
+    required this.topicId,
+    required this.examType,
+  });
 }
