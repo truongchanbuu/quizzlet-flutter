@@ -50,61 +50,34 @@ class _RankingTableState extends State<RankingTable> {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Chọn chủ để',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+            _buildTitle('Chọn chủ đề'),
+            const SizedBox(width: 20),
+            buildDropdown<TopicModel>(
+              items: topics,
+              selectedItem: selectedTopic,
+              hintText: 'Chủ đề',
+              itemBuilder: _createDropdownItem,
+              onChanged: (topic) {
+                setState(() => selectedTopic = topic);
+                if (selectedTopic != null) {
+                  _getResults(context);
+                }
+              },
             ),
             const SizedBox(width: 20),
-            Expanded(
-              child: DropdownButton<TopicModel>(
-                items:
-                    topics.map((topic) => _createDropdownItem(topic)).toList(),
-                hint: const Text('Chủ đề'),
-                isExpanded: true,
-                value: selectedTopic,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                onChanged: (topic) {
-                  setState(() => selectedTopic = topic);
-                  context
-                      .read<ResultBloc>()
-                      .add(GetAllResultsByTopicAndExamType(
-                        topicId: selectedTopic!.topicId,
-                        examType: examType.toLowerCase(),
-                      ));
-                },
-              ),
-            ),
+            _buildTitle('Chọn loại kiểm tra'),
             const SizedBox(width: 20),
-            const Text(
-              'Chọn loại kiểm tra',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: DropdownButton<String>(
-                items: const [
-                  DropdownMenuItem(value: 'Quiz', child: Text('Quiz')),
-                  DropdownMenuItem(value: 'Typing', child: Text('Typing')),
-                ],
-                isExpanded: true,
-                value: examType,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                onChanged: (type) {
-                  setState(() => examType = type ?? 'Quiz');
-                  if (selectedTopic != null) {
-                    context
-                        .read<ResultBloc>()
-                        .add(GetAllResultsByTopicAndExamType(
-                          topicId: selectedTopic!.topicId,
-                          examType: examType.toLowerCase(),
-                        ));
-                  }
-                },
-              ),
+            buildDropdown<String>(
+              items: ['Quiz', 'Typing'],
+              selectedItem: examType,
+              hintText: 'Chọn loại kiểm tra',
+              itemBuilder: (type) => Text(type),
+              onChanged: (type) {
+                setState(() => examType = type ?? 'Quiz');
+                if (selectedTopic != null) {
+                  _getResults(context);
+                }
+              },
             ),
           ],
         );
@@ -112,12 +85,38 @@ class _RankingTableState extends State<RankingTable> {
     );
   }
 
-  DropdownMenuItem<TopicModel> _createDropdownItem(TopicModel topic) {
-    return DropdownMenuItem<TopicModel>(
-      onTap: () {},
-      value: topic,
-      child: Text(topic.topicName),
+  Widget buildDropdown<T>({
+    required List<T> items,
+    T? selectedItem,
+    String? hintText,
+    required Widget Function(T) itemBuilder,
+    required void Function(T?) onChanged,
+  }) {
+    return Expanded(
+      child: DropdownButton<T>(
+        items: items
+            .map((item) =>
+                DropdownMenuItem(value: item, child: itemBuilder(item)))
+            .toList(),
+        hint: Text(hintText ?? ''),
+        isExpanded: true,
+        value: selectedItem,
+        onChanged: onChanged,
+      ),
     );
+  }
+
+  Widget _buildTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _createDropdownItem(TopicModel topic) {
+    return Text(topic.topicName);
   }
 
   Widget _buildRankingTable() {
@@ -205,5 +204,12 @@ class _RankingTableState extends State<RankingTable> {
         DataCell(Text(result.completionTime.inSeconds.toString())),
       ],
     );
+  }
+
+  _getResults(BuildContext context) {
+    context.read<ResultBloc>().add(GetAllResultsByTopicAndExamType(
+          topicId: selectedTopic!.topicId,
+          examType: examType.toLowerCase(),
+        ));
   }
 }
