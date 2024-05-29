@@ -14,11 +14,13 @@ class TypingExamPage extends StatefulWidget {
   final List<WordModel> words;
   final String topicId;
   final String mode;
+  final bool isShuffling;
 
   const TypingExamPage({
     super.key,
     required this.topicId,
     required this.words,
+    this.isShuffling = false,
     this.mode = 'en-vie',
   });
 
@@ -54,6 +56,10 @@ class _TypingExamPageState extends State<TypingExamPage> {
     initTTS();
     _answerController = TextEditingController();
     userAnswers = List.empty(growable: true);
+
+    if (widget.isShuffling) {
+      widget.words.shuffle();
+    }
   }
 
   @override
@@ -140,7 +146,23 @@ class _TypingExamPageState extends State<TypingExamPage> {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: TextField(
-                onSubmitted: _checkAnswer,
+                onSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    _checkAnswer(value);
+                  } else {
+                    AwesomeDialog(
+                      context: context,
+                      title:
+                          'Bạn chưa nhập câu trả lới! Bạn có chắc muốn bỏ qua câu hỏi này không?',
+                      dialogType: DialogType.info,
+                      headerAnimationLoop: false,
+                      btnCancelOnPress: () {},
+                      btnCancelText: 'Đóng',
+                      btnOkText: 'Bỏ qua',
+                      btnOkOnPress: () => _checkAnswer(value),
+                    ).show();
+                  }
+                },
                 controller: _answerController,
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
@@ -240,22 +262,25 @@ class _TypingExamPageState extends State<TypingExamPage> {
       score: calculateScore(),
     );
 
-    context.read<ResultBloc>().add(StoreResult(
-        result: result,
-        topicId: widget.topicId,
-        email: currentUser.email!,
-        examType: 'typing'));
+    context.read<ResultBloc>().add(
+          StoreResult(
+              result: result,
+              topicId: widget.topicId,
+              email: currentUser.email!,
+              examType: 'typing'),
+        );
   }
 
   double calculateScore() {
     int correctAnswers = 0;
     for (var answer in userAnswers) {
-      if (answer.userAnswer == answer.correctAnswer) {
+      if (answer.userAnswer?.toLowerCase() ==
+          answer.correctAnswer.toLowerCase()) {
         correctAnswers++;
       }
     }
 
-    return (correctAnswers / widget.words.length) * 100;
+    return ((correctAnswers / widget.words.length) * 100).roundToDouble();
   }
 
   _navigateToResultPage() {

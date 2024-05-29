@@ -21,7 +21,7 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
 
   int _qnALangUserChosen = 0;
   int _examChosen = 0;
-  int _currentLearningContentSelected = 0;
+  int _isShuffling = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,7 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
               trailing: const Icon(Icons.arrow_forward_ios),
             ),
             const SizedBox(height: 20),
-            _buildContentSelection(),
+            _shufflingSelection(),
             const SizedBox(height: 20),
             TextButton(
               onPressed: _doExam,
@@ -203,15 +203,14 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
     );
   }
 
-  _buildContentSelection() {
+  _shufflingSelection() {
     return SizedBox(
       width: double.infinity,
       child: ToggleSwitch(
-        onToggle: (index) =>
-            setState(() => _currentLearningContentSelected = index ?? 0),
-        initialLabelIndex: _currentLearningContentSelected,
+        onToggle: (index) => setState(() => _isShuffling = index ?? 0),
+        initialLabelIndex: _isShuffling,
         totalSwitches: 2,
-        labels: const ['Tất cả các thẻ', 'Chỉ các thẻ được gắn sao'],
+        labels: const ['Sắp xếp theo thứ tự', 'Trộn các thẻ'],
         activeBgColor: const [Colors.indigo],
         inactiveBgColor: Colors.white,
         activeFgColor: Colors.white,
@@ -247,6 +246,7 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
               topicId: widget.topic.topicId,
               words: widget.topic.words,
               mode: _qnALang[_qnALangUserChosen],
+              isShuffling: _isShuffling == 1,
             ),
           ),
           settings: RouteSettings(name: fullRouteName),
@@ -262,6 +262,7 @@ class _ExamSettingPageState extends State<ExamSettingPage> {
               words: widget.topic.words,
               topicId: widget.topic.topicId,
               mode: _qnALang[_qnALangUserChosen],
+              isShuffling: _isShuffling == 1,
             ),
           ),
         ),

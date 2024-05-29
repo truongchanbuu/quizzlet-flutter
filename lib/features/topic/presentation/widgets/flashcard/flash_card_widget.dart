@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -6,29 +8,33 @@ import 'package:quizzlet_fluttter/injection_container.dart';
 
 class FlashCard extends StatefulWidget {
   final WordModel word;
+  final Stream? notifyToFlipCard;
   final Color borderColor;
-  const FlashCard({
+
+  FlashCard({
     super.key,
     required this.word,
+    this.notifyToFlipCard,
     this.borderColor = Colors.transparent,
   });
 
+  final _FlashCardState state = _FlashCardState();
+
   @override
-  State<FlashCard> createState() => _FlashCardState();
+  State<FlashCard> createState() => state;
+
+  late bool? isFront = state._flipCardController.state?.isFront;
 }
 
 class _FlashCardState extends State<FlashCard> {
-  final flutterTTS = sl.get<FlutterTts>();
-  Map? _currentVoice;
+  late final StreamSubscription? streamSubscription;
 
+  final flutterTTS = sl.get<FlutterTts>();
   void initTTS() {
     flutterTTS.getVoices.then((data) {
       try {
         List<Map> voices = List.from(data);
         voices = voices.where((voice) => voice['name'].contains('en')).toList();
-        setState(() {
-          _currentVoice = voices.first;
-        });
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -44,11 +50,9 @@ class _FlashCardState extends State<FlashCard> {
     super.initState();
     initTTS();
     _flipCardController = FlipCardController();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+    streamSubscription = widget.notifyToFlipCard?.listen((_) async {
+      _flipCardController.flipcard();
+    });
   }
 
   final textStyle = const TextStyle(
@@ -83,7 +87,7 @@ class _FlashCardState extends State<FlashCard> {
       onLongPress: () => _showCardDialog(title),
       child: SizedBox(
         width: MediaQuery.of(context).size.width - 100,
-        height: MediaQuery.of(context).size.height - 250,
+        height: MediaQuery.of(context).size.height - 200,
         child: Stack(
           children: [
             Center(
@@ -105,14 +109,7 @@ class _FlashCardState extends State<FlashCard> {
                   color: _isPronouncing ? Colors.grey.withOpacity(0.3) : null,
                 ),
                 child: IconButton(
-                  onPressed: () {
-                    flutterTTS.speak(title).then((value) {
-                      Future.delayed(
-                        const Duration(seconds: 1),
-                        () => setState(() => _isPronouncing = !_isPronouncing),
-                      );
-                    });
-                  },
+                  onPressed: () => _speakText(title),
                   icon: const Icon(Icons.volume_up_outlined),
                 ),
               ),
@@ -144,5 +141,15 @@ class _FlashCardState extends State<FlashCard> {
         ],
       ),
     );
+  }
+
+  _speakText(String title) async {
+    setState(() => _isPronouncing = !_isPronouncing);
+    if (_isPronouncing) {
+      await flutterTTS.speak(title);
+      flutterTTS.setCompletionHandler(() {
+        setState(() => _isPronouncing = !_isPronouncing);
+      });
+    }
   }
 }

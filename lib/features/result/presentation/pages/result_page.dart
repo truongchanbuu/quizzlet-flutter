@@ -31,7 +31,9 @@ class _ResultPageState extends State<ResultPage> {
   void initState() {
     super.initState();
     correctAnswersCount = widget.userAnswers
-        .where((answer) => answer?.correctAnswer == answer?.userAnswer)
+        .where((answer) =>
+            answer?.correctAnswer.toLowerCase() ==
+            answer?.userAnswer?.toLowerCase())
         .length;
     wrongAnswersCount = widget.words.length - correctAnswersCount;
 
@@ -131,8 +133,6 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   _buildStatsSection() {
-    int wrongCount = widget.words.length - correctAnswersCount;
-
     return Row(
       children: [
         Expanded(flex: 1, child: _buildProgressPie(correctAnswersCount)),
@@ -172,7 +172,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                   ),
                   Text(
-                    '$wrongCount',
+                    '$wrongAnswersCount',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: wrongColor,

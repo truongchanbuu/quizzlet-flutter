@@ -17,6 +17,7 @@ class SearchBox extends StatelessWidget {
           ),
         ),
       ),
+      textInputAction: TextInputAction.search,
     );
   }
 }
