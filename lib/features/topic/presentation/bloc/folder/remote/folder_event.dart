@@ -47,3 +47,9 @@ final class RemoveTopicsFromFolder extends FolderEvent {
 
   const RemoveTopicsFromFolder(this.folderId, this.topicIds);
 }
+
+final class GetFoldersByName extends FolderEvent {
+  final String name;
+
+  const GetFoldersByName(this.name);
+}

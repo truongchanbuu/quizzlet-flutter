@@ -191,6 +191,29 @@ class TopicRepositoryImpl implements TopicRepository {
   }
 
   @override
+  Future<DataState<List<TopicModel>>> getTopicsByTopicName(String name) async {
+    try {
+      List<TopicModel> topics = [];
+      var topicsDoc =
+          await topicCollection.where('topicName', isEqualTo: name).get();
+
+      topics = topicsDoc.docs
+          .map((snapshot) => TopicModel.fromJson(snapshot.data()))
+          .toList();
+
+      return DataSuccess(data: topics);
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
   Future<DataState<void>> addWordToTopic(String topicId, WordModel word) {
     // TODO: implement addWordToTopic
     throw UnimplementedError();
@@ -294,6 +317,29 @@ class TopicRepositoryImpl implements TopicRepository {
       await folderCollection.doc(folderId).update({'topics': topics});
 
       return const DataSuccess();
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<List<FolderModel>>> getFoldersByName(String name) async {
+    try {
+      List<FolderModel> folders = [];
+      var foldersDoc =
+          await folderCollection.where('folderName', isEqualTo: name).get();
+
+      folders = foldersDoc.docs
+          .map((snapshot) => FolderModel.fromJson(snapshot.data()))
+          .toList();
+
+      return DataSuccess(data: folders);
     } on FirebaseException catch (e) {
       return DataFailed(
         error: DioException(

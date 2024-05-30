@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quizzlet_fluttter/core/constants/constants.dart';
 import 'package:quizzlet_fluttter/core/util/shared_preference_util.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/pages/account/user_info_page.dart';
+import 'package:quizzlet_fluttter/features/auth/presentation/pages/home/search_page.dart';
 import 'package:quizzlet_fluttter/features/result/presentation/bloc/result/result_bloc.dart';
 import 'package:quizzlet_fluttter/features/result/presentation/widgets/ranking_table.dart';
 import 'package:quizzlet_fluttter/features/auth/presentation/widgets/search_box.dart';
@@ -118,10 +119,12 @@ class _HomePageState extends State<HomePage> {
       bottom: PreferredSize(
           preferredSize:
               Size.fromHeight(MediaQuery.of(context).size.height / 6),
-          child: const SizedBox(
+          child: SizedBox(
             child: Padding(
-              padding: EdgeInsets.only(left: 50, right: 50, bottom: 40),
-              child: SearchBox(),
+              padding: const EdgeInsets.only(left: 50, right: 50, bottom: 40),
+              child: SearchBox(
+                onTap: _navigateToSearchPage,
+              ),
             ),
           )),
       title: const Text(
@@ -280,5 +283,16 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  _navigateToSearchPage() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MultiBlocProvider(providers: [
+            BlocProvider(create: (context) => sl.get<TopicBloc>()),
+            BlocProvider(create: (context) => sl.get<FolderBloc>())
+          ], child: const SearchPage()),
+        ));
   }
 }
