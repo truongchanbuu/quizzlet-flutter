@@ -93,7 +93,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _buildListResults(List results) {
-    print(results);
     return ListView.builder(
       itemCount: results.length,
       itemBuilder: (context, index) => _createResultItem(results[index]),
@@ -131,6 +130,13 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _search(String value) {
+    print(value);
+    if (value.isEmpty) {
+      setState(() {
+        results.clear();
+      });
+    }
+
     if (value.length >= 2) {
       if (debounce?.isActive ?? false) debounce?.cancel();
 
