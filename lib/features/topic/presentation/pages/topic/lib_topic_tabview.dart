@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,7 +21,15 @@ class LibTopicTabView extends StatefulWidget {
 class _LibTopicTabViewState extends State<LibTopicTabView> {
   final currentUser = sl.get<FirebaseAuth>().currentUser!;
 
+  Timer? debounce;
+
   Map<String, List<TopicModel>> groupTopics = {};
+
+  @override
+  void dispose() {
+    debounce?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +41,15 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
                   topic.createdBy == currentUser.email || topic.isPublic)
               .toList());
           return groupTopics.isEmpty ? _buildNoTopicShowedUI() : _buildTopics();
-        } else {
-          return const LoadingIndicator();
+        } else if (state is TopicsLoaded) {
+          groupTopics = _topicsByDate(state.topics
+              .where((topic) =>
+                  topic.createdBy == currentUser.email || topic.isPublic)
+              .toList());
+          return _buildTopics();
         }
+
+        return const LoadingIndicator();
       },
     );
   }
@@ -141,9 +157,9 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
 
   _buildSearchBar() {
     return TextField(
-      onChanged: (value) {},
+      onChanged: _search,
       decoration: const InputDecoration(
-        labelText: 'BỘ LỌC',
+        labelText: 'FILTER',
       ),
     );
   }
@@ -205,5 +221,24 @@ class _LibTopicTabViewState extends State<LibTopicTabView> {
     }
 
     return sortedGroupTopics;
+  }
+
+  _search(String value) {
+    value = value.trim().toLowerCase();
+
+    if (value.isEmpty) {
+      context.read<TopicBloc>().add(const GetTopicsByName(''));
+    }
+
+    if (value.length >= 2) {
+      if (debounce?.isActive ?? false) debounce?.cancel();
+
+      debounce = Timer(
+        const Duration(milliseconds: 500),
+        () {
+          context.read<TopicBloc>().add(GetTopicsByName(value));
+        },
+      );
+    }
   }
 }

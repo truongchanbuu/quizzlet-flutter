@@ -191,6 +191,29 @@ class TopicRepositoryImpl implements TopicRepository {
   }
 
   @override
+  Future<DataState<List<TopicModel>>> getTopicsByTopicName(String name) async {
+    try {
+      List<TopicModel> topics = [];
+      var topicsDoc = await topicCollection.get();
+
+      topics = topicsDoc.docs
+          .map((snapshot) => TopicModel.fromJson(snapshot.data()))
+          .where((topic) => topic.topicName.toLowerCase().contains(name))
+          .toList();
+
+      return DataSuccess(data: topics);
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
   Future<DataState<void>> addWordToTopic(String topicId, WordModel word) {
     // TODO: implement addWordToTopic
     throw UnimplementedError();
@@ -209,7 +232,6 @@ class TopicRepositoryImpl implements TopicRepository {
       await folderCollection.doc(folder.folderId).set(folder.toJson());
       return const DataSuccess();
     } on FirebaseException catch (e) {
-      debugPrint('Created failed: ${e.message}');
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),
@@ -294,6 +316,29 @@ class TopicRepositoryImpl implements TopicRepository {
       await folderCollection.doc(folderId).update({'topics': topics});
 
       return const DataSuccess();
+    } on FirebaseException catch (e) {
+      return DataFailed(
+        error: DioException(
+          requestOptions: RequestOptions(),
+          error: e.code,
+          message: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<List<FolderModel>>> getFoldersByName(String name) async {
+    try {
+      List<FolderModel> folders = [];
+      var foldersDoc = await folderCollection.get();
+
+      folders = foldersDoc.docs
+          .map((snapshot) => FolderModel.fromJson(snapshot.data()))
+          .where((folder) => folder.folderName.toLowerCase().contains(name))
+          .toList();
+
+      return DataSuccess(data: folders);
     } on FirebaseException catch (e) {
       return DataFailed(
         error: DioException(

@@ -32,3 +32,9 @@ final class RemoveTopic extends TopicEvent {
   final String topicId;
   const RemoveTopic(this.topicId);
 }
+
+final class GetTopicsByName extends TopicEvent {
+  final String name;
+
+  const GetTopicsByName(this.name);
+}

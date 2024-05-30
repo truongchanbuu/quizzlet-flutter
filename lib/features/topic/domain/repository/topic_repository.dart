@@ -7,6 +7,7 @@ abstract class TopicRepository {
   // Topic
   Stream<List<TopicModel>> topics();
   Future<DataState<List<TopicModel>>> getTopicsByEmail(String email);
+  Future<DataState<List<TopicModel>>> getTopicsByTopicName(String name);
   Future<DataState<void>> createTopic(TopicModel topic);
   Future<DataState<void>> editTopic(TopicModel editedTopic);
   Future<DataState<void>> deleteTopic(String topicId);
@@ -28,6 +29,7 @@ abstract class TopicRepository {
   // Folder
   Stream<List<FolderModel>> folders();
   Future<DataState<List<FolderModel>>> getFoldersByEmail(String email);
+  Future<DataState<List<FolderModel>>> getFoldersByName(String name);
   Future<DataState<void>> createFolder(FolderModel folder);
   Future<DataState<void>> editFolder(FolderModel editedFolder);
   Future<DataState<void>> deleteFolder(String folderId);

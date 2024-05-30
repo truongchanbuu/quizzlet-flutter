@@ -39,6 +39,24 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
       }
     });
 
+    on<GetFoldersByName>((event, emit) async {
+      try {
+        var dataState = await _topicRepository.getFoldersByName(event.name);
+
+        if (dataState is DataFailed) {
+          emit(FolderLoadFailed(
+              dataState.error?.message ?? 'There is something wrong'));
+        } else if (dataState is DataSuccess) {
+          emit(FolderLoading());
+          emit(FolderLoaded(dataState.data!));
+        } else {
+          emit(FolderLoading());
+        }
+      } catch (e) {
+        emit(FolderLoadFailed(e.toString()));
+      }
+    });
+
     on<CreateFolder>((event, emit) async {
       try {
         var dataState = await _topicRepository.createFolder(event.folder);
@@ -109,16 +127,17 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
 
     on<RemoveTopicsFromFolder>((event, emit) async {
       try {
-        var dataState = await _topicRepository.removeTopicsFromFolder(event.folderId, event.topicIds);
+        var dataState = await _topicRepository.removeTopicsFromFolder(
+            event.folderId, event.topicIds);
 
         if (dataState is DataFailed) {
-          emit(RemoveTopicsFailed(dataState.error?.message ?? 'There is something wrong'));
+          emit(RemoveTopicsFailed(
+              dataState.error?.message ?? 'There is something wrong'));
         } else if (dataState is DataSuccess) {
           emit(RemoveTopicsSuccess());
         } else {
           emit(RemovingTopics());
         }
-
       } catch (e) {
         emit(RemoveTopicsFailed(e.toString()));
       }

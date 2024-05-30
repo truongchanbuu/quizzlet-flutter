@@ -81,10 +81,9 @@ class _LibFolderTabViewState extends State<LibFolderTabView> {
       MaterialPageRoute(
         builder: (context) => BlocProvider(
           create: (context) => sl.get<FolderBloc>(),
-          child: FolderDetailPage(
-            folder: folder,
-          ),
+          child: FolderDetailPage(folder: folder),
         ),
+        settings: RouteSettings(name: '/folder/detail/${folder.folderId}'),
       ),
     );
   }

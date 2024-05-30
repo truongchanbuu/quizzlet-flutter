@@ -105,7 +105,8 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
             dialogType: DialogType.error,
             btnCancelOnPress: () {},
           ).show();
-        } else if (state is DeleteFolderSuccess || state is RemoveTopicsSuccess) {
+        } else if (state is DeleteFolderSuccess ||
+            state is RemoveTopicsSuccess) {
           Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
         }
       },
@@ -213,12 +214,13 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
       );
     }
 
-    return ListView.builder(
+    return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) =>
           _createTopicItem(widget.folder.topics[index]),
       itemCount: widget.folder.topics.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 20),
     );
   }
 
@@ -260,7 +262,7 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
       ),
       items: [
         PopupMenuItem(
-          onTap: ()=> _deleteTopicFromFolder(topic),
+          onTap: () => _deleteTopicFromFolder(topic),
           child: const ListTile(
             title: Text('Xóa'),
           ),
@@ -280,7 +282,6 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
       ),
     );
   }
-
 
   _deleteFolder(BuildContext ctx) {
     showDialog(
