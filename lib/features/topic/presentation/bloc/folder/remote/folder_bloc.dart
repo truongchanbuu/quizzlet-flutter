@@ -47,6 +47,7 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
           emit(FolderLoadFailed(
               dataState.error?.message ?? 'There is something wrong'));
         } else if (dataState is DataSuccess) {
+          emit(FolderLoading());
           emit(FolderLoaded(dataState.data!));
         } else {
           emit(FolderLoading());

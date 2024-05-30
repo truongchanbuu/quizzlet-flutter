@@ -48,6 +48,7 @@ class TopicBloc extends Bloc<TopicEvent, TopicState> {
           emit(TopicsLoadFailure(
               dataState.error?.message ?? 'There is something wrong'));
         } else if (dataState is DataSuccess) {
+          emit(TopicLoading());
           emit(TopicsLoaded(dataState.data!));
         } else {
           emit(TopicLoading());

@@ -24,7 +24,7 @@ class TopicItem extends StatelessWidget {
       onTapDown: onTapDown,
       borderRadius: const BorderRadius.all(Radius.circular(10)),
       child: Material(
-        elevation: 3,
+        elevation: 5,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         child: Container(
           decoration: BoxDecoration(

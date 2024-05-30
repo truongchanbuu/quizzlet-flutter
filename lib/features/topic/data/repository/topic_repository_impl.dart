@@ -194,11 +194,11 @@ class TopicRepositoryImpl implements TopicRepository {
   Future<DataState<List<TopicModel>>> getTopicsByTopicName(String name) async {
     try {
       List<TopicModel> topics = [];
-      var topicsDoc =
-          await topicCollection.where('topicName', isEqualTo: name).get();
+      var topicsDoc = await topicCollection.get();
 
       topics = topicsDoc.docs
           .map((snapshot) => TopicModel.fromJson(snapshot.data()))
+          .where((topic) => topic.topicName.toLowerCase().contains(name))
           .toList();
 
       return DataSuccess(data: topics);
@@ -232,7 +232,6 @@ class TopicRepositoryImpl implements TopicRepository {
       await folderCollection.doc(folder.folderId).set(folder.toJson());
       return const DataSuccess();
     } on FirebaseException catch (e) {
-      debugPrint('Created failed: ${e.message}');
       return DataFailed(
         error: DioException(
           requestOptions: RequestOptions(),
@@ -332,11 +331,11 @@ class TopicRepositoryImpl implements TopicRepository {
   Future<DataState<List<FolderModel>>> getFoldersByName(String name) async {
     try {
       List<FolderModel> folders = [];
-      var foldersDoc =
-          await folderCollection.where('folderName', isEqualTo: name).get();
+      var foldersDoc = await folderCollection.get();
 
       folders = foldersDoc.docs
           .map((snapshot) => FolderModel.fromJson(snapshot.data()))
+          .where((folder) => folder.folderName.toLowerCase().contains(name))
           .toList();
 
       return DataSuccess(data: folders);

@@ -7,6 +7,9 @@ import 'package:quizzlet_fluttter/features/topic/data/models/folder.dart';
 import 'package:quizzlet_fluttter/features/topic/data/models/topic.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/folder/remote/folder_bloc.dart';
 import 'package:quizzlet_fluttter/features/topic/presentation/bloc/topic/remote/topic_bloc.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/folder/folder_detail_page.dart';
+import 'package:quizzlet_fluttter/features/topic/presentation/pages/topic/topic_detail_page.dart';
+import 'package:quizzlet_fluttter/injection_container.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -49,6 +52,8 @@ class _SearchPageState extends State<SearchPage> {
       builder: (context) {
         final topicState = context.watch<TopicBloc>().state;
         final folderState = context.watch<FolderBloc>().state;
+
+        results.clear();
 
         if (topicState is TopicsLoaded) {
           if (topicState.topics.isNotEmpty) {
@@ -102,17 +107,22 @@ class _SearchPageState extends State<SearchPage> {
   _createResultItem(item) {
     String title = '';
     String trailing = '';
+    bool isTopic = false;
 
     if (item[0] is FolderModel) {
+      isTopic = false;
       title = item[0].folderName;
       trailing = 'Folder';
     } else if (item[0] is TopicModel) {
+      isTopic = true;
       title = item[0].topicName;
       trailing = 'Topic';
     }
 
     return ListTile(
-      onTap: () {},
+      onTap: isTopic
+          ? () => _navigateToTopic(item[0])
+          : () => _navigateToFolder(item[0]),
       leading: const Icon(Icons.search),
       title: Text(
         title,
@@ -130,12 +140,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   _search(String value) {
-    print(value);
-    if (value.isEmpty) {
-      setState(() {
-        results.clear();
-      });
-    }
+    value = value.trim().toLowerCase();
 
     if (value.length >= 2) {
       if (debounce?.isActive ?? false) debounce?.cancel();
@@ -148,5 +153,26 @@ class _SearchPageState extends State<SearchPage> {
         },
       );
     }
+  }
+
+  _navigateToTopic(TopicModel topic) {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => BlocProvider(
+                create: (context) => sl.get<TopicBloc>(),
+                child: TopicDetailPage(topic: topic)),
+            settings: RouteSettings(name: '/topic/detail/${topic.topicId}')));
+  }
+
+  _navigateToFolder(FolderModel folder) {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider(
+              create: (context) => sl.get<FolderBloc>(),
+              child: FolderDetailPage(folder: folder)),
+          settings: RouteSettings(name: '/folder/detail/${folder.folderId}'),
+        ));
   }
 }
