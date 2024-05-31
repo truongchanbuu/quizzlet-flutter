@@ -9,7 +9,7 @@ String streakDayKey = 'streak_day';
 String lastLoginDateKey = 'last_login';
 
 String getStreakDayKey(String email) {
-  return '$email-$streakDayKey';
+  return '${email}_$streakDayKey';
 }
 
 Future<void> saveToSharedPref(String key, String? value) async {
@@ -23,11 +23,19 @@ Future<void> deleteToken() async {
 
 Future<int> getStreakDate(String email) async {
   String key = getStreakDayKey(email);
-  return int.parse(await storage.read(key: key) ?? '10');
+
+  var userStreakDay = await storage.read(key: key);
+
+  if (userStreakDay == null) {
+    startStreakDay(email);
+  }
+
+  return int.parse(userStreakDay!);
 }
 
-Future<void> startStreakDay() async {
-  await storage.write(key: streakDayKey, value: '0');
+Future<void> startStreakDay(String email) async {
+  var key = '${email}_$streakDayKey';
+  await storage.write(key: key, value: '0');
 }
 
 Future<void> addStreakDay(String email) async {
@@ -36,23 +44,24 @@ Future<void> addStreakDay(String email) async {
   await storage.write(key: key, value: (streakDay + 1).toString());
 }
 
-Future<void> setLastLogin() async {
-  await storage.write(key: lastLoginDateKey, value: DateTime.now().toString());
+Future<void> setLastLogin(String email) async {
+  var key = '${email}_$lastLoginDateKey';
+  await storage.write(key: key, value: DateTime.now().toString());
 }
 
 Future<void> updateStreakDay(String email) async {
-  var lastLogin =
-      DateTime.tryParse(await storage.read(key: lastLoginDateKey) ?? '');
+  var lastLogin = DateTime.tryParse(
+      await storage.read(key: '${email}_$lastLoginDateKey') ?? '');
 
   if (lastLogin != null) {
     if (isYesterday(lastLogin)) {
       addStreakDay(email);
     } else if (!isToday(lastLogin)) {
-      startStreakDay();
+      startStreakDay(email);
     }
   } else {
-    startStreakDay();
+    startStreakDay(email);
   }
 
-  await setLastLogin();
+  await setLastLogin(email);
 }
