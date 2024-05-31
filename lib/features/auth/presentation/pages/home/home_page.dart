@@ -83,7 +83,13 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      const Text('Loi giai'),
+      const Center(
+        child: Text(
+          'Hiện trong quá trình phát triển',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 20),
+        ),
+      ),
       const LibraryPage(),
       const InfoPage(),
     ];

@@ -106,7 +106,7 @@ class _StreakDaySectionState extends State<StreakDaySection> {
           '$streak STREAK',
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 35,
+            fontSize: 30,
           ),
         ),
         const SizedBox(width: 10),
@@ -121,12 +121,8 @@ class _StreakDaySectionState extends State<StreakDaySection> {
   Widget _buildWeekdaysRow(streak) {
     final weekDays = getWeekDays();
 
-    return Wrap(
-      direction: Axis.horizontal,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      alignment: WrapAlignment.spaceBetween,
-      spacing: 50,
-      runSpacing: 20,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: weekDays.map((day) {
         var streakDays = _getStreakDays(streak);
         final weekDate = _getWeekdayDay(day);
@@ -142,29 +138,31 @@ class _StreakDaySectionState extends State<StreakDaySection> {
   Widget _buildDays(String day, bool isStreakDay) {
     final weekDate = _getWeekdayDay(day);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: isStreakDay ? Colors.indigo : Colors.transparent,
-        shape: BoxShape.circle,
-      ),
-      padding: isStreakDay ? const EdgeInsets.all(15) : null,
-      child: Column(
-        children: [
-          Text(
-            day,
-            style: TextStyle(
-              color: isStreakDay ? Colors.white : null,
-              fontWeight: isStreakDay ? FontWeight.bold : FontWeight.normal,
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          color: isStreakDay ? Colors.indigo : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        padding: const EdgeInsets.all(5),
+        child: Column(
+          children: [
+            Text(
+              day,
+              style: TextStyle(
+                color: isStreakDay ? Colors.white : null,
+                fontWeight: isStreakDay ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
-          ),
-          Text(
-            weekDate,
-            style: TextStyle(
-              color: isStreakDay ? Colors.white : null,
-              fontWeight: isStreakDay ? FontWeight.bold : FontWeight.normal,
+            Text(
+              weekDate,
+              style: TextStyle(
+                color: isStreakDay ? Colors.white : null,
+                fontWeight: isStreakDay ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
