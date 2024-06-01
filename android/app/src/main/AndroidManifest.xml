@@ -20,7 +20,7 @@
     </queries>
 
     <application
-        android:label="quizzlet_fluttter"
+        android:label="Quizzlet"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
